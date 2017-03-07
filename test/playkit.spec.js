@@ -1,5 +1,5 @@
 import chai from 'chai';
-import playkit from 'PlayKit.js/src/playkit';
+import playkit from 'playkit-js/src/playkit';
 import shaka from '../src/shaka';
 
 chai.should();
