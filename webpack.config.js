@@ -5,7 +5,7 @@ const path = require("path");
 
 module.exports = {
   context: __dirname + "/src",
-  entry: "index.js",
+  entry: "shaka.js",
   output: {
     path: __dirname + "/dist",
     filename: '[name].js'

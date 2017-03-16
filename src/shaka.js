@@ -33,5 +33,5 @@ export default class Shaka extends Playkit.BaseMediaSourceHandler{
 }
 
 if( Shaka.isSupported() ){
-  Playkit.addMediaSourceHandler(Shaka);
+  Playkit.registerMediaSourceHandler(Shaka);
 }
