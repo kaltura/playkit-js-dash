@@ -1,6 +1,6 @@
 // @flow
 import shaka from 'shaka-player/dist/shaka-player.compiled';
-import * as Playkit from 'playkit-js/src/playkit';
+import * as Playkit from 'playkit-js';
 
 export default class Shaka extends Playkit.BaseMediaSourceHandler{
 
