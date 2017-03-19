@@ -1,8 +1,9 @@
 // @flow
-import shaka from 'shaka-player/dist/shaka-player.compiled';
+import shaka from 'shaka-player';
+import {BaseMediaSourceHandler} from 'playkit-js';
 import * as Playkit from 'playkit-js';
 
-export default class Shaka extends Playkit.BaseMediaSourceHandler{
+export default class Shaka extends BaseMediaSourceHandler {
 
   static _mimeTypes = ['dash'];
   static _name = 'Shaka';
@@ -14,11 +15,11 @@ export default class Shaka extends Playkit.BaseMediaSourceHandler{
     return shaka.Player.isBrowserSupported();
   }
 
-  static onError(error: Object){
+  static onError(error: Object) {
     super.onError(error);
   }
 
-  constructor(videoElement: HTMLVideoElement, config: Object): Playkit.BaseMediaSourceHandler {
+  constructor(videoElement: HTMLVideoElement, config: Object): BaseMediaSourceHandler {
     super(Shaka._name);
     this._msPlayer = new shaka.Player(videoElement);
     // this._msPlayer.configure(config.shaka);
@@ -32,6 +33,6 @@ export default class Shaka extends Playkit.BaseMediaSourceHandler{
   }
 }
 
-if( Shaka.isSupported() ){
-  Playkit.registerMediaSourceHandler(Shaka);
+if (Shaka.isSupported()) {
+  Playkit.registerHandler(Shaka);
 }
