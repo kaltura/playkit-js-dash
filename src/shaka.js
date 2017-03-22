@@ -31,6 +31,10 @@ export default class Shaka extends BaseMediaSourceHandler {
       this._logger.info('The manifest has been loaded');
     }).catch(Shaka.onError.bind(this));
   }
+
+  destroy(){
+    this._msPlayer.destroy();
+  }
 }
 
 if (Shaka.isSupported()) {

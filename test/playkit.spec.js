@@ -15,12 +15,12 @@ describe('playkit:playkit', function() {
     });
     let video = document.getElementsByTagName("video")[0];
     video.onplaying = function () {
-      true.should.be.true;
+      player.destroy();
       done();
     };
     video.addEventListener('error', function (err) {
-      true.should.be.false;
-      done();
+      player.destroy();
+      should.fail();
     });
     player.play();
   });
