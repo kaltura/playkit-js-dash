@@ -61,11 +61,10 @@ export default class Shaka extends BaseMediaSourceAdapter {
   /**
    * Load the video source
    * @function load
-   * @param {Object} source - The source to load
    * @override
    */
-  load(source: Object) {
-    this._msPlayer.load(source.src).then(() => {
+  load() {
+    this._msPlayer.load(this._source).then(() => {
       // This runs if the asynchronous load is successful.
       this._logger.info('The manifest has been loaded');
     }).catch(Shaka.onError.bind(this));
