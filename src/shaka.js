@@ -50,10 +50,12 @@ export default class Shaka extends BaseMediaSourceAdapter {
   /**
    * @constructor
    * @param {HTMLVideoElement} videoElement - The video element which bind to Shaka
+   * @param {string} source - The source URL
    * @param {Object} config - The engines entry on the player config
    */
-  constructor(videoElement: HTMLVideoElement, config: Object): BaseMediaSourceAdapter {
+  constructor(videoElement: HTMLVideoElement, source: string, config: Object): BaseMediaSourceAdapter {
     super(Shaka._name);
+    this._source = source;
     this._msPlayer = new shaka.Player(videoElement);
     // this._msPlayer.configure(config.shaka);
   }
