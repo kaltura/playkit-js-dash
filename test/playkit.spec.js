@@ -4,24 +4,39 @@ import shaka from '../src/shaka';
 
 chai.should();
 
-describe('playkit:playkit', function() {
+describe('playkit:playkit', function () {
 
   this.timeout(4000);
 
-  it('should play dash stream', (done) => {
+  it('should play dash stream - preload none', (done) => {
     let player = playkit({
-      mimeType: "dash",
-      source: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
+      sources: [{
+        mimetype: "application/dash+xml",
+        src: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
+      }]
     });
     let video = document.getElementsByTagName("video")[0];
     video.onplaying = function () {
       player.destroy();
       done();
     };
-    video.addEventListener('error', function (err) {
-      player.destroy();
-      should.fail();
+    player.load();
+    player.play();
+  });
+
+  it('should play dash stream - preload auto', (done) => {
+    let player = playkit({
+      preload: "auto",
+      sources: [{
+        mimetype: "application/dash+xml",
+        src: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
+      }]
     });
+    let video = document.getElementsByTagName("video")[0];
+    video.onplaying = function () {
+      player.destroy();
+      done();
+    };
     player.play();
   });
 
