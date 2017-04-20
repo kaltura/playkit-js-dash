@@ -1,7 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {BaseMediaSourceAdapter} from 'playkit-js';
-import * as Playkit from 'playkit-js';
+import {BaseMediaSourceAdapter, registerAdapter} from 'playkit-js';
 
 /**
  * Adapter of shaka lib for dash content
@@ -44,19 +43,18 @@ export default class Shaka extends BaseMediaSourceAdapter {
    * @static
    */
   static onError(error: Object) {
-    super.onError(error);
   }
 
   /**
    * @constructor
-   * @param {HTMLVideoElement} videoElement - The video element which bind to Shaka
-   * @param {string} source - The source URL
-   * @param {Object} config - The engines entry on the player config
+   * @param {IEngine} engine - The video element which bind to Shaka
+   * @param {Object} source - The source object
+   * @param {Object} config - The media source adapter configuration
    */
-  constructor(videoElement: HTMLVideoElement, source: string, config: Object): BaseMediaSourceAdapter {
-    super(Shaka._name);
-    this._source = source;
-    this._msPlayer = new shaka.Player(videoElement);
+  constructor(engine: IEngine, source: Object, config: Object) {
+    super(engine, source, config);
+    this._source = source.url;
+    this._msPlayer = new shaka.Player(engine.getVideoElement());
     // this._msPlayer.configure(config.shaka);
   }
 
@@ -68,7 +66,6 @@ export default class Shaka extends BaseMediaSourceAdapter {
   load() {
     this._msPlayer.load(this._source).then(() => {
       // This runs if the asynchronous load is successful.
-      this._logger.info('The manifest has been loaded');
     }).catch(Shaka.onError.bind(this));
   }
 
@@ -83,5 +80,5 @@ export default class Shaka extends BaseMediaSourceAdapter {
 
 // Register Shaka to the media source adapter manager
 if (Shaka.isSupported()) {
-  Playkit.registerAdapter(Shaka);
+  registerAdapter(Shaka);
 }

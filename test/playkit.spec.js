@@ -12,7 +12,7 @@ describe('playkit:playkit', function () {
     let player = playkit({
       sources: [{
         mimetype: "application/dash+xml",
-        src: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
+        url: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
       }]
     });
     let video = document.getElementsByTagName("video")[0];
@@ -29,7 +29,7 @@ describe('playkit:playkit', function () {
       preload: "auto",
       sources: [{
         mimetype: "application/dash+xml",
-        src: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
+        url: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
       }]
     });
     let video = document.getElementsByTagName("video")[0];
