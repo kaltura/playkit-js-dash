@@ -47,7 +47,7 @@ export default class Shaka extends BaseMediaSourceAdapter {
 
   /**
    * @constructor
-   * @param {IEngine} engine - The video element which bind to NativeAdapter
+   * @param {IEngine} engine - The video element which bind to Shaka
    * @param {Object} source - The source object
    * @param {Object} config - The media source adapter configuration
    */
