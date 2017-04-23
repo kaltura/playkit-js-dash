@@ -26,7 +26,7 @@ export default class Shaka extends BaseMediaSourceAdapter {
   /**
    * Checks if the Shaka is supported
    * @function isSupported
-   * @returns {boolean}
+   * @returns {boolean} -
    * @static
    */
   static isSupported(): boolean {
@@ -34,15 +34,6 @@ export default class Shaka extends BaseMediaSourceAdapter {
       shaka.polyfill.installAll();
     }
     return shaka.Player.isBrowserSupported();
-  }
-
-  /**
-   * Error handler
-   * @function onError
-   * @param {Object} error
-   * @static
-   */
-  static onError(error: Object) {
   }
 
   /**
@@ -63,17 +54,18 @@ export default class Shaka extends BaseMediaSourceAdapter {
    * @function load
    * @override
    */
-  load() {
+  load(): void {
     this._msPlayer.load(this._source).then(() => {
       // This runs if the asynchronous load is successful.
-    }).catch(Shaka.onError.bind(this));
+    });
   }
 
   /**
    * Destroying the _msPlayer
    * @function destroy
+   * @override
    */
-  destroy() {
+  destroy(): void {
     this._msPlayer.destroy();
   }
 }
