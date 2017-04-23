@@ -1,8 +1,6 @@
-import chai from 'chai';
 import playkit from 'playkit-js';
-import shaka from '../src/shaka';
-
-chai.should();
+//eslint-disable-next-line no-unused-vars
+import shaka from '../../src/shaka';
 
 describe('playkit:playkit', function () {
 
@@ -39,5 +37,4 @@ describe('playkit:playkit', function () {
     };
     player.play();
   });
-
 });
