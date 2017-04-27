@@ -54,7 +54,7 @@
   "keywords": [],
   "license": "AGPL-3.0",
   "dependencies": {
-    "playkit-js": "https://github.com/kaltura/playkit-js.git#develop",
+    "playkit-js": "https://github.com/kaltura/playkit-js.git#update-dist",
     "shaka-player": "latest"
   },
   "repository": {
