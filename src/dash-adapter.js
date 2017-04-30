@@ -5,7 +5,6 @@ import {registerMediaSourceAdapter} from 'playkit-js';
 /**
  * Adapter of shaka lib for dash content
  * @classdesc
- * @implements IMediaSourceAdapter
  */
 export default class DashAdapter implements IMediaSourceAdapter {
   /**
