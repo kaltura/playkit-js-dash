@@ -14,13 +14,15 @@ export default class DashAdapter implements IMediaSourceAdapter {
    * @private
    */
   static _name = 'DashAdapter';
+
   /**
-   * The supported mime types by the DashAdapter
-   * @member {Array<string>} _mimeTypes
+   * The supported mime type by the DashAdapter
+   * @member {string} _dashMimeType
    * @static
    * @private
    */
   static _dashMimeType = 'application/dash+xml';
+
   /**
    * The adapter config
    * @member {Object} _config
