@@ -1,6 +1,6 @@
 import playkit from 'playkit-js';
 //eslint-disable-next-line no-unused-vars
-import shaka from '../../src/shaka';
+import DashAdapter from '../../src/dash-adapter';
 
 describe('playkit:playkit', function () {
 
