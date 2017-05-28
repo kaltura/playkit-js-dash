@@ -5,7 +5,9 @@ const path = require("path");
 
 module.exports = {
   context: __dirname + "/src",
-  entry: "shaka.js",
+  entry: {
+    "playkit-js-dash": "dash-adapter.js"
+  },
   output: {
     path: __dirname + "/dist",
     filename: '[name].js'

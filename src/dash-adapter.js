@@ -121,7 +121,7 @@ export default class DashAdapter implements IMediaSourceAdapter {
   }
 
   /**
-   * Destroying the _msPlayer
+   * Destroying the dash adapter
    * @function destroy
    * @override
    */
