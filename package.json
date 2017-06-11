@@ -2,6 +2,7 @@
   "name": "playkit-js-dash",
   "version": "1.0.0",
   "description": "",
+  "main": "dist/playkit-js-dash.js",
   "scripts": {
     "clean": "rm -rf ./dist",
     "prebuild": "npm run clean",
