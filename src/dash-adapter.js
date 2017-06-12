@@ -42,13 +42,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _loadPromise: ?Promise<Object>;
-  /**
-   * Reference to the player tracks.
-   * @member {Array<Track>} - _playerTracks
-   * @type {Array<Track>}
-   * @private
-   */
-  _playerTracks: Array<Track>;
 
   /**
    * Checks if dash adapter can play a given mime type
@@ -82,10 +75,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @param {Object} source - The source object
    * @param {Object} config - The media source adapter configuration
    */
-  constructor(videoElement: HTMLVideoElement, source: Object, config: Object) {
+  constructor(videoElement: HTMLVideoElement, source: Object, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
     this._shaka = new shaka.Player(videoElement);
+    this._shaka.configure(config);
     this._addBindings();
   }
 
@@ -258,10 +252,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   selectVideoTrack(videoTrack: VideoTrack): void {
     let videoTracks = this._getVideoTracks();
-    if ((videoTrack instanceof VideoTrack) && videoTracks && videoTracks[videoTrack.index]) {
-      this._shaka.configure({abr:{enabled: false}});
-      this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
-      super._onTrackChanged(videoTrack);
+    if ((videoTrack instanceof VideoTrack) && videoTracks) {
+      let selectedVideoTrack = videoTracks[videoTrack.index];
+      if (selectedVideoTrack) {
+        this._shaka.configure({abr:{enabled: false}});
+        if (!selectedVideoTrack.active) {
+          this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
+          super._onTrackChanged(videoTrack);
+        }
+      }
     }
   }
 
@@ -273,7 +272,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   selectAudioTrack(audioTrack: AudioTrack): void {
-    if ((audioTrack instanceof AudioTrack)) {
+    if ((audioTrack instanceof AudioTrack) && !audioTrack.active) {
       this._shaka.selectAudioLanguage(audioTrack.language);
       super._onTrackChanged(audioTrack);
     }
@@ -287,7 +286,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   selectTextTrack(textTrack: TextTrack): void {
-    if ((textTrack instanceof TextTrack) && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
+    if ((textTrack instanceof TextTrack) && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
       this._shaka.selectTextLanguage(textTrack.language);
       super._onTrackChanged(textTrack);
     }
@@ -310,7 +309,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onAdaptation(): void {
-    let selectedVideoTrack = this._getVideoTracks().filter(function (videoTrack) {
+    let selectedVideoTrack = this._getParsedVideoTracks().filter(function (videoTrack) {
       return videoTrack.active;
     })[0];
     super._onTrackChanged(selectedVideoTrack);
@@ -318,7 +317,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   /**
    * An handler to shaka error event
-   * @function _onAdaptation
+   * @function _onError
    * @param {any} error - the error
    * @returns {void}
    * @private
