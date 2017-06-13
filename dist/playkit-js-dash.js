@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["PlaykitJsDash"] = factory();
+	else
+		root["PlaykitJsDash"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -5375,8 +5385,8 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      * @static
      */
     value: function canPlayType(mimeType) {
-      var canPlayType = mimeType === DashAdapter._dashMimeType;
-      DashAdapter._logger.debug('canPlayType result for mimeType:' + mimeType + ' is ' + canPlayType.toString());
+      var canPlayType = typeof mimeType === 'string' ? mimeType.toLowerCase() === DashAdapter._dashMimeType : false;
+      DashAdapter._logger.debug('canPlayType result for mimeType: ' + mimeType + ' is ' + canPlayType.toString());
       return canPlayType;
     }
 
@@ -5395,10 +5405,10 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      */
 
     /**
-     * The name of Adapter
-     * @member {string} _name
+     * The id of Adapter
+     * @member {string} id
      * @static
-     * @private
+     * @public
      */
 
   }, {
@@ -5508,6 +5518,46 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     }
 
     /**
+     * Get the original video tracks
+     * @function _getVideoTracks
+     * @returns {Array<Object>} - The original video tracks
+     * @private
+     */
+
+  }, {
+    key: '_getVideoTracks',
+    value: function _getVideoTracks() {
+      var variantTracks = this._shaka.getVariantTracks();
+      var activeVariantTrack = variantTracks.filter(function (variantTrack) {
+        return variantTrack.active;
+      })[0];
+      var videoTracks = variantTracks.filter(function (variantTrack) {
+        return variantTrack.audioId === activeVariantTrack.audioId;
+      });
+      return videoTracks;
+    }
+
+    /**
+     * Get the original audio tracks
+     * @function _getAudioTracks
+     * @returns {Array<Object>} - The original audio tracks
+     * @private
+     */
+
+  }, {
+    key: '_getAudioTracks',
+    value: function _getAudioTracks() {
+      var variantTracks = this._shaka.getVariantTracks();
+      var activeVariantTrack = variantTracks.filter(function (variantTrack) {
+        return variantTrack.active;
+      })[0];
+      var audioTracks = variantTracks.filter(function (variantTrack) {
+        return variantTrack.videoId === activeVariantTrack.videoId;
+      });
+      return audioTracks;
+    }
+
+    /**
      * Get the parsed tracks
      * @function _getParsedTracks
      * @returns {Array<Track>} - The parsed tracks
@@ -5549,18 +5599,6 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
       }
       return parsedTracks;
     }
-  }, {
-    key: '_getVideoTracks',
-    value: function _getVideoTracks() {
-      var variantTracks = this._shaka.getVariantTracks();
-      var activeVariantTrack = variantTracks.filter(function (variantTrack) {
-        return variantTrack.active;
-      })[0];
-      var videoTracks = variantTracks.filter(function (variantTrack) {
-        return variantTrack.audioId === activeVariantTrack.audioId;
-      });
-      return videoTracks;
-    }
 
     /**
      * Get the parsed audio tracks
@@ -5572,13 +5610,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
   }, {
     key: '_getParsedAudioTracks',
     value: function _getParsedAudioTracks() {
-      var variantTracks = this._shaka.getVariantTracks();
-      var activeVariantTrack = variantTracks.filter(function (variantTrack) {
-        return variantTrack.active;
-      })[0];
-      var audioTracks = variantTracks.filter(function (variantTrack) {
-        return variantTrack.videoId === activeVariantTrack.videoId;
-      });
+      var audioTracks = this._getAudioTracks();
       var parsedTracks = [];
       if (audioTracks) {
         for (var i = 0; i < audioTracks.length; i++) {
@@ -5640,7 +5672,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
           this._shaka.configure({ abr: { enabled: false } });
           if (!selectedVideoTrack.active) {
             this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
-            _get(DashAdapter.prototype.__proto__ || Object.getPrototypeOf(DashAdapter.prototype), '_onTrackChanged', this).call(this, videoTrack);
+            this._onTrackChanged(videoTrack);
           }
         }
       }
@@ -5659,7 +5691,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     value: function selectAudioTrack(audioTrack) {
       if (audioTrack instanceof _playkitJs.AudioTrack && !audioTrack.active) {
         this._shaka.selectAudioLanguage(audioTrack.language);
-        _get(DashAdapter.prototype.__proto__ || Object.getPrototypeOf(DashAdapter.prototype), '_onTrackChanged', this).call(this, audioTrack);
+        this._onTrackChanged(audioTrack);
       }
     }
 
@@ -5676,7 +5708,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     value: function selectTextTrack(textTrack) {
       if (textTrack instanceof _playkitJs.TextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
         this._shaka.selectTextLanguage(textTrack.language);
-        _get(DashAdapter.prototype.__proto__ || Object.getPrototypeOf(DashAdapter.prototype), '_onTrackChanged', this).call(this, textTrack);
+        this._onTrackChanged(textTrack);
       }
     }
 
@@ -5706,7 +5738,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
       var selectedVideoTrack = this._getParsedVideoTracks().filter(function (videoTrack) {
         return videoTrack.active;
       })[0];
-      _get(DashAdapter.prototype.__proto__ || Object.getPrototypeOf(DashAdapter.prototype), '_onTrackChanged', this).call(this, selectedVideoTrack);
+      this._onTrackChanged(selectedVideoTrack);
     }
 
     /**
@@ -5746,8 +5778,8 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
 // Register DashAdapter to the media source adapter manager
 
 
-DashAdapter._name = 'DashAdapter';
-DashAdapter._logger = _playkitJs.BaseMediaSourceAdapter.getLogger(DashAdapter._name);
+DashAdapter.id = 'DashAdapter';
+DashAdapter._logger = _playkitJs.BaseMediaSourceAdapter.getLogger(DashAdapter.id);
 DashAdapter._dashMimeType = 'application/dash+xml';
 exports.default = DashAdapter;
 if (DashAdapter.isSupported()) {
@@ -5756,4 +5788,5 @@ if (DashAdapter.isSupported()) {
 
 /***/ })
 /******/ ]);
+});
 //# sourceMappingURL=playkit-js-dash.js.map

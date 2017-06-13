@@ -54,6 +54,10 @@ describe('DashAdapter: canPlayType', () => {
     DashAdapter.canPlayType('application/dash+xml').should.be.true;
   });
 
+  it('should return true for APPLICATION/DASH+XML', () => {
+    DashAdapter.canPlayType('APPLICATION/DASH+XML').should.be.true;
+  });
+
   it('should return false to video/mp4', function () {
     DashAdapter.canPlayType('video/mp4').should.be.false;
   });
@@ -204,15 +208,9 @@ describe('DashAdapter: _getParsedTracks', () => {
   it('should return the parsed tracks', (done) => {
     dashInstance.load().then((data) => {
       let videoTracks = dashInstance._getVideoTracks();
-      let variantTracks = dashInstance._shaka.getVariantTracks();
-      let activeVariantTrack = variantTracks.filter((variantTrack) => {
-        return variantTrack.active;
-      })[0];
-      let audioTracks = variantTracks.filter((variantTrack) => {
-        return variantTrack.videoId === activeVariantTrack.videoId;
-      });
+      let audioTracks = dashInstance._getAudioTracks();
       let textTracks = dashInstance._shaka.getTextTracks();
-      let totalTracksLength = videoTracks.length + audioTracks.length + dashInstance._shaka.getTextTracks().length;
+      let totalTracksLength = videoTracks.length + audioTracks.length + textTracks.length;
       data.tracks.length.should.be.equal(totalTracksLength);
       data.tracks.map((track) => {
         if (track instanceof VideoTrack) {
@@ -567,6 +565,31 @@ describe('DashAdapter: selectTextTrack', () => {
         done();
       }, 1000)
     });
+  });
+});
+
+describe('DashAdapter: enableAdaptiveBitrate', () => {
+  let video;
+  let dashInstance;
+
+  beforeEach(() => {
+    video = document.createElement("video");
+    dashInstance = DashAdapter.createAdapter(video, source, config);
+  });
+
+  afterEach(() => {
+    dashInstance.destroy();
+    dashInstance = null;
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should enable ABR', () => {
+    dashInstance._shaka.getConfiguration().abr.enabled.should.be.false;
+    dashInstance.enableAdaptiveBitrate();
+    dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
   });
 });
 

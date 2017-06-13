@@ -9,19 +9,19 @@ import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
  */
 export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
-   * The name of Adapter
-   * @member {string} _name
+   * The id of Adapter
+   * @member {string} id
    * @static
-   * @private
+   * @public
    */
-  static _name = 'DashAdapter';
+  static id = 'DashAdapter';
   /**
    * The adapter logger
    * @member {any} _logger
    * @private
    * @static
    */
-  static _logger = BaseMediaSourceAdapter.getLogger(DashAdapter._name);
+  static _logger = BaseMediaSourceAdapter.getLogger(DashAdapter.id);
   /**
    * The supported mime type by the dash adapter
    * @member {string} _dashMimeType
@@ -51,8 +51,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static canPlayType(mimeType: string): boolean {
-    let canPlayType = (mimeType === DashAdapter._dashMimeType);
-    DashAdapter._logger.debug('canPlayType result for mimeType:' + mimeType + ' is ' + canPlayType.toString());
+    let canPlayType = typeof mimeType === 'string' ? mimeType.toLowerCase() === DashAdapter._dashMimeType : false;
+    DashAdapter._logger.debug('canPlayType result for mimeType: ' + mimeType + ' is ' + canPlayType.toString());
     return canPlayType;
   }
 
@@ -142,6 +142,40 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Get the original video tracks
+   * @function _getVideoTracks
+   * @returns {Array<Object>} - The original video tracks
+   * @private
+   */
+  _getVideoTracks(): Array<Object> {
+    let variantTracks = this._shaka.getVariantTracks();
+    let activeVariantTrack = variantTracks.filter((variantTrack) => {
+      return variantTrack.active;
+    })[0];
+    let videoTracks = variantTracks.filter((variantTrack) => {
+      return variantTrack.audioId === activeVariantTrack.audioId;
+    });
+    return videoTracks;
+  }
+
+  /**
+   * Get the original audio tracks
+   * @function _getAudioTracks
+   * @returns {Array<Object>} - The original audio tracks
+   * @private
+   */
+  _getAudioTracks(): Array<Object> {
+    let variantTracks = this._shaka.getVariantTracks();
+    let activeVariantTrack = variantTracks.filter((variantTrack) => {
+      return variantTrack.active;
+    })[0];
+    let audioTracks = variantTracks.filter((variantTrack) => {
+      return variantTrack.videoId === activeVariantTrack.videoId;
+    });
+    return audioTracks;
+  }
+
+  /**
    * Get the parsed tracks
    * @function _getParsedTracks
    * @returns {Array<Track>} - The parsed tracks
@@ -178,17 +212,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return parsedTracks;
   }
 
-  _getVideoTracks() {
-    let variantTracks = this._shaka.getVariantTracks();
-    let activeVariantTrack = variantTracks.filter((variantTrack) => {
-      return variantTrack.active;
-    })[0];
-    let videoTracks = variantTracks.filter((variantTrack) => {
-      return variantTrack.audioId === activeVariantTrack.audioId;
-    });
-    return videoTracks;
-  }
-
   /**
    * Get the parsed audio tracks
    * @function _getParsedAudioTracks
@@ -196,13 +219,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _getParsedAudioTracks(): Array<AudioTrack> {
-    let variantTracks = this._shaka.getVariantTracks();
-    let activeVariantTrack = variantTracks.filter((variantTrack) => {
-      return variantTrack.active;
-    })[0];
-    let audioTracks = variantTracks.filter((variantTrack) => {
-      return variantTrack.videoId === activeVariantTrack.videoId;
-    });
+    let audioTracks = this._getAudioTracks();
     let parsedTracks = [];
     if (audioTracks) {
       for (let i = 0; i < audioTracks.length; i++) {
@@ -258,7 +275,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._shaka.configure({abr:{enabled: false}});
         if (!selectedVideoTrack.active) {
           this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
-          super._onTrackChanged(videoTrack);
+          this._onTrackChanged(videoTrack);
         }
       }
     }
@@ -274,7 +291,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   selectAudioTrack(audioTrack: AudioTrack): void {
     if ((audioTrack instanceof AudioTrack) && !audioTrack.active) {
       this._shaka.selectAudioLanguage(audioTrack.language);
-      super._onTrackChanged(audioTrack);
+      this._onTrackChanged(audioTrack);
     }
   }
 
@@ -288,7 +305,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   selectTextTrack(textTrack: TextTrack): void {
     if ((textTrack instanceof TextTrack) && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
       this._shaka.selectTextLanguage(textTrack.language);
-      super._onTrackChanged(textTrack);
+      this._onTrackChanged(textTrack);
     }
   }
 
@@ -312,7 +329,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let selectedVideoTrack = this._getParsedVideoTracks().filter(function (videoTrack) {
       return videoTrack.active;
     })[0];
-    super._onTrackChanged(selectedVideoTrack);
+    this._onTrackChanged(selectedVideoTrack);
   }
 
   /**
