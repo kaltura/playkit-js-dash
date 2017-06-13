@@ -5,6 +5,20 @@ const path = require("path");
 const PROD = (process.env.NODE_ENV === 'production');
 
 let plugins = PROD ? [new webpack.optimize.UglifyJsPlugin({sourceMap: true})] : [];
+let externals = PROD ? {
+  "playkit-js": {
+    commonjs: "playkit-js",
+    commonjs2: "playkit-js",
+    amd: "playkit-js",
+    root: "Playkit"
+  },
+  "shaka-player": {
+    commonjs: "shaka-player",
+    commonjs2: "shaka-player",
+    amd: "shaka-player",
+    root: "shaka"
+  }
+} : {};
 
 module.exports = {
   context: __dirname + "/src",
@@ -13,7 +27,9 @@ module.exports = {
   },
   output: {
     path: __dirname + "/dist",
-    filename: '[name].js'
+    filename: '[name].js',
+    library: "PlaykitJsDash",
+    libraryTarget: "umd"
   },
   devtool: 'source-map',
   plugins: plugins,
@@ -49,5 +65,6 @@ module.exports = {
       path.resolve(__dirname, "src"),
       "node_modules"
     ]
-  }
+  },
+  externals: externals
 };

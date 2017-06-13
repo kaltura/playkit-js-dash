@@ -2,6 +2,7 @@
   "name": "playkit-js-dash",
   "version": "1.0.0",
   "description": "",
+  "main": "dist/playkit-js-dash.js",
   "scripts": {
     "clean": "rm -rf ./dist",
     "prebuild": "npm run clean",
@@ -57,11 +58,13 @@
     "standard-version": "^4.0.0",
     "uglifyjs-webpack-plugin": "^0.4.3",
     "webpack": "latest",
-    "webpack-dev-server": "latest"
+    "webpack-dev-server": "latest",
+    "playkit-js": "https://github.com/kaltura/playkit-js.git#develop",
+    "shaka-player": "latest"
   },
   "keywords": [],
   "license": "AGPL-3.0",
-  "dependencies": {
+  "peerDependencies": {
     "playkit-js": "https://github.com/kaltura/playkit-js.git#develop",
     "shaka-player": "latest"
   },
