@@ -85,9 +85,9 @@ describe('DashAdapter: isSupported', () => {
   });
 });
 
-describe('DashAdapter: name', () => {
+describe('DashAdapter: id', () => {
   it('should be named DashAdapter', function () {
-    DashAdapter.name.should.equal('DashAdapter');
+    DashAdapter.id.should.equal('DashAdapter');
   });
 });
 
