@@ -4,35 +4,18 @@ const webpack = require("webpack");
 const path = require("path");
 const PROD = (process.env.NODE_ENV === 'production');
 
-let plugins = PROD ? [new webpack.optimize.UglifyJsPlugin({sourceMap: true})] : [];
-let externals = PROD ? {
-  "playkit-js": {
-    commonjs: "playkit-js",
-    commonjs2: "playkit-js",
-    amd: "playkit-js",
-    root: "Playkit"
-  },
-  "shaka-player": {
-    commonjs: "shaka-player",
-    commonjs2: "shaka-player",
-    amd: "shaka-player",
-    root: "shaka"
-  }
-} : {};
-
 module.exports = {
   context: __dirname + "/src",
-  entry: {
-    "playkit-js-dash": "dash-adapter.js"
-  },
+  entry: PROD ? {"playkit-dash.min": "dash-adapter.js"} : {"playkit-dash": "dash-adapter.js"},
   output: {
     path: __dirname + "/dist",
     filename: '[name].js',
     library: "PlaykitJsDash",
-    libraryTarget: "umd"
+    libraryTarget: "umd",
+    devtoolModuleFilenameTemplate: "webpack:///dash/[resource-path]",
   },
   devtool: 'source-map',
-  plugins: plugins,
+  plugins: PROD ? [new webpack.optimize.UglifyJsPlugin({sourceMap: true})] : [],
   module: {
     rules: [
       {
@@ -40,11 +23,15 @@ module.exports = {
         use: [{
           loader: "babel-loader"
         }],
-        exclude: [/node_modules/]
+        exclude: [
+          /node_modules/
+        ]
       },
       {
         test: /\.js$/,
-        exclude: /node_modules/,
+        exclude: [
+          /node_modules/
+        ],
         enforce: 'pre',
         use: [{
           loader: 'eslint-loader',
@@ -66,5 +53,18 @@ module.exports = {
       "node_modules"
     ]
   },
-  externals: externals
+  externals: {
+    "playkit-js": {
+      commonjs: "playkit-js",
+      commonjs2: "playkit-js",
+      amd: "playkit-js",
+      root: "Playkit"
+    },
+    "shaka-player": {
+      commonjs: "shaka-player",
+      commonjs2: "shaka-player",
+      amd: "shaka-player",
+      root: "shaka"
+    }
+  }
 };
