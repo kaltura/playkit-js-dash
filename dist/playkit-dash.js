@@ -464,8 +464,22 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     value: function selectTextTrack(textTrack) {
       if (textTrack instanceof _playkitJs.TextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
         this._shaka.selectTextLanguage(textTrack.language);
+        this._shaka.setTextTrackVisibility(true);
         this._onTrackChanged(textTrack);
       }
+    }
+
+    /**
+     * Hide the text track
+     * @function hideTextTrack
+     * @returns {void}
+     * @public
+     */
+
+  }, {
+    key: 'hideTextTrack',
+    value: function hideTextTrack() {
+      this._shaka.setTextTrackVisibility(false);
     }
 
     /**
