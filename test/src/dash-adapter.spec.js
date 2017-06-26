@@ -41,10 +41,11 @@ describe.skip('DashAdapter [debugging and testing manually]', () => {
     player = playkit({
       sources: [source]
     });
-    player.load().then(() => {
+    player.ready().then(() => {
       displayTracksOnScreen();
-      player.play();
     });
+    player.load();
+    window.player = player;
   });
 });
 
@@ -261,12 +262,15 @@ describe('DashAdapter: selectVideoTrack', () => {
   });
 
   it('should select a new video track', (done) => {
+    let inactiveTrack;
+    let onVideoTrackChanged = (event) => {
+      dashInstance.removeEventListener('videotrackchanged', onVideoTrackChanged);
+      event.payload.selectedVideoTrack.id.should.be.equal(inactiveTrack.id);
+      done();
+    };
     dashInstance.load().then(() => {
-      dashInstance.addEventListener('videotrackchanged', (event) => {
-        event.payload.selectedVideoTrack.id.should.be.equal(inactiveTrack.id);
-        done();
-      });
-      let inactiveTrack = dashInstance._getParsedVideoTracks().filter((track) => {
+      dashInstance.addEventListener('videotrackchanged', onVideoTrackChanged);
+      inactiveTrack = dashInstance._getParsedVideoTracks().filter((track) => {
         return !track.active;
       })[0];
       dashInstance.selectVideoTrack(inactiveTrack);
