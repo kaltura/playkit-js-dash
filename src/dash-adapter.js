@@ -272,7 +272,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if ((videoTrack instanceof VideoTrack) && videoTracks) {
       let selectedVideoTrack = videoTracks[videoTrack.index];
       if (selectedVideoTrack) {
-        this._shaka.configure({abr:{enabled: false}});
+        this._shaka.configure({abr: {enabled: false}});
         if (!selectedVideoTrack.active) {
           this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
           this._onTrackChanged(videoTrack);
@@ -305,8 +305,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   selectTextTrack(textTrack: TextTrack): void {
     if ((textTrack instanceof TextTrack) && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
       this._shaka.selectTextLanguage(textTrack.language);
+      this._shaka.setTextTrackVisibility(true);
       this._onTrackChanged(textTrack);
     }
+  }
+
+  /**
+   * Hide the text track
+   * @function hideTextTrack
+   * @returns {void}
+   * @public
+   */
+  hideTextTrack(): void {
+    this._shaka.setTextTrackVisibility(false);
   }
 
   /**
@@ -316,7 +327,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   enableAdaptiveBitrate(): void {
-    this._shaka.configure({abr:{enabled: true}});
+    this._shaka.configure({abr: {enabled: true}});
   }
 
   /**
