@@ -1,18 +1,27 @@
-import playkit from 'playkit-js'
-//eslint-disable-next-line no-unused-vars
+import loadPlayer from 'playkit-js'
 import DashAdapter from '../../src/dash-adapter';
 import * as TestUtils from 'playkit-js/test/src/utils/test-utils'
 import {VideoTrack, AudioTrack, TextTrack} from 'playkit-js';
 
+const targetId = 'player-placeholder_dash-adapter.spec';
+
+let config = {abr: {enabled: false}};
 let source = {
   mimetype: "application/dash+xml",
   url: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
 };
-let config = {abr: {enabled: false}};
 
 describe.skip('DashAdapter [debugging and testing manually]', () => {
 
   let player, tracks, videoTracks, textTracks, audioTracks;
+
+  before(function () {
+    TestUtils.createElement('DIV', targetId);
+  });
+
+  after(function () {
+    TestUtils.removeElement(targetId);
+  });
 
   /**
    * @function displayTracksOnScreen
@@ -38,8 +47,10 @@ describe.skip('DashAdapter [debugging and testing manually]', () => {
   }
 
   it('should play dash stream', () => {
-    player = playkit({
-      sources: [source]
+    player = loadPlayer(targetId, {
+      sources: {
+        dash: [source]
+      }
     });
     player.ready().then(() => {
       displayTracksOnScreen();
