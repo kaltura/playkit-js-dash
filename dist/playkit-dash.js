@@ -110,14 +110,16 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
   _inherits(DashAdapter, _BaseMediaSourceAdapt);
 
   _createClass(DashAdapter, null, [{
-    key: 'canPlayType',
+    key: 'createAdapter',
 
 
     /**
-     * Checks if dash adapter can play a given mime type
-     * @function canPlayType
-     * @param {string} mimeType - The mime type to check
-     * @returns {boolean} - Whether the dash adapter can play a specific mime type
+     * Factory method to create media source adapter.
+     * @function createAdapter
+     * @param {HTMLVideoElement} videoElement - The video element that the media source adapter work with.
+     * @param {Object} source - The source Object.
+     * @param {Object} config - The player configuration.
+     * @returns {IMediaSourceAdapter} - New instance of the run time media source adapter.
      * @static
      */
 
@@ -140,16 +142,15 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      * @private
      * @static
      */
-    value: function canPlayType(mimeType) {
-      var canPlayType = typeof mimeType === 'string' ? mimeType.toLowerCase() === DashAdapter._dashMimeType : false;
-      DashAdapter._logger.debug('canPlayType result for mimeType: ' + mimeType + ' is ' + canPlayType.toString());
-      return canPlayType;
+    value: function createAdapter(videoElement, source, config) {
+      return new this(videoElement, source, config.playback.options.html5.dash);
     }
 
     /**
-     * Checks if the dash adapter is supported
-     * @function isSupported
-     * @returns {boolean} -  Whether dash is supported.
+     * Checks if dash adapter can play a given mime type
+     * @function canPlayType
+     * @param {string} mimeType - The mime type to check
+     * @returns {boolean} - Whether the dash adapter can play a specific mime type
      * @static
      */
 
@@ -165,6 +166,21 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      * @member {string} id
      * @static
      * @public
+     */
+
+  }, {
+    key: 'canPlayType',
+    value: function canPlayType(mimeType) {
+      var canPlayType = typeof mimeType === 'string' ? mimeType.toLowerCase() === DashAdapter._dashMimeType : false;
+      DashAdapter._logger.debug('canPlayType result for mimeType: ' + mimeType + ' is ' + canPlayType.toString());
+      return canPlayType;
+    }
+
+    /**
+     * Checks if the dash adapter is supported
+     * @function isSupported
+     * @returns {boolean} -  Whether dash is supported.
+     * @static
      */
 
   }, {

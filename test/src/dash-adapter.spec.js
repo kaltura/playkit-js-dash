@@ -1,18 +1,26 @@
-import playkit from 'playkit-js'
-//eslint-disable-next-line no-unused-vars
+import loadPlayer from 'playkit-js'
 import DashAdapter from '../../src/dash-adapter';
 import * as TestUtils from 'playkit-js/test/src/utils/test-utils'
 import {VideoTrack, AudioTrack, TextTrack} from 'playkit-js';
+
+const targetId = 'player-placeholder_dash-adapter.spec';
 
 let source = {
   mimetype: "application/dash+xml",
   url: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
 };
-let config = {abr: {enabled: false}};
 
 describe.skip('DashAdapter [debugging and testing manually]', () => {
 
   let player, tracks, videoTracks, textTracks, audioTracks;
+
+  before(function () {
+    TestUtils.createElement('DIV', targetId);
+  });
+
+  after(function () {
+    TestUtils.removeElement(targetId);
+  });
 
   /**
    * @function displayTracksOnScreen
@@ -38,8 +46,10 @@ describe.skip('DashAdapter [debugging and testing manually]', () => {
   }
 
   it('should play dash stream', () => {
-    player = playkit({
-      sources: [source]
+    player = loadPlayer(targetId, {
+      sources: {
+        dash: [source]
+      }
     });
     player.ready().then(() => {
       displayTracksOnScreen();
@@ -93,11 +103,11 @@ describe('DashAdapter: id', () => {
 });
 
 describe('DashAdapter: constructor', () => {
-  let video;
-  let dashInstance;
+  let video, dashInstance, config;
 
   before(() => {
     video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
   });
 
   after(() => {
@@ -105,7 +115,7 @@ describe('DashAdapter: constructor', () => {
   });
 
   beforeEach(() => {
-    dashInstance = DashAdapter.createAdapter(video, {url: ''}, {});
+    dashInstance = DashAdapter.createAdapter(video, {url: ''}, config);
   });
 
   afterEach(() => {
@@ -122,10 +132,11 @@ describe('DashAdapter: constructor', () => {
 });
 
 describe('DashAdapter: load', () => {
-  let video, dashInstance;
+  let video, dashInstance, config;
 
   beforeEach(() => {
     video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
   });
 
   afterEach(() => {
@@ -138,8 +149,7 @@ describe('DashAdapter: load', () => {
   });
 
   it('should success', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, source, {});
-
+    dashInstance = DashAdapter.createAdapter(video, source, config);
     dashInstance.load().then(() => {
       done();
     });
@@ -148,8 +158,8 @@ describe('DashAdapter: load', () => {
   it('should failed', (done) => {
     dashInstance = DashAdapter.createAdapter(video, {
       mimetype: 'application/dash+xml',
-      url: 'some corrupted_url'
-    }, {});
+      url: 'some/corrupted/url'
+    }, config);
 
     dashInstance.load().catch((error) => {
       error.should.be.exist;
@@ -159,11 +169,12 @@ describe('DashAdapter: load', () => {
 });
 
 describe('DashAdapter: destroy', () => {
-  let video, dashInstance;
+  let video, dashInstance, config;
 
   beforeEach(() => {
     video = document.createElement("video");
-    dashInstance = DashAdapter.createAdapter(video, source, {});
+    config = {playback: {options: {html5: {dash: {}}}}};
+    dashInstance = DashAdapter.createAdapter(video, source, config);
   });
 
   afterEach(() => {
@@ -189,12 +200,12 @@ describe('DashAdapter: destroy', () => {
 });
 
 describe('DashAdapter: _getParsedTracks', () => {
-  let video;
-  let dashInstance;
+  let video, dashInstance, config;
 
   beforeEach(() => {
     video = document.createElement("video");
-    dashInstance = DashAdapter.createAdapter(video, source, {});
+    config = {playback: {options: {html5: {dash: {}}}}};
+    dashInstance = DashAdapter.createAdapter(video, source, config);
   });
 
   afterEach(() => {
@@ -244,11 +255,11 @@ describe('DashAdapter: _getParsedTracks', () => {
 });
 
 describe('DashAdapter: selectVideoTrack', () => {
-  let video;
-  let dashInstance;
+  let video, dashInstance, config;
 
   beforeEach(() => {
     video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {abr: {enabled: false}}}}}};
     dashInstance = DashAdapter.createAdapter(video, source, config);
   });
 
@@ -365,12 +376,12 @@ describe('DashAdapter: selectVideoTrack', () => {
 });
 
 describe('DashAdapter: selectAudioTrack', () => {
-  let video;
-  let dashInstance;
+  let video, dashInstance, config;
 
   beforeEach(() => {
     video = document.createElement("video");
-    dashInstance = DashAdapter.createAdapter(video, source, {});
+    config = {playback: {options: {html5: {dash: {}}}}};
+    dashInstance = DashAdapter.createAdapter(video, source, config);
   });
 
   afterEach(() => {
@@ -457,12 +468,12 @@ describe('DashAdapter: selectAudioTrack', () => {
 });
 
 describe('DashAdapter: selectTextTrack', () => {
-  let video;
-  let dashInstance;
+  let video, dashInstance, config;
 
   beforeEach(() => {
     video = document.createElement("video");
-    dashInstance = DashAdapter.createAdapter(video, source, {});
+    config = {playback: {options: {html5: {dash: {}}}}};
+    dashInstance = DashAdapter.createAdapter(video, source, config);
   });
 
   afterEach(() => {
@@ -573,11 +584,11 @@ describe('DashAdapter: selectTextTrack', () => {
 });
 
 describe('DashAdapter: enableAdaptiveBitrate', () => {
-  let video;
-  let dashInstance;
+  let video, dashInstance, config;
 
   beforeEach(() => {
     video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {abr: {enabled: false}}}}}};
     dashInstance = DashAdapter.createAdapter(video, source, config);
   });
 
