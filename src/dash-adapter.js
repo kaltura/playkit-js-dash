@@ -2,6 +2,7 @@
 import shaka from 'shaka-player';
 import {registerMediaSourceAdapter, BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
+import {Utils} from 'playkit-js'
 
 /**
  * Adapter of shaka lib for dash content
@@ -53,7 +54,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static createAdapter(videoElement: HTMLVideoElement, source: Source, config: Object): IMediaSourceAdapter {
-    return new this(videoElement, source, config.playback.options.html5.dash);
+    let dashConfig = {};
+    if (Utils.getNestedValue(config, 'playback.options.html5.dash')) {
+      dashConfig = config.playback.options.html5.dash;
+    }
+    return new this(videoElement, source, dashConfig);
   }
 
   /**
