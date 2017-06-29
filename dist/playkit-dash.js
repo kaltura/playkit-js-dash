@@ -143,7 +143,11 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      * @static
      */
     value: function createAdapter(videoElement, source, config) {
-      return new this(videoElement, source, config.playback.options.html5.dash);
+      var dashConfig = {};
+      if (_playkitJs.Utils.getNestedValue(config, 'playback.options.html5.dash')) {
+        dashConfig = config.playback.options.html5.dash;
+      }
+      return new this(videoElement, source, dashConfig);
     }
 
     /**
