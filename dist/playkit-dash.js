@@ -362,6 +362,8 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
           var settings = {
             id: videoTracks[i].id,
             bandwidth: videoTracks[i].bandwidth,
+            width: videoTracks[i].width,
+            height: videoTracks[i].height,
             active: videoTracks[i].active,
             label: videoTracks[i].label,
             index: i
