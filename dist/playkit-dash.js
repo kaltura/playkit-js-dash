@@ -212,6 +212,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
 
     _this._shaka = new _shakaPlayer2.default.Player(videoElement);
     _this._shaka.configure(config);
+    _this._shaka.setTextTrackVisibility(true);
     _this._addBindings();
     return _this;
   }

@@ -93,6 +93,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     super(videoElement, source, config);
     this._shaka = new shaka.Player(videoElement);
     this._shaka.configure(config);
+    this._shaka.setTextTrackVisibility(true);
     this._addBindings();
   }
 
