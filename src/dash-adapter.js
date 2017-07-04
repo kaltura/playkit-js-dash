@@ -98,6 +98,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     super(videoElement, source, config);
     this._shaka = new shaka.Player(videoElement);
     this._shaka.configure(config);
+    this._shaka.setTextTrackVisibility(true);
     this._addBindings();
   }
 
@@ -220,6 +221,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         let settings = {
           id: videoTracks[i].id,
           bandwidth: videoTracks[i].bandwidth,
+          width: videoTracks[i].width,
+          height: videoTracks[i].height,
           active: videoTracks[i].active,
           label: videoTracks[i].label,
           index: i
