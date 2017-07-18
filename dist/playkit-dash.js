@@ -144,7 +144,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      */
     value: function createAdapter(videoElement, source, config) {
       var dashConfig = {};
-      if (_playkitJs.Utils.hasPropertyPath(config, 'playback.options.html5.dash')) {
+      if (_playkitJs.Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
         dashConfig = config.playback.options.html5.dash;
       }
       return new this(videoElement, source, dashConfig);
