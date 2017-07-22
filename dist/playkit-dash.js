@@ -252,19 +252,20 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
 
     /**
      * Load the video source
+     * @param {number} startTime - Optional time to start the video from.
      * @function load
      * @override
      */
 
   }, {
     key: 'load',
-    value: function load() {
+    value: function load(startTime) {
       var _this2 = this;
 
       if (!this._loadPromise) {
         this._loadPromise = new Promise(function (resolve, reject) {
           if (_this2._sourceObj && _this2._sourceObj.url) {
-            _this2._shaka.load(_this2._sourceObj.url).then(function () {
+            _this2._shaka.load(_this2._sourceObj.url, startTime).then(function () {
               var data = { tracks: _this2._getParsedTracks() };
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);

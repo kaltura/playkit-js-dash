@@ -126,14 +126,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   /**
    * Load the video source
+   * @param {number} startTime - Optional time to start the video from.
    * @function load
    * @override
    */
-  load(): Promise<Object> {
+  load(startTime: ?number): Promise<Object> {
     if (!this._loadPromise) {
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
-          this._shaka.load(this._sourceObj.url).then(() => {
+          this._shaka.load(this._sourceObj.url, startTime).then(() => {
             let data = {tracks: this._getParsedTracks()};
             DashAdapter._logger.debug('The source has been loaded successfully');
             resolve(data);
