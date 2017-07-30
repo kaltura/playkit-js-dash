@@ -604,7 +604,7 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
   it('should enable ABR', () => {
     dashInstance._shaka.getConfiguration().abr.enabled.should.be.false;
     dashInstance.enableAdaptiveBitrate();
-    dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
+    dashInstance.isAdaptiveBitrateEnabled().should.be.true;
   });
 });
 
