@@ -520,11 +520,11 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     }
 
     /**
-     +   * Checking if adaptive bitrate switching is enabled.
-     +   * @function isAdaptiveBitrateEnabled
-     +   * @returns {boolean} - Whether adaptive bitrate is enabled.
-     +   * @public
-     +   */
+     * Checking if adaptive bitrate switching is enabled.
+     * @function isAdaptiveBitrateEnabled
+     * @returns {boolean} - Whether adaptive bitrate is enabled.
+     * @public
+     */
 
   }, {
     key: 'isAdaptiveBitrateEnabled',
