@@ -353,11 +353,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   +   * Checking if adaptive bitrate switching is enabled.
-   +   * @function isAdaptiveBitrateEnabled
-   +   * @returns {boolean} - Whether adaptive bitrate is enabled.
-   +   * @public
-   +   */
+   * Checking if adaptive bitrate switching is enabled.
+   * @function isAdaptiveBitrateEnabled
+   * @returns {boolean} - Whether adaptive bitrate is enabled.
+   * @public
+   */
   isAdaptiveBitrateEnabled(): boolean {
     let shakaConfig = this._shaka.getConfiguration();
     return shakaConfig.abr.enabled;

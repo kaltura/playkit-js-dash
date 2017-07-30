@@ -520,6 +520,20 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     }
 
     /**
+     +   * Checking if adaptive bitrate switching is enabled.
+     +   * @function isAdaptiveBitrateEnabled
+     +   * @returns {boolean} - Whether adaptive bitrate is enabled.
+     +   * @public
+     +   */
+
+  }, {
+    key: 'isAdaptiveBitrateEnabled',
+    value: function isAdaptiveBitrateEnabled() {
+      var shakaConfig = this._shaka.getConfiguration();
+      return shakaConfig.abr.enabled;
+    }
+
+    /**
      * An handler to shaka adaptation event
      * @function _onAdaptation
      * @returns {void}
