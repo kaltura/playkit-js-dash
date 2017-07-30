@@ -265,6 +265,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
       if (!this._loadPromise) {
         this._loadPromise = new Promise(function (resolve, reject) {
           if (_this2._sourceObj && _this2._sourceObj.url) {
+            _this2._trigger(_playkitJs.BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, { mode: _this2.isAdaptiveBitrateEnabled() ? 'auto' : 'manual' });
             _this2._shaka.load(_this2._sourceObj.url, startTime).then(function () {
               var data = { tracks: _this2._getParsedTracks() };
               DashAdapter._logger.debug('The source has been loaded successfully');
@@ -291,6 +292,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
       DashAdapter._logger.debug('destroy');
       _get(DashAdapter.prototype.__proto__ || Object.getPrototypeOf(DashAdapter.prototype), 'destroy', this).call(this);
       this._loadPromise = null;
+      this._sourceObj = null;
       this._removeBindings();
       this._shaka.destroy();
     }
@@ -449,7 +451,10 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
       if (videoTrack instanceof _playkitJs.VideoTrack && videoTracks) {
         var selectedVideoTrack = videoTracks[videoTrack.index];
         if (selectedVideoTrack) {
-          this._shaka.configure({ abr: { enabled: false } });
+          if (this.isAdaptiveBitrateEnabled()) {
+            this._shaka.configure({ abr: { enabled: false } });
+            this._trigger(_playkitJs.BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, { mode: 'manual' });
+          }
           if (!selectedVideoTrack.active) {
             this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
             this._onTrackChanged(videoTrack);
@@ -516,7 +521,10 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
   }, {
     key: 'enableAdaptiveBitrate',
     value: function enableAdaptiveBitrate() {
-      this._shaka.configure({ abr: { enabled: true } });
+      if (!this.isAdaptiveBitrateEnabled()) {
+        this._trigger(_playkitJs.BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, { mode: 'auto' });
+        this._shaka.configure({ abr: { enabled: true } });
+      }
     }
 
     /**
