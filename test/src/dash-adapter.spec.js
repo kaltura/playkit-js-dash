@@ -293,7 +293,6 @@ describe('DashAdapter: selectVideoTrack', () => {
   });
 
   it('should not change the already selected video track but disable ABR', (done) => {
-    //TODO this is a bug in shaka which fires 'adaptation' when disabling adaptation. see https://github.com/google/shaka-player/issues/856
     dashInstance.load().then(() => {
       dashInstance.addEventListener('videotrackchanged', () => {
         eventIsFired = true;
@@ -307,8 +306,7 @@ describe('DashAdapter: selectVideoTrack', () => {
         return track.active;
       })[0].id);
       setTimeout(() => {
-        //TODO should be false once shaka will fix the issue above
-        eventIsFired.should.be.true;
+        eventIsFired.should.be.false;
         done();
       }, 1000)
     });
@@ -606,6 +604,27 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
     dashInstance.enableAdaptiveBitrate();
     dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
     dashInstance.isAdaptiveBitrateEnabled().should.be.true;
+  });
+
+  it('should fire abr mode changed event', (done) => {
+    let mode = 'manual';
+    let counter = 0;
+    dashInstance.addEventListener('abrmodechanged', (event) => {
+      event.payload.mode.should.equal(mode);
+      counter++;
+      if (counter === 3) {
+        done();
+      }
+    });
+    dashInstance.load().then(() => {
+      mode = 'auto';
+      dashInstance.enableAdaptiveBitrate();
+      let inactiveTrack = dashInstance._getParsedVideoTracks().filter((track) => {
+        return !track.active;
+      })[0];
+      mode = 'manual';
+      dashInstance.selectVideoTrack(inactiveTrack);
+    });
   });
 });
 

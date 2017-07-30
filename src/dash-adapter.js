@@ -134,6 +134,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (!this._loadPromise) {
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
+          this._trigger(BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
           this._shaka.load(this._sourceObj.url, startTime).then(() => {
             let data = {tracks: this._getParsedTracks()};
             DashAdapter._logger.debug('The source has been loaded successfully');
@@ -157,6 +158,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     DashAdapter._logger.debug('destroy');
     super.destroy();
     this._loadPromise = null;
+    this._sourceObj = null;
     this._removeBindings();
     this._shaka.destroy();
   }
@@ -294,7 +296,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if ((videoTrack instanceof VideoTrack) && videoTracks) {
       let selectedVideoTrack = videoTracks[videoTrack.index];
       if (selectedVideoTrack) {
-        this._shaka.configure({abr: {enabled: false}});
+        if (this.isAdaptiveBitrateEnabled()) {
+          this._shaka.configure({abr: {enabled: false}});
+          this._trigger(BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, {mode: 'manual'});
+        }
         if (!selectedVideoTrack.active) {
           this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
           this._onTrackChanged(videoTrack);
@@ -349,7 +354,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   enableAdaptiveBitrate(): void {
-    this._shaka.configure({abr: {enabled: true}});
+    if (!this.isAdaptiveBitrateEnabled()) {
+      this._trigger(BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, {mode: 'auto'});
+      this._shaka.configure({abr: {enabled: true}});
+    }
   }
 
   /**
