@@ -48,7 +48,7 @@ Finally, add the bundle as a script tag in your page, and initialize the player
 ```html
 <script type="text/javascript" src="/PATH/TO/FILE/playkit.js"></script>
 <script type="text/javascript" src="/PATH/TO/FILE/playkit-dash.js"></script>
-<div id="videoContainer" style="height:360px;width:640px">
+<div id="videoContainer" style="height:360px; width:640px">
 <script type="text/javascript">
 var config = {...};
 var player = playkit.loadPlayer("videoContainer", config);
@@ -66,8 +66,8 @@ The configuration is exposed via the playback section:
 {
   playback:{
     options: {
-      html5:{
-        dash:{
+      html5: {
+        dash: {
           // Shaka Player configuration options here
         }
       }
@@ -78,7 +78,7 @@ The configuration is exposed via the playback section:
 
 ## Running the tests
 
-Tests can be run localy via [Karma], which will run on Chrome, Firefox and Safari
+Tests can be run locally via [Karma], which will run on Chrome, Firefox and Safari
 
 [Karma]: https://karma-runner.github.io/1.0/index.html
 ```
