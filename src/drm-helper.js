@@ -1,5 +1,6 @@
 // @flow
 import {Env} from 'playkit-js'
+import DashAdapter from './dash-adapter'
 
 const DEVICE: ?string = Env.device.type;
 const OS: string = Env.os.name;
@@ -37,8 +38,15 @@ export default class DrmHelper {
 
   static canPlayDrm(drmData: Array<Object>): boolean {
     if (typeof DrmHelper.DrmSupport[BROWSER] === 'function') {
-      const drmScheme = DrmHelper.DrmSupport[BROWSER]();
-      return !!(drmData.find((drmEntry) => drmEntry.scheme === drmScheme));
+      let drmScheme = DrmHelper.DrmSupport[BROWSER]();
+      let drmEntry = (drmData.find((drmEntry) => drmEntry.scheme === drmScheme));
+      let canPlayDrm = !!drmEntry;
+      if (canPlayDrm) {
+        DashAdapter._logger.debug(`Can play ${drmEntry.scheme} drm since running env is ${BROWSER}/${OS}`, drmEntry);
+      } else {
+        DashAdapter._logger.debug(`Cannot play any drm since running env is ${BROWSER}/${OS}`);
+      }
+      return canPlayDrm;
     }
     return false;
   }
