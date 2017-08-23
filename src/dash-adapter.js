@@ -1,5 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
+import DrmHelper from './drm-helper'
 import {registerMediaSourceAdapter, BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
 import {Utils} from 'playkit-js'
@@ -75,6 +76,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Checks if dash adapter can play a given drm data.
+   * @param {Array<Object>} drmData - The drm data to check.
+   * @returns {boolean} - Whether the dash adapter can play a specific drm data.
+   * @static
+   */
+  static canPlayDrm(drmData: Array<Object>): boolean {
+    let canPlayDrm = DrmHelper.canPlayDrm(drmData);
+    DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString());
+    return canPlayDrm;
+  }
+
+  /**
    * Checks if the dash adapter is supported
    * @function isSupported
    * @returns {boolean} -  Whether dash is supported.
@@ -97,9 +110,22 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
     this._shaka = new shaka.Player(videoElement);
-    this._shaka.configure(config);
+    this._maybeSetDrmConfig();
+    this._shaka.configure(this._config);
     this._shaka.setTextTrackVisibility(true);
     this._addBindings();
+  }
+
+  /**
+   * Configure drm for shaka player.
+   * @private
+   * @returns {void}
+   */
+  _maybeSetDrmConfig(): void {
+    if (this._sourceObj && this._sourceObj.drmData) {
+      DashAdapter._logger.debug('Sets drm configuration for shaka player');
+      DrmHelper.setDrmConfig(this._config, this._sourceObj.drmData);
+    }
   }
 
   /**
