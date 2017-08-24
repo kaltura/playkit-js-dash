@@ -1,8 +1,6 @@
 // @flow
-import {DrmSupport, DrmScheme, Env} from 'playkit-js'
+import {DrmSupport, DrmScheme} from 'playkit-js'
 import DashAdapter from '../dash-adapter'
-
-const BROWSER: string = Env.browser.name;
 
 export default class PlayReady {
   /**
@@ -14,12 +12,7 @@ export default class PlayReady {
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
     DashAdapter._logger.debug("Can play DRM scheme of: " + DrmScheme.PLAYREADY);
-    if (typeof DrmSupport[BROWSER] === 'function') {
-      let drmScheme = DrmSupport[BROWSER]();
-      DashAdapter._logger.debug("Supported DRM scheme for current environment is: " + drmScheme);
-      return (drmScheme === DrmScheme.PLAYREADY && !!(drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.PLAYREADY)));
-    }
-    return false;
+    return DrmSupport.isProtocolSupported(DrmScheme.PLAYREADY, drmData);
   }
 
   /**

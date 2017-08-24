@@ -14,12 +14,7 @@ export default class Widevine {
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
     DashAdapter._logger.debug("Can play DRM scheme of: " + DrmScheme.WIDEVINE);
-    if (typeof DrmSupport[BROWSER] === 'function') {
-      let drmScheme = DrmSupport[BROWSER]();
-      DashAdapter._logger.debug("Supported DRM scheme for current environment is: " + drmScheme);
-      return (drmScheme === DrmScheme.WIDEVINE && !!(drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.WIDEVINE)));
-    }
-    return false;
+    return DrmSupport.isProtocolSupported(DrmScheme.WIDEVINE, drmData);
   }
 
   /**
