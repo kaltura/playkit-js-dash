@@ -25,18 +25,20 @@ export default class Widevine {
    */
   static setDrmPlayback(config: Object, drmData: Array<Object>): void {
     let wwDrmEntry = drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.WIDEVINE);
-    config.drm = {
-      servers: {
-        [DrmScheme.WIDEVINE]: wwDrmEntry.licenseUrl
-      }
-    };
-    if (BROWSER === 'Chrome') {
-      config.drm.advanced = {
-        [DrmScheme.WIDEVINE]: {
-          'videoRobustness': 'SW_SECURE_CRYPTO',
-          'audioRobustness': 'SW_SECURE_CRYPTO'
+    if (wwDrmEntry) {
+      config.drm = {
+        servers: {
+          [DrmScheme.WIDEVINE]: wwDrmEntry.licenseUrl
         }
       };
+      if (BROWSER === 'Chrome') {
+        config.drm.advanced = {
+          [DrmScheme.WIDEVINE]: {
+            'videoRobustness': 'SW_SECURE_CRYPTO',
+            'audioRobustness': 'SW_SECURE_CRYPTO'
+          }
+        };
+      }
     }
   }
 }

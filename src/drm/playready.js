@@ -23,10 +23,12 @@ export default class PlayReady {
    */
   static setDrmPlayback(config: Object, drmData: Array<Object>): void {
     let prDrmEntry = drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.PLAYREADY);
-    config.drm = {
-      servers: {
-        [DrmScheme.PLAYREADY]: prDrmEntry.licenseUrl
-      }
-    };
+    if (prDrmEntry) {
+      config.drm = {
+        servers: {
+          [DrmScheme.PLAYREADY]: prDrmEntry.licenseUrl
+        }
+      };
+    }
   }
 }
