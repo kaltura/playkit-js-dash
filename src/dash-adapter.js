@@ -1,9 +1,10 @@
 // @flow
 import shaka from 'shaka-player';
-import DrmHelper from './drm-helper'
 import {registerMediaSourceAdapter, BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
 import {Utils} from 'playkit-js'
+import Widevine from './drm/widevine'
+import PlayReady from './drm/playready'
 
 /**
  * Adapter of shaka lib for dash content
@@ -31,6 +32,20 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   static _dashMimeType = 'application/dash+xml';
+  /**
+   * The DRM protocols implementations for native adapter.
+   * @type {Array<Function>}
+   * @private
+   * @static
+   */
+  static _drmProtocols: Array<Function> = [Widevine, PlayReady];
+  /**
+   * The DRM protocol for the current playback.
+   * @type {?Function}
+   * @private
+   * @static
+   */
+  static _drmProtocol: ?Function = null;
   /**
    * The shaka player instance
    * @member {any} _shaka
@@ -82,9 +97,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
-    let canPlayDrm = DrmHelper.canPlayDrm(drmData);
-    DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString());
-    return canPlayDrm;
+    for (let drmProtocol of DashAdapter._drmProtocols) {
+      if (drmProtocol.canPlayDrm(drmData)) {
+        DashAdapter._drmProtocol = drmProtocol;
+        DashAdapter._logger.debug('canPlayDrm result is true');
+        return true;
+      }
+    }
+    DashAdapter._logger.warn('canPlayDrm result is false');
+    return false;
   }
 
   /**
@@ -122,9 +143,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _maybeSetDrmConfig(): void {
-    if (this._sourceObj && this._sourceObj.drmData) {
-      DashAdapter._logger.debug('Sets drm configuration for shaka player');
-      DrmHelper.setDrmConfig(this._config, this._sourceObj.drmData);
+    if (DashAdapter._drmProtocol && this._sourceObj && this._sourceObj.drmData) {
+      DashAdapter._drmProtocol.setDrmPlayback(this._config, this._sourceObj.drmData);
     }
   }
 
@@ -187,6 +207,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._sourceObj = null;
     this._removeBindings();
     this._shaka.destroy();
+    DashAdapter._drmProtocol = null;
   }
 
   /**
