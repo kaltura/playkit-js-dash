@@ -371,6 +371,14 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return shakaConfig.abr.enabled;
   }
 
+  seekToLiveEdge(): void {
+    this._videoElement.currentTime = this._shaka.seekRange().end;
+  }
+
+  isLive(): boolean {
+    return this._shaka.isLive();
+  }
+
   /**
    * An handler to shaka adaptation event
    * @function _onAdaptation
@@ -406,6 +414,47 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       return this._sourceObj.url;
     }
     return "";
+  }
+
+  /**
+   * Get the current time in seconds.
+   * @returns {Number} - The current playback time.
+   * @public
+   */
+  get currentTime(): number {
+    if (this.isLive()) {
+      return this._videoElement.currentTime - this._shaka.seekRange().start;
+    } else {
+      return super.currentTime;
+    }
+  }
+
+  /**
+   * Set the current time in seconds.
+   * @param {Number} to - The number to set in seconds.
+   * @public
+   * @returns {void}
+   */
+  set currentTime(to: number): void {
+    if (this.isLive()) {
+      this._videoElement.currentTime = this._shaka.seekRange().start + to;
+    } else {
+      super.currentTime = to;
+    }
+  }
+
+  /**
+   * Get the duration in seconds.
+   * @returns {?Number} - The playback duration.
+   * @public
+   */
+  get duration(): number {
+    if (this.isLive()) {
+      let seekRange = this._shaka.seekRange();
+      return seekRange.end - seekRange.start;
+    } else {
+      return super.duration;
+    }
   }
 }
 
