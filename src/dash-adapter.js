@@ -3,6 +3,8 @@ import shaka from 'shaka-player';
 import {registerMediaSourceAdapter, BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
 import {Utils} from 'playkit-js'
+import Widevine from './drm/widevine'
+import PlayReady from './drm/playready'
 
 /**
  * Adapter of shaka lib for dash content
@@ -30,6 +32,20 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   static _dashMimeType = 'application/dash+xml';
+  /**
+   * The DRM protocols implementations for dash adapter.
+   * @type {Array<Function>}
+   * @private
+   * @static
+   */
+  static _drmProtocols: Array<Function> = [Widevine, PlayReady];
+  /**
+   * The DRM protocol for the current playback.
+   * @type {?Function}
+   * @private
+   * @static
+   */
+  static _drmProtocol: ?Function = null;
   /**
    * The shaka player instance
    * @member {any} _shaka
@@ -75,6 +91,25 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Checks if dash adapter can play a given drm data.
+   * @param {Array<Object>} drmData - The drm data to check.
+   * @returns {boolean} - Whether the dash adapter can play a specific drm data.
+   * @static
+   */
+  static canPlayDrm(drmData: Array<Object>): boolean {
+    let canPlayDrm = false;
+    for (let drmProtocol of DashAdapter._drmProtocols) {
+      if (drmProtocol.canPlayDrm(drmData)) {
+        DashAdapter._drmProtocol = drmProtocol;
+        canPlayDrm = true;
+        break;
+      }
+    }
+    DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString(), drmData);
+    return canPlayDrm;
+  }
+
+  /**
    * Checks if the dash adapter is supported
    * @function isSupported
    * @returns {boolean} -  Whether dash is supported.
@@ -97,9 +132,21 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
     this._shaka = new shaka.Player(videoElement);
-    this._shaka.configure(config);
+    this._maybeSetDrmConfig();
+    this._shaka.configure(this._config);
     this._shaka.setTextTrackVisibility(true);
     this._addBindings();
+  }
+
+  /**
+   * Configure drm for shaka player.
+   * @private
+   * @returns {void}
+   */
+  _maybeSetDrmConfig(): void {
+    if (DashAdapter._drmProtocol && this._sourceObj && this._sourceObj.drmData) {
+      DashAdapter._drmProtocol.setDrmPlayback(this._config, this._sourceObj.drmData);
+    }
   }
 
   /**
@@ -161,6 +208,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._sourceObj = null;
     this._removeBindings();
     this._shaka.destroy();
+    if (DashAdapter._drmProtocol) {
+      DashAdapter._drmProtocol.destroy();
+      DashAdapter._drmProtocol = null;
+    }
   }
 
   /**
