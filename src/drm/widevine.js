@@ -33,7 +33,8 @@ export default class Widevine extends BaseDrmProtocol {
       config.drm = {
         servers: {
           [DrmScheme.WIDEVINE]: wwDrmEntry.licenseUrl
-        }
+        },
+        advanced: {}
       };
       if (browser === 'Chrome') {
         config.drm.advanced = {
