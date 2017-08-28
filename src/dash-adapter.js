@@ -371,10 +371,22 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return shakaConfig.abr.enabled;
   }
 
+  /**
+   * Seeking to live edge.
+   * @function seekToLiveEdge
+   * @returns {void}
+   * @public
+   */
   seekToLiveEdge(): void {
     this._videoElement.currentTime = this._shaka.seekRange().end;
   }
 
+  /**
+   * Checking if the current playback is live.
+   * @function isLive
+   * @returns {boolean} - Whether playback is live.
+   * @public
+   */
   isLive(): boolean {
     return this._shaka.isLive();
   }
