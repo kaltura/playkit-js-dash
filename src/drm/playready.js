@@ -1,11 +1,12 @@
 // @flow
 import {BaseDrmProtocol} from 'playkit-js'
-import DashAdapter from '../dash-adapter'
 
 const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 
 export default class PlayReady extends BaseDrmProtocol {
+  static _logger = BaseDrmProtocol.getLogger('PlayReady');
+
   /**
    * PlayReady playback supports in case 2 conditions are met:
    * 1. The environment supports PlayReady playback.
@@ -14,7 +15,7 @@ export default class PlayReady extends BaseDrmProtocol {
    * @return {boolean} - Whether FairPlay can be play on the current environment.
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
-    DashAdapter._logger.debug("Can play DRM scheme of: " + DrmScheme.PLAYREADY);
+    PlayReady._logger.debug("Can play DRM scheme of: " + DrmScheme.PLAYREADY);
     return DrmSupport.isProtocolSupported(DrmScheme.PLAYREADY, drmData);
   }
 
@@ -25,6 +26,7 @@ export default class PlayReady extends BaseDrmProtocol {
    * @returns {void}
    */
   static setDrmPlayback(config: Object, drmData: Array<Object>): void {
+    PlayReady._logger.debug("Sets drm playback");
     let prDrmEntry = drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.PLAYREADY);
     if (prDrmEntry) {
       config.drm = {
