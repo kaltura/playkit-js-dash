@@ -1,8 +1,11 @@
 // @flow
-import {DrmSupport, DrmScheme} from 'playkit-js'
+import {BaseDrmProtocol} from 'playkit-js'
 import DashAdapter from '../dash-adapter'
 
-export default class PlayReady {
+const DrmSupport = BaseDrmProtocol.DrmSupport;
+const DrmScheme = BaseDrmProtocol.DrmScheme;
+
+export default class PlayReady extends BaseDrmProtocol {
   /**
    * PlayReady playback supports in case 2 conditions are met:
    * 1. The environment supports PlayReady playback.

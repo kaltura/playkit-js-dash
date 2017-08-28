@@ -33,7 +33,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   static _dashMimeType = 'application/dash+xml';
   /**
-   * The DRM protocols implementations for native adapter.
+   * The DRM protocols implementations for dash adapter.
    * @type {Array<Function>}
    * @private
    * @static
@@ -97,15 +97,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
+    let canPlayDrm = false;
     for (let drmProtocol of DashAdapter._drmProtocols) {
       if (drmProtocol.canPlayDrm(drmData)) {
         DashAdapter._drmProtocol = drmProtocol;
-        DashAdapter._logger.debug('canPlayDrm result is true');
-        return true;
+        canPlayDrm = true;
+        break;
       }
     }
-    DashAdapter._logger.warn('canPlayDrm result is false');
-    return false;
+    DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString(), drmData);
+    return canPlayDrm;
   }
 
   /**

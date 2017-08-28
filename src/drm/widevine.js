@@ -1,10 +1,11 @@
 // @flow
-import {DrmSupport, DrmScheme, Env} from 'playkit-js'
+import {BaseDrmProtocol, Env} from 'playkit-js'
 import DashAdapter from '../dash-adapter'
 
-const BROWSER: string = Env.browser.name;
+const DrmSupport = BaseDrmProtocol.DrmSupport;
+const DrmScheme = BaseDrmProtocol.DrmScheme;
 
-export default class Widevine {
+export default class Widevine extends BaseDrmProtocol {
   /**
    * Widevine playback supports in case 2 conditions are met:
    * 1. The environment supports Widevine playback.
@@ -24,6 +25,7 @@ export default class Widevine {
    * @returns {void}
    */
   static setDrmPlayback(config: Object, drmData: Array<Object>): void {
+    let browser = Env.browser.name;
     let wwDrmEntry = drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.WIDEVINE);
     if (wwDrmEntry) {
       config.drm = {
@@ -31,7 +33,7 @@ export default class Widevine {
           [DrmScheme.WIDEVINE]: wwDrmEntry.licenseUrl
         }
       };
-      if (BROWSER === 'Chrome') {
+      if (browser === 'Chrome') {
         config.drm.advanced = {
           [DrmScheme.WIDEVINE]: {
             'videoRobustness': 'SW_SECURE_CRYPTO',
