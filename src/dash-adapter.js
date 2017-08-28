@@ -208,7 +208,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._sourceObj = null;
     this._removeBindings();
     this._shaka.destroy();
-    DashAdapter._drmProtocol = null;
+    if (DashAdapter._drmProtocol) {
+      DashAdapter._drmProtocol.destroy();
+      DashAdapter._drmProtocol = null;
+    }
   }
 
   /**
