@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/kaltura/playkit-js-dash/compare/v1.0.1...v1.1.0) (2017-08-31)
+
+
+### Bug Fixes
+
+* **FEC-6968:** loadstart issue ([#26](https://github.com/kaltura/playkit-js-dash/issues/26)) ([4246079](https://github.com/kaltura/playkit-js-dash/commit/4246079))
+
+
+### Features
+
+* drm ([#24](https://github.com/kaltura/playkit-js-dash/issues/24)) ([a844b81](https://github.com/kaltura/playkit-js-dash/commit/a844b81))
+* support dash live ([#25](https://github.com/kaltura/playkit-js-dash/issues/25)) ([0e0e97f](https://github.com/kaltura/playkit-js-dash/commit/0e0e97f))
+
+
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/kaltura/playkit-js-dash/compare/v1.0.0...v1.0.1) (2017-07-30)
 
