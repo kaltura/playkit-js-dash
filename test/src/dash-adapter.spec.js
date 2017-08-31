@@ -144,35 +144,6 @@ describe('DashAdapter: id', () => {
   });
 });
 
-describe('DashAdapter: constructor', () => {
-  let video, dashInstance, config;
-
-  before(() => {
-    video = document.createElement('video');
-    config = {playback: {options: {html5: {dash: {}}}}};
-  });
-
-  after(() => {
-    TestUtils.removeVideoElementsFromTestPage();
-  });
-
-  beforeEach(() => {
-    dashInstance = DashAdapter.createAdapter(video, {url: ''}, config);
-  });
-
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
-  });
-
-  it('should create all dash adapter properties', () => {
-    dashInstance._shaka.should.exist;
-    dashInstance._config.should.exist;
-    dashInstance._videoElement.should.exist;
-    dashInstance._sourceObj.should.exist;
-  });
-});
-
 describe('DashAdapter: load', () => {
   let video, dashInstance, config;
 
@@ -188,6 +159,16 @@ describe('DashAdapter: load', () => {
 
   after(() => {
     TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should create all dash adapter properties', () => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance.load().then(() => {
+      dashInstance._shaka.should.exist;
+      dashInstance._config.should.exist;
+      dashInstance._videoElement.should.exist;
+      dashInstance._sourceObj.should.exist;
+    });
   });
 
   it('should success', (done) => {
@@ -642,10 +623,12 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
   });
 
   it('should enable ABR', () => {
-    dashInstance._shaka.getConfiguration().abr.enabled.should.be.false;
-    dashInstance.enableAdaptiveBitrate();
-    dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
-    dashInstance.isAdaptiveBitrateEnabled().should.be.true;
+    dashInstance.load().then(() => {
+      dashInstance._shaka.getConfiguration().abr.enabled.should.be.false;
+      dashInstance.enableAdaptiveBitrate();
+      dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
+      dashInstance.isAdaptiveBitrateEnabled().should.be.true;
+    });
   });
 
   it('should fire abr mode changed event', (done) => {
