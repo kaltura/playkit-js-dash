@@ -441,6 +441,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       let shakaConfig = this._shaka.getConfiguration();
       return shakaConfig.abr.enabled;
     }
+    return false;
   }
 
   /**
