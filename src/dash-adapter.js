@@ -332,7 +332,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   selectTextTrack(textTrack: TextTrack): void {
     if ((textTrack instanceof TextTrack) && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
       this._shaka.selectTextLanguage(textTrack.language);
-      this._shaka.setTextTrackVisibility(true);
+      this._shaka.setTextTrackVisibility(false);
       this._onTrackChanged(textTrack);
     }
   }
