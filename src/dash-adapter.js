@@ -116,8 +116,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static isSupported(): boolean {
+    let resetVttPolyfill = false;
+    //for browsers which don't have VTT cue we need to install a polyfill for both isBrowserSupported
+    //check and also for playback, but we might not use Shaka so if we install the polyfill now just for browser support
+    //check then uninstall it after, and call it again if we actually use DASH adapter for playback on init
+    //this is in order to avoid collisions with other libs
+    if (!window.VTTCue) {
+      resetVttPolyfill = true;
+    }
     shaka.polyfill.installAll();
     let isSupported = shaka.Player.isBrowserSupported();
+    if (resetVttPolyfill){
+      window.VTTCue = undefined;
+    }
     DashAdapter._logger.debug('isSupported:' + isSupported);
     return isSupported;
   }
@@ -140,10 +151,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _init(): void {
+    //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
+    shaka.polyfill.installAll();
     this._shaka = new shaka.Player(this._videoElement);
     this._maybeSetDrmConfig();
     this._shaka.configure(this._config);
-    this._shaka.setTextTrackVisibility(true);
+    this._shaka.setTextTrackVisibility(false);
     this._addBindings();
   }
 
@@ -400,7 +413,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   selectTextTrack(textTrack: TextTrack): void {
     if (this._shaka && (textTrack instanceof TextTrack) && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
       this._shaka.selectTextLanguage(textTrack.language);
-      this._shaka.setTextTrackVisibility(true);
+      this._shaka.setTextTrackVisibility(false);
       this._onTrackChanged(textTrack);
     }
   }
