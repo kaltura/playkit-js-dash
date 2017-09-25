@@ -12,7 +12,7 @@ module.exports = {
     filename: '[name].js',
     library: "PlaykitJsDash",
     libraryTarget: "umd",
-    devtoolModuleFilenameTemplate: "webpack:///dash/[resource-path]",
+    devtoolModuleFilenameTemplate: "./dash/[resource-path]",
   },
   devtool: 'source-map',
   plugins: PROD ? [new webpack.optimize.UglifyJsPlugin({sourceMap: true})] : [],
