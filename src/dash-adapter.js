@@ -207,23 +207,25 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * Destroying the dash adapter
+   * Destroys the dash adapter
    * @function destroy
    * @override
+   * @returns {Promise<*>} - The destroy promise.
    */
-  destroy(): void {
-    DashAdapter._logger.debug('destroy');
-    super.destroy();
-    this._loadPromise = null;
-    this._sourceObj = null;
-    if (this._shaka) {
-      this._removeBindings();
-      this._shaka.destroy();
-    }
-    if (DashAdapter._drmProtocol) {
-      DashAdapter._drmProtocol.destroy();
-      DashAdapter._drmProtocol = null;
-    }
+  destroy(): Promise<*> {
+    return super.destroy().then(() => {
+      DashAdapter._logger.debug('destroy');
+      this._loadPromise = null;
+      if (DashAdapter._drmProtocol) {
+        DashAdapter._drmProtocol.destroy();
+        DashAdapter._drmProtocol = null;
+      }
+      if (this._shaka) {
+        this._removeBindings();
+        return this._shaka.destroy();
+      }
+      return Promise.resolve();
+    });
   }
 
   /**
