@@ -691,7 +691,7 @@ describe('DashAdapter: isLive', () => {
     });
   });
 
-  it('should return true for live + DVR', (done) => {
+  it.skip('should return true for live + DVR', (done) => {
     dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
     dashInstance.load().then(() => {
       dashInstance.isLive().should.be.true;
@@ -728,7 +728,7 @@ describe('DashAdapter: seekToLiveEdge', () => {
     });
   });
 
-  it('should seek to live edge - DVR', (done) => {
+  it.skip('should seek to live edge - DVR', (done) => {
     dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
     dashInstance.load().then(() => {
       video.currentTime = dashInstance._shaka.seekRange().start;
@@ -777,7 +777,7 @@ describe('DashAdapter: get currentTime', () => {
     });
   });
 
-  it('should return live current time for live + DVR', (done) => {
+  it.skip('should return live current time for live + DVR', (done) => {
     dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
     dashInstance.load().then(() => {
       dashInstance.currentTime.should.be.equal(video.currentTime - dashInstance._shaka.seekRange().start);
@@ -825,7 +825,7 @@ describe('DashAdapter: set currentTime', () => {
     });
   });
 
-  it('should set live current time for live + DVR', (done) => {
+  it.skip('should set live current time for live + DVR', (done) => {
     dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
     dashInstance.load().then(() => {
       let ct = video.currentTime;
@@ -869,7 +869,7 @@ describe('DashAdapter: get duration', () => {
     });
   });
 
-  it('should return live duration for live + DVR', (done) => {
+  it.skip('should return live duration for live + DVR', (done) => {
     dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
     dashInstance.load().then(() => {
       dashInstance.duration.should.be.equal(dashInstance._shaka.seekRange().end - dashInstance._shaka.seekRange().start);
