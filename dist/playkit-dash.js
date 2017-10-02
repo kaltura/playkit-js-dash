@@ -264,8 +264,21 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
   }, {
     key: 'isSupported',
     value: function isSupported() {
+      /*
+      for browsers which don't have VTT cue we need to install a polyfill for both isBrowserSupported
+      check and also for playback, but we might not use Shaka so if we install the polyfill now just for browser support
+      check then uninstall it after, and call it again if we actually use DASH adapter for playback on init
+      this is in order to avoid collisions with other libs
+       */
+      var resetVttPolyfill = false;
+      if (!window.VTTCue) {
+        resetVttPolyfill = true;
+      }
       _shakaPlayer2.default.polyfill.installAll();
       var isSupported = _shakaPlayer2.default.Player.isBrowserSupported();
+      if (resetVttPolyfill) {
+        window.VTTCue = undefined;
+      }
       DashAdapter._logger.debug('isSupported:' + isSupported);
       return isSupported;
     }
@@ -298,10 +311,12 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
   _createClass(DashAdapter, [{
     key: '_init',
     value: function _init() {
+      //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
+      _shakaPlayer2.default.polyfill.installAll();
       this._shaka = new _shakaPlayer2.default.Player(this._videoElement);
       this._maybeSetDrmConfig();
       this._shaka.configure(this._config);
-      this._shaka.setTextTrackVisibility(true);
+      this._shaka.setTextTrackVisibility(false);
       this._addBindings();
     }
 
@@ -602,7 +617,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     value: function selectTextTrack(textTrack) {
       if (this._shaka && textTrack instanceof _playkitJs.TextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
         this._shaka.selectTextLanguage(textTrack.language);
-        this._shaka.setTextTrackVisibility(true);
+        this._shaka.setTextTrackVisibility(false);
         this._onTrackChanged(textTrack);
       }
     }

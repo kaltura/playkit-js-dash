@@ -1,6 +1,6 @@
 {
   "name": "playkit-js-dash",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "",
   "main": "dist/playkit-dash.js",
   "scripts": {
@@ -16,6 +16,7 @@
     "test:safari": "NODE_ENV=test karma start --color --browsers Safari",
     "test:watch": "NODE_ENV=test karma start --color --auto-watch",
     "start": "webpack-dev-server",
+    "release:dry-run": "standard-version --dry-run",
     "release": "standard-version",
     "publish": "git push --follow-tags --no-verify origin master",
     "eslint": "eslint . --color",
@@ -60,7 +61,7 @@
     "karma-webpack": "^2.0.2",
     "mocha": "^3.2.0",
     "mocha-cli": "^1.0.1",
-    "playkit-js": "git+https://github.com/kaltura/playkit-js.git#v0.6.1",
+    "playkit-js": "git+https://github.com/kaltura/playkit-js.git#v0.10.0",
     "shaka-player": "2.2.0",
     "sinon": "^2.0.0",
     "sinon-chai": "^2.8.0",
@@ -72,7 +73,7 @@
   "keywords": [],
   "license": "AGPL-3.0",
   "peerDependencies": {
-    "playkit-js": "git+https://github.com/kaltura/playkit-js.git#v0.6.1",
+    "playkit-js": "git+https://github.com/kaltura/playkit-js.git#v0.10.0",
     "shaka-player": "2.2.0"
   },
   "repository": {
