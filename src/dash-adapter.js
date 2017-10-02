@@ -116,11 +116,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static isSupported(): boolean {
+    /*
+    for browsers which don't have VTT cue we need to install a polyfill for both isBrowserSupported
+    check and also for playback, but we might not use Shaka so if we install the polyfill now just for browser support
+    check then uninstall it after, and call it again if we actually use DASH adapter for playback on init
+    this is in order to avoid collisions with other libs
+     */
     let resetVttPolyfill = false;
-    //for browsers which don't have VTT cue we need to install a polyfill for both isBrowserSupported
-    //check and also for playback, but we might not use Shaka so if we install the polyfill now just for browser support
-    //check then uninstall it after, and call it again if we actually use DASH adapter for playback on init
-    //this is in order to avoid collisions with other libs
     if (!window.VTTCue) {
       resetVttPolyfill = true;
     }
