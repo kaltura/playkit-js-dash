@@ -262,7 +262,7 @@ describe('DashAdapter: _getParsedTracks', () => {
         }
         if (track instanceof TextTrack) {
           track.kind.should.equal(textTracks[track.index].kind + 's');
-          track.active.should.equal(textTracks[track.index].active);
+          track.active.should.be.false;
           track.language.should.equal(textTracks[track.index].language);
           (track.label === textTracks[track.index].label).should.be.true;
         }
@@ -524,80 +524,80 @@ describe('DashAdapter: selectTextTrack', () => {
   });
 
   it('should not change the already selected text track', (done) => {
+    let eventCounter = 0;
     dashInstance.load().then(() => {
       dashInstance.addEventListener('texttrackchanged', () => {
-        eventIsFired = true;
+        eventCounter++;
+        activeTrack.active = true;
       });
-      let activeTrack = dashInstance._getParsedTextTracks().filter((track) => {
-        return track.active;
-      })[0];
-      let eventIsFired = false;
+      let activeTrack = dashInstance._getParsedTextTracks()[0];
+      dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(activeTrack);
       activeTrack.language.should.be.equal(dashInstance._shaka.getTextTracks().filter((track) => {
         return track.active;
       })[0].language);
       setTimeout(() => {
-        eventIsFired.should.be.false;
+        eventCounter.should.equals(1);
         done();
       }, 1000)
     });
   });
 
   it('should not change the selected for video track given', (done) => {
+    let eventCounter = 0;
     dashInstance.load().then(() => {
       dashInstance.addEventListener('texttrackchanged', () => {
-        eventIsFired = true;
+        eventCounter++;
+        activeTrack.active = true;
       });
-      let activeTrack = dashInstance._getParsedTextTracks().filter((track) => {
-        return track.active;
-      })[0];
-      let eventIsFired = false;
+      let activeTrack = dashInstance._getParsedTextTracks()[0];
+      dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(new VideoTrack({index: 0}));
       activeTrack.language.should.be.equal(dashInstance._shaka.getTextTracks().filter((track) => {
         return track.active;
       })[0].language);
       setTimeout(() => {
-        eventIsFired.should.be.false;
+        eventCounter.should.equals(1);
         done();
       }, 1000)
     });
   });
 
   it('should not change the selected for no text track given', (done) => {
+    let eventCounter = 0;
     dashInstance.load().then(() => {
       dashInstance.addEventListener('texttrackchanged', () => {
-        eventIsFired = true;
+        eventCounter++;
+        activeTrack.active = true;
       });
-      let activeTrack = dashInstance._getParsedTextTracks().filter((track) => {
-        return track.active;
-      })[0];
-      let eventIsFired = false;
+      let activeTrack = dashInstance._getParsedTextTracks()[0];
+      dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack();
       activeTrack.language.should.be.equal(dashInstance._shaka.getTextTracks().filter((track) => {
         return track.active;
       })[0].language);
       setTimeout(() => {
-        eventIsFired.should.be.false;
+        eventCounter.should.equals(1);
         done();
       }, 1000)
     });
   });
 
   it('should not change the selected for no subtitle or captions given', (done) => {
+    let eventCounter = 0;
     dashInstance.load().then(() => {
       dashInstance.addEventListener('texttrackchanged', () => {
-        eventIsFired = true;
+        eventCounter++;
+        activeTrack.active = true;
       });
-      let activeTrack = dashInstance._getParsedTextTracks().filter((track) => {
-        return track.active;
-      })[0];
-      let eventIsFired = false;
+      let activeTrack = dashInstance._getParsedTextTracks()[0];
+      dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(new TextTrack({kind: 'metadata'}));
       activeTrack.language.should.be.equal(dashInstance._shaka.getTextTracks().filter((track) => {
         return track.active;
       })[0].language);
       setTimeout(() => {
-        eventIsFired.should.be.false;
+        eventCounter.should.equals(1);
         done();
       }, 1000)
     });
