@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.2.1"></a>
+## [1.2.1](https://github.com/kaltura/playkit-js-dash/compare/v1.2.0...v1.2.1) (2017-10-04)
+
+
+### Bug Fixes
+
+* **FEC-7034:** update shaka version ([aedbb29](https://github.com/kaltura/playkit-js-dash/commit/aedbb29))
+* **FEC-7233:** when parsing text tracks mark all as inactive ([#30](https://github.com/kaltura/playkit-js-dash/issues/30)) ([de9b1e5](https://github.com/kaltura/playkit-js-dash/commit/de9b1e5))
+
+
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/kaltura/playkit-js-dash/compare/v1.0.1...v1.2.0) (2017-10-02)
 
