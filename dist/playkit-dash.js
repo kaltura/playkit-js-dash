@@ -547,7 +547,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
         for (var i = 0; i < textTracks.length; i++) {
           var settings = {
             kind: textTracks[i].kind ? textTracks[i].kind + 's' : "",
-            active: textTracks[i].active,
+            active: false,
             label: textTracks[i].label,
             language: textTracks[i].language,
             index: i
