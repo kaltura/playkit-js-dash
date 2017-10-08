@@ -152,22 +152,25 @@ describe('DashAdapter: load', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should create all dash adapter properties', () => {
+  it('should create all dash adapter properties', (done) => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance.load().then(() => {
       dashInstance._shaka.should.exist;
       dashInstance._config.should.exist;
       dashInstance._videoElement.should.exist;
       dashInstance._sourceObj.should.exist;
+      done();
     });
   });
 
@@ -213,11 +216,12 @@ describe('DashAdapter: destroy', () => {
       dashInstance._loadPromise.should.be.exist;
       dashInstance._sourceObj.should.be.exist;
       dashInstance._config.should.be.exist;
-      dashInstance.destroy();
-      (!dashInstance._loadPromise).should.be.true;
-      (!dashInstance._sourceObj).should.be.true;
-      (!dashInstance._config).should.be.true;
-      done();
+      dashInstance.destroy().then(() => {
+        (!dashInstance._loadPromise).should.be.true;
+        (!dashInstance._sourceObj).should.be.true;
+        (!dashInstance._config).should.be.true;
+        done();
+      });
     });
   });
 });
@@ -231,9 +235,11 @@ describe('DashAdapter: _getParsedTracks', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -286,9 +292,11 @@ describe('DashAdapter: selectVideoTrack', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -405,9 +413,11 @@ describe('DashAdapter: selectAudioTrack', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -497,9 +507,11 @@ describe('DashAdapter: selectTextTrack', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -613,9 +625,11 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -661,9 +675,11 @@ describe('DashAdapter: isLive', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -708,9 +724,11 @@ describe('DashAdapter: seekToLiveEdge', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -748,9 +766,11 @@ describe('DashAdapter: get currentTime', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -796,9 +816,11 @@ describe('DashAdapter: set currentTime', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -844,9 +866,11 @@ describe('DashAdapter: get duration', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
