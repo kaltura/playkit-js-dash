@@ -239,7 +239,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._removeBindings();
         return this._shaka.destroy();
       }
-      return Promise.resolve();
     });
   }
 
