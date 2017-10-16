@@ -59,6 +59,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _loadPromise: ?Promise<Object>;
+  /**
+   * The buffering state flag
+   * @member {Promise<Object>} - _buffering
+   * @type {boolean}
+   * @private
+   */
+  _buffering: boolean = false;
 
   /**
    * Factory method to create media source adapter.
@@ -182,6 +189,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _addBindings(): void {
     this._shaka.addEventListener('adaptation', this._onAdaptation.bind(this));
     this._shaka.addEventListener('error', this._onError.bind(this));
+    this._shaka.addEventListener('buffering', this._onBuffering.bind(this));
+    //TODO use events enum when available
+    this._videoElement.addEventListener('playing', this._onPlaying.bind(this));
   }
 
   /**
@@ -193,6 +203,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _removeBindings(): void {
     this._shaka.removeEventListener('adaptation', this._onAdaptation);
     this._shaka.removeEventListener('error', this._onError);
+    this._shaka.removeEventListener('buffering', this._onBuffering.bind(this));
+    //TODO use events enum when available
+    this._videoElement.removeEventListener('playing', this._onPlaying.bind(this));
   }
 
   /**
@@ -231,6 +244,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     super.destroy();
     this._loadPromise = null;
     this._sourceObj = null;
+    this._buffering = false;
     if (this._shaka) {
       this._removeBindings();
       this._shaka.destroy();
@@ -506,6 +520,36 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _onError(error: any): void {
     DashAdapter._logger.error(error);
+  }
+
+  /**
+   * An handler to shaka buffering event
+   * @function _onBuffering
+   * @param {any} event - the buffering event
+   * @returns {void}
+   * @private
+   */
+  _onBuffering(event: any): void {
+    this._buffering = event.buffering;
+    if (this._buffering) { //the player enters the buffering state.
+      //TODO use events enum when available
+      this._videoElement.dispatchEvent(new window.Event('waiting'));
+    } else if (!this._videoElement.paused) { //the player leaves the buffering state.
+      this._videoElement.dispatchEvent(new window.Event('playing'));
+    }
+  }
+
+  /**
+   * An handler to HTMLVideoElement playing event
+   * @function _onPlaying
+   * @returns {void}
+   * @private
+   */
+  _onPlaying(): void {
+    if (this._buffering) { //the player is in buffering state.
+      //TODO use events enum when available
+      this._videoElement.dispatchEvent(new window.Event('waiting'));
+    }
   }
 
   /**
