@@ -213,10 +213,12 @@ describe('DashAdapter: destroy', () => {
       dashInstance._loadPromise.should.be.exist;
       dashInstance._sourceObj.should.be.exist;
       dashInstance._config.should.be.exist;
+      dashInstance._buffering = true;
       dashInstance.destroy();
       (!dashInstance._loadPromise).should.be.true;
       (!dashInstance._sourceObj).should.be.true;
       (!dashInstance._config).should.be.true;
+      dashInstance._buffering.should.be.false;
       done();
     });
   });
@@ -875,6 +877,97 @@ describe('DashAdapter: get duration', () => {
       dashInstance.duration.should.be.equal(dashInstance._shaka.seekRange().end - dashInstance._shaka.seekRange().start);
       done();
     });
+  });
+});
+
+describe('DashAdapter: _onBuffering', () => {
+  let video, dashInstance, config;
+
+  beforeEach(() => {
+    video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach(() => {
+    dashInstance.destroy();
+    dashInstance = null;
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should dispatch waiting event when buffering is true', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance._videoElement.addEventListener('waiting', () => {
+      done();
+    });
+    dashInstance._onBuffering({buffering: true});
+  });
+
+  it('should dispatch playing event when buffering is false and video is playing', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    let hasPlaying = false;
+    let onPlaying = () => {
+      if (hasPlaying) {
+        dashInstance._videoElement.removeEventListener('playing', onPlaying);
+        done();
+      } else {
+        hasPlaying = true;
+        dashInstance._onBuffering({buffering: false});
+      }
+    };
+    dashInstance._videoElement.addEventListener('playing', onPlaying);
+    dashInstance.load().then(() => {
+      dashInstance._videoElement.play();
+    });
+  });
+
+  it('should not dispatch playing event when buffering is false but video is paused', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    let t = setTimeout(done, 0);
+    dashInstance._videoElement.addEventListener('playing', () => {
+      done(new Error("test fail"));
+      clearTimeout(t);
+    });
+    dashInstance._onBuffering({buffering: false});
+  });
+});
+
+describe('DashAdapter: _onPlaying', () => {
+  let video, dashInstance, config;
+
+  beforeEach(() => {
+    video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach(() => {
+    dashInstance.destroy();
+    dashInstance = null;
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should dispatch waiting event when buffering is true', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance._videoElement.addEventListener('waiting', () => {
+      done();
+    });
+    dashInstance._buffering = true;
+    dashInstance._onPlaying();
+  });
+
+  it('should not dispatch waiting event when buffering is false', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    let t = setTimeout(done, 0);
+    dashInstance._videoElement.addEventListener('waiting', () => {
+      done(new Error("test fail"));
+      clearTimeout(t);
+    });
+    dashInstance._onPlaying();
   });
 });
 
