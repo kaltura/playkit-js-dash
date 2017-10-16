@@ -61,7 +61,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _loadPromise: ?Promise<Object>;
   /**
    * The buffering state flag
-   * @member {Promise<Object>} - _buffering
+   * @member {boolean} - _buffering
    * @type {boolean}
    * @private
    */
