@@ -140,6 +140,49 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      */
 
     /**
+     * The DRM protocol for the current playback.
+     * @type {?Function}
+     * @private
+     * @static
+     */
+
+    /**
+     * The supported mime type by the dash adapter
+     * @member {string} _dashMimeType
+     * @static
+     * @private
+     */
+
+    /**
+     * The id of Adapter
+     * @member {string} id
+     * @static
+     * @public
+     */
+    value: function createAdapter(videoElement, source, config) {
+      var dashConfig = {};
+      if (_playkitJs.Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
+        dashConfig = config.playback.options.html5.dash;
+      }
+      return new this(videoElement, source, dashConfig);
+    }
+
+    /**
+     * Checks if dash adapter can play a given mime type
+     * @function canPlayType
+     * @param {string} mimeType - The mime type to check
+     * @returns {boolean} - Whether the dash adapter can play a specific mime type
+     * @static
+     */
+
+    /**
+     * The buffering state flag
+     * @member {boolean} - _buffering
+     * @type {boolean}
+     * @private
+     */
+
+    /**
      * The shaka player instance
      * @member {any} _shaka
      * @private
@@ -164,42 +207,6 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      * @member {any} _logger
      * @private
      * @static
-     */
-    value: function createAdapter(videoElement, source, config) {
-      var dashConfig = {};
-      if (_playkitJs.Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
-        dashConfig = config.playback.options.html5.dash;
-      }
-      return new this(videoElement, source, dashConfig);
-    }
-
-    /**
-     * Checks if dash adapter can play a given mime type
-     * @function canPlayType
-     * @param {string} mimeType - The mime type to check
-     * @returns {boolean} - Whether the dash adapter can play a specific mime type
-     * @static
-     */
-
-    /**
-     * The DRM protocol for the current playback.
-     * @type {?Function}
-     * @private
-     * @static
-     */
-
-    /**
-     * The supported mime type by the dash adapter
-     * @member {string} _dashMimeType
-     * @static
-     * @private
-     */
-
-    /**
-     * The id of Adapter
-     * @member {string} id
-     * @static
-     * @public
      */
 
   }, {
@@ -298,7 +305,11 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     _classCallCheck(this, DashAdapter);
 
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + _shakaPlayer2.default.Player.version);
-    return _possibleConstructorReturn(this, (DashAdapter.__proto__ || Object.getPrototypeOf(DashAdapter)).call(this, videoElement, source, config));
+
+    var _this = _possibleConstructorReturn(this, (DashAdapter.__proto__ || Object.getPrototypeOf(DashAdapter)).call(this, videoElement, source, config));
+
+    _this._buffering = false;
+    return _this;
   }
 
   /**
@@ -346,6 +357,9 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     value: function _addBindings() {
       this._shaka.addEventListener('adaptation', this._onAdaptation.bind(this));
       this._shaka.addEventListener('error', this._onError.bind(this));
+      this._shaka.addEventListener('buffering', this._onBuffering.bind(this));
+      //TODO use events enum when available
+      this._videoElement.addEventListener('playing', this._onPlaying.bind(this));
     }
 
     /**
@@ -360,6 +374,9 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     value: function _removeBindings() {
       this._shaka.removeEventListener('adaptation', this._onAdaptation);
       this._shaka.removeEventListener('error', this._onError);
+      this._shaka.removeEventListener('buffering', this._onBuffering.bind(this));
+      //TODO use events enum when available
+      this._videoElement.removeEventListener('playing', this._onPlaying.bind(this));
     }
 
     /**
@@ -394,26 +411,30 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     }
 
     /**
-     * Destroying the dash adapter
+     * Destroys the dash adapter
      * @function destroy
      * @override
+     * @returns {Promise<*>} - The destroy promise.
      */
 
   }, {
     key: 'destroy',
     value: function destroy() {
-      DashAdapter._logger.debug('destroy');
-      _get(DashAdapter.prototype.__proto__ || Object.getPrototypeOf(DashAdapter.prototype), 'destroy', this).call(this);
-      this._loadPromise = null;
-      this._sourceObj = null;
-      if (this._shaka) {
-        this._removeBindings();
-        this._shaka.destroy();
-      }
-      if (DashAdapter._drmProtocol) {
-        DashAdapter._drmProtocol.destroy();
-        DashAdapter._drmProtocol = null;
-      }
+      var _this3 = this;
+
+      return _get(DashAdapter.prototype.__proto__ || Object.getPrototypeOf(DashAdapter.prototype), 'destroy', this).call(this).then(function () {
+        DashAdapter._logger.debug('destroy');
+        _this3._loadPromise = null;
+        _this3._buffering = false;
+        if (DashAdapter._drmProtocol) {
+          DashAdapter._drmProtocol.destroy();
+          DashAdapter._drmProtocol = null;
+        }
+        if (_this3._shaka) {
+          _this3._removeBindings();
+          return _this3._shaka.destroy();
+        }
+      });
     }
 
     /**
@@ -729,6 +750,45 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     key: '_onError',
     value: function _onError(error) {
       DashAdapter._logger.error(error);
+    }
+
+    /**
+     * An handler to shaka buffering event
+     * @function _onBuffering
+     * @param {any} event - the buffering event
+     * @returns {void}
+     * @private
+     */
+
+  }, {
+    key: '_onBuffering',
+    value: function _onBuffering(event) {
+      this._buffering = event.buffering;
+      if (this._buffering) {
+        //the player enters the buffering state.
+        //TODO use events enum when available
+        this._videoElement.dispatchEvent(new window.Event('waiting'));
+      } else if (!this._videoElement.paused) {
+        //the player leaves the buffering state.
+        this._videoElement.dispatchEvent(new window.Event('playing'));
+      }
+    }
+
+    /**
+     * An handler to HTMLVideoElement playing event
+     * @function _onPlaying
+     * @returns {void}
+     * @private
+     */
+
+  }, {
+    key: '_onPlaying',
+    value: function _onPlaying() {
+      if (this._buffering) {
+        //the player is in buffering state.
+        //TODO use events enum when available
+        this._videoElement.dispatchEvent(new window.Event('waiting'));
+      }
     }
 
     /**
