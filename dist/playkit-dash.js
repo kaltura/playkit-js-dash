@@ -140,6 +140,13 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      */
 
     /**
+     * Whether 'waiting' event has been sent by the HTMLVideoElement
+     * @member {boolean} - _waitingSent
+     * @type {boolean}
+     * @private
+     */
+
+    /**
      * The DRM protocol for the current playback.
      * @type {?Function}
      * @private
@@ -173,6 +180,13 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
      * @param {string} mimeType - The mime type to check
      * @returns {boolean} - Whether the dash adapter can play a specific mime type
      * @static
+     */
+
+    /**
+     * Whether 'playing' event has been sent by the HTMLVideoElement
+     * @member {boolean} - _playingSent
+     * @type {boolean}
+     * @private
      */
 
     /**
@@ -309,6 +323,8 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
     var _this = _possibleConstructorReturn(this, (DashAdapter.__proto__ || Object.getPrototypeOf(DashAdapter)).call(this, videoElement, source, config));
 
     _this._buffering = false;
+    _this._waitingSent = false;
+    _this._playingSent = false;
     return _this;
   }
 
@@ -359,6 +375,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
       this._shaka.addEventListener('error', this._onError.bind(this));
       this._shaka.addEventListener('buffering', this._onBuffering.bind(this));
       //TODO use events enum when available
+      this._videoElement.addEventListener('waiting', this._onWaiting.bind(this));
       this._videoElement.addEventListener('playing', this._onPlaying.bind(this));
     }
 
@@ -376,6 +393,7 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
       this._shaka.removeEventListener('error', this._onError);
       this._shaka.removeEventListener('buffering', this._onBuffering.bind(this));
       //TODO use events enum when available
+      this._videoElement.removeEventListener('waiting', this._onWaiting.bind(this));
       this._videoElement.removeEventListener('playing', this._onPlaying.bind(this));
     }
 
@@ -426,6 +444,8 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
         DashAdapter._logger.debug('destroy');
         _this3._loadPromise = null;
         _this3._buffering = false;
+        _this3._waitingSent = false;
+        _this3._playingSent = false;
         if (DashAdapter._drmProtocol) {
           DashAdapter._drmProtocol.destroy();
           DashAdapter._drmProtocol = null;
@@ -763,15 +783,34 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
   }, {
     key: '_onBuffering',
     value: function _onBuffering(event) {
-      this._buffering = event.buffering;
-      if (this._buffering) {
-        //the player enters the buffering state.
-        //TODO use events enum when available
-        this._videoElement.dispatchEvent(new window.Event('waiting'));
-      } else if (!this._videoElement.paused) {
-        //the player leaves the buffering state.
-        this._videoElement.dispatchEvent(new window.Event('playing'));
+      if (event.buffering) {
+        if (!this._waitingSent) {
+          //the player enters the buffering state. and 'waiting' event hasn't been sent by the HTMLVideoElement.
+          //TODO use events enum when available
+          this._videoElement.dispatchEvent(new window.Event('waiting'));
+          this._buffering = true;
+        }
+      } else {
+        this._buffering = false;
+        if (!this._videoElement.paused && !this._playingSent) {
+          //the player leaves the buffering state. and 'playing' event hasn't been sent by the HTMLVideoElement.
+          this._videoElement.dispatchEvent(new window.Event('playing'));
+        }
       }
+    }
+
+    /**
+     * An handler to HTMLVideoElement waiting event
+     * @function _onWaiting
+     * @returns {void}
+     * @private
+     */
+
+  }, {
+    key: '_onWaiting',
+    value: function _onWaiting() {
+      this._waitingSent = true;
+      this._playingSent = false;
     }
 
     /**
@@ -784,6 +823,8 @@ var DashAdapter = function (_BaseMediaSourceAdapt) {
   }, {
     key: '_onPlaying',
     value: function _onPlaying() {
+      this._playingSent = true;
+      this._waitingSent = false;
       if (this._buffering) {
         //the player is in buffering state.
         //TODO use events enum when available
