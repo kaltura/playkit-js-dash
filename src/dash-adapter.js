@@ -135,7 +135,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
     shaka.polyfill.installAll();
     let isSupported = shaka.Player.isBrowserSupported();
-    if (resetVttPolyfill){
+    if (resetVttPolyfill) {
       window.VTTCue = undefined;
     }
     DashAdapter._logger.debug('isSupported:' + isSupported);
@@ -191,6 +191,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.addEventListener('error', this._onError.bind(this));
     this._shaka.addEventListener('buffering', this._onBuffering.bind(this));
     //TODO use events enum when available
+    this._videoElement.addEventListener('waiting', this._onWaiting.bind(this));
     this._videoElement.addEventListener('playing', this._onPlaying.bind(this));
   }
 
@@ -205,6 +206,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.removeEventListener('error', this._onError);
     this._shaka.removeEventListener('buffering', this._onBuffering.bind(this));
     //TODO use events enum when available
+    this._videoElement.removeEventListener('waiting', this._onWaiting.bind(this));
     this._videoElement.removeEventListener('playing', this._onPlaying.bind(this));
   }
 
@@ -531,13 +533,29 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onBuffering(event: any): void {
-    this._buffering = event.buffering;
-    if (this._buffering) { //the player enters the buffering state.
-      //TODO use events enum when available
-      this._videoElement.dispatchEvent(new window.Event('waiting'));
-    } else if (!this._videoElement.paused) { //the player leaves the buffering state.
-      this._videoElement.dispatchEvent(new window.Event('playing'));
+    if (event.buffering) {
+      if (!this._waitingSent) { //the player enters the buffering state. and 'waiting' event hasn't been sent by the HTMLVideoElement.
+        //TODO use events enum when available
+        this._videoElement.dispatchEvent(new window.Event('waiting'));
+        this._buffering = true;
+      }
+    } else {
+      this._buffering = false;
+      if (!this._videoElement.paused && !this._playingSent) { //the player leaves the buffering state. and 'playing' event hasn't been sent by the HTMLVideoElement.
+        this._videoElement.dispatchEvent(new window.Event('playing'));
+      }
     }
+  }
+
+  /**
+   * An handler to HTMLVideoElement waiting event
+   * @function _onWaiting
+   * @returns {void}
+   * @private
+   */
+  _onWaiting(): void {
+    this._waitingSent = true;
+    this._playingSent = false;
   }
 
   /**
@@ -547,6 +565,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onPlaying(): void {
+    this._playingSent = true;
+    this._waitingSent = false;
     if (this._buffering) { //the player is in buffering state.
       //TODO use events enum when available
       this._videoElement.dispatchEvent(new window.Event('waiting'));
