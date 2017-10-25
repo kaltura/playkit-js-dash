@@ -66,6 +66,20 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _buffering: boolean = false;
+  /**
+   * Whether 'waiting' event has been sent by the HTMLVideoElement
+   * @member {boolean} - _waitingSent
+   * @type {boolean}
+   * @private
+   */
+  _waitingSent: boolean = false;
+  /**
+   * Whether 'playing' event has been sent by the HTMLVideoElement
+   * @member {boolean} - _playingSent
+   * @type {boolean}
+   * @private
+   */
+  _playingSent: boolean = false;
 
   /**
    * Factory method to create media source adapter.
@@ -247,6 +261,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       DashAdapter._logger.debug('destroy');
       this._loadPromise = null;
       this._buffering = false;
+      this._waitingSent = false;
+      this._playingSent = false;
       if (DashAdapter._drmProtocol) {
         DashAdapter._drmProtocol.destroy();
         DashAdapter._drmProtocol = null;
