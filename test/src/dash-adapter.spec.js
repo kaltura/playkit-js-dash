@@ -221,7 +221,7 @@ describe('DashAdapter: destroy', () => {
         (!dashInstance._loadPromise).should.be.true;
         (!dashInstance._sourceObj).should.be.true;
         (!dashInstance._config).should.be.true;
-      dashInstance._buffering.should.be.false;
+        dashInstance._buffering.should.be.false;
         done();
       });
     });
@@ -905,16 +905,18 @@ describe('DashAdapter: get duration', () => {
 });
 
 describe('DashAdapter: _onBuffering', () => {
-  let video, dashInstance, config;
+  let video, dashInstance, config, sandbox;
 
   beforeEach(() => {
     video = document.createElement("video");
     config = {playback: {options: {html5: {dash: {}}}}};
+    sandbox = sinon.sandbox.create();
   });
 
   afterEach(() => {
     dashInstance.destroy();
     dashInstance = null;
+    sandbox = sinon.sandbox.restore();
   });
 
   after(() => {
@@ -926,6 +928,19 @@ describe('DashAdapter: _onBuffering', () => {
     dashInstance._videoElement.addEventListener('waiting', () => {
       done();
     });
+    dashInstance._onBuffering({buffering: true});
+  });
+
+  it('should not dispatch waiting event when buffering is true but it has already been sent by the video element', (done) => {
+    let waitingCount = 0;
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance._init();
+    dashInstance._videoElement.addEventListener('waiting', () => {
+      waitingCount++;
+      waitingCount.should.equals(1);
+      setTimeout(done, 0);
+    });
+    dashInstance._videoElement.dispatchEvent(new window.Event('waiting'));
     dashInstance._onBuffering({buffering: true});
   });
 
@@ -945,6 +960,18 @@ describe('DashAdapter: _onBuffering', () => {
     dashInstance.load().then(() => {
       dashInstance._videoElement.play();
     });
+  });
+
+  it('should not dispatch playing event when buffering is false and video is playing but it has already been sent by the video element', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    sandbox.stub(dashInstance._videoElement, "paused").get(() => false);
+    let t = setTimeout(done, 0);
+    dashInstance._videoElement.addEventListener('playing', () => {
+      done(new Error("test fail"));
+      clearTimeout(t);
+    });
+    dashInstance._onPlaying();
+    dashInstance._onBuffering({buffering: false});
   });
 
   it('should not dispatch playing event when buffering is false but video is paused', (done) => {
