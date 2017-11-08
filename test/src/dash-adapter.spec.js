@@ -1,5 +1,5 @@
 import loadPlayer from 'playkit-js'
-import DashAdapter from '../../src/dash-adapter';
+import DashAdapter from '../../src';
 import * as TestUtils from 'playkit-js/test/src/utils/test-utils'
 import {VideoTrack, AudioTrack, TextTrack} from 'playkit-js';
 import Widevine from '../../src/drm/widevine'

@@ -1,6 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {registerMediaSourceAdapter, BaseMediaSourceAdapter} from 'playkit-js'
+import {BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
 import {Utils} from 'playkit-js'
 import Widevine from './drm/widevine'
@@ -642,15 +642,4 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       return super.duration;
     }
   }
-}
-
-declare var __VERSION__: string;
-declare var __NAME__: string;
-
-export {__VERSION__ as VERSION, __NAME__ as NAME};
-
-
-// Register DashAdapter to the media source adapter manager
-if (DashAdapter.isSupported()) {
-  registerMediaSourceAdapter(DashAdapter);
 }
