@@ -644,6 +644,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 }
 
+declare var __VERSION__: string;
+declare var __NAME__: string;
+
+export {__VERSION__ as VERSION, __NAME__ as NAME};
+
+
 // Register DashAdapter to the media source adapter manager
 if (DashAdapter.isSupported()) {
   registerMediaSourceAdapter(DashAdapter);
