@@ -1,5 +1,6 @@
-const webpack = require("webpack");
-const packageData = require("./package.json");
+let webpackConfig = require('./webpack.config.js');
+//Need to remove externals otherwise they won't be included in test
+delete webpackConfig.externals;
 
 const isWindows = /^win/.test(process.platform);
 const isMacOS = /^darwin/.test(process.platform);
@@ -41,26 +42,7 @@ module.exports = function (config) {
       'progress',
       'coverage'
     ],
-    webpack: {
-      plugins: [
-        new webpack.DefinePlugin({
-          __VERSION__: JSON.stringify(packageData.version),
-          __NAME__: JSON.stringify(packageData.name)
-        })
-      ],
-      devtool: 'inline-source-map',
-      module: {
-        rules: [{
-          test: /\.js$/,
-          use: [{
-            loader: "babel-loader"
-          }],
-          exclude: [
-            /node_modules/
-          ]
-        }]
-      }
-    },
+    webpack: webpackConfig,
     webpackServer: {
       noInfo: true
     },
