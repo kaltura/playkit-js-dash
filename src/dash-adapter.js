@@ -3,6 +3,7 @@ import shaka from 'shaka-player';
 import {registerMediaSourceAdapter, BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
 import {Utils} from 'playkit-js'
+import {PlayerError} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 
@@ -144,6 +145,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: Object, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
+    this._playerError = new PlayerError(this);
 
   }
 
@@ -183,6 +185,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.addEventListener('adaptation', this._onAdaptation.bind(this));
     this._shaka.addEventListener('error', this._onError.bind(this));
   }
+
 
   /**
    * Remove the bindings to shaka.
@@ -505,6 +508,21 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onError(error: any): void {
+    try{
+      this._playerError.dispatchFromContext({
+        severity: this._playerError.Severity.CRITICAL,
+        category: error.category,
+        code: error.code,
+        args: {data: error.data}
+      });
+    }catch(e){
+      this._playerError.dispatchFromContext({
+        severity: this._playerError.Severity.RECOVERABLE,
+        category: this._playerError.Category.TEXT,
+        code: this._playerError.Code.DASH_ADAPTER_ERROR_PARSE_ISSUE,
+        args: error
+      });
+    }
     DashAdapter._logger.error(error);
   }
 
