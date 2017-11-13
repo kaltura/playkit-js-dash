@@ -145,8 +145,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: Object, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
-    this._playerError = new PlayerError(this);
-
+    this._playerError = new PlayerError();
   }
 
   /**
@@ -508,21 +507,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onError(error: any): void {
-    try{
-      this._playerError.dispatchFromContext({
-        severity: this._playerError.Severity.CRITICAL,
-        category: error.category,
-        code: error.code,
-        args: {data: error.data}
-      });
-    }catch(e){
-      this._playerError.dispatchFromContext({
-        severity: this._playerError.Severity.RECOVERABLE,
-        category: this._playerError.Category.TEXT,
-        code: this._playerError.Code.DASH_ADAPTER_ERROR_PARSE_ISSUE,
-        args: error
-      });
-    }
+    this._playerError.dispatch.bind(this,{
+      severity: this._playerError.Severity.CRITICAL,
+      category: error.category,
+      code: error.code,
+      args: {data: error.data}
+    });
     DashAdapter._logger.error(error);
   }
 
