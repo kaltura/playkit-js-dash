@@ -507,12 +507,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onError(error: any): void {
-    this._playerError.dispatch.bind(this,{
-      severity: this._playerError.Severity.CRITICAL,
+    const message = PlayerError.createError({
+      severity: PlayerError.Severity.CRITICAL,
       category: error.category,
       code: error.code,
       args: {data: error.data}
     });
+    this._trigger(BaseMediaSourceAdapter.CustomEvents.ERROR, {message: message});
     DashAdapter._logger.error(error);
   }
 
