@@ -1,3 +1,7 @@
+let webpackConfig = require('./webpack.config.js');
+//Need to remove externals otherwise they won't be included in test
+delete webpackConfig.externals;
+
 const isWindows = /^win/.test(process.platform);
 const isMacOS = /^darwin/.test(process.platform);
 // Create custom launcher in case running with Travis
@@ -38,20 +42,7 @@ module.exports = function (config) {
       'progress',
       'coverage'
     ],
-    webpack: {
-      devtool: 'inline-source-map',
-      module: {
-        rules: [{
-          test: /\.js$/,
-          use: [{
-            loader: "babel-loader"
-          }],
-          exclude: [
-            /node_modules/
-          ]
-        }]
-      }
-    },
+    webpack: webpackConfig,
     webpackServer: {
       noInfo: true
     },

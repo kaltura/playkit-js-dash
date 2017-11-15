@@ -1,6 +1,6 @@
 # PlayKit JS DASH - [Shaka Player] Adapter for the [PlayKit JS Player]
 
-[![Build Status](https://travis-ci.com/kaltura/playkit-js-dash.svg?token=s2ZQw18ukx9Q6ePzDX3F&branch=master)](https://travis-ci.com/kaltura/playkit-js-dash)
+[![Build Status](https://travis-ci.org/kaltura/playkit-js-dash.svg?branch=master)](https://travis-ci.org/kaltura/playkit-js-dash)
 
 PlayKit JS DASH adapter integrates [Shaka Player] with the [PlayKit JS Player].
  

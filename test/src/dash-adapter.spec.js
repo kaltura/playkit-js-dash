@@ -1,5 +1,5 @@
 import loadPlayer from 'playkit-js'
-import DashAdapter from '../../src/dash-adapter';
+import DashAdapter from '../../src';
 import * as TestUtils from 'playkit-js/test/src/utils/test-utils'
 import {VideoTrack, AudioTrack, TextTrack} from 'playkit-js';
 import Widevine from '../../src/drm/widevine'
@@ -152,22 +152,25 @@ describe('DashAdapter: load', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should create all dash adapter properties', () => {
+  it('should create all dash adapter properties', (done) => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance.load().then(() => {
       dashInstance._shaka.should.exist;
       dashInstance._config.should.exist;
       dashInstance._videoElement.should.exist;
       dashInstance._sourceObj.should.exist;
+      done();
     });
   });
 
@@ -213,11 +216,14 @@ describe('DashAdapter: destroy', () => {
       dashInstance._loadPromise.should.be.exist;
       dashInstance._sourceObj.should.be.exist;
       dashInstance._config.should.be.exist;
-      dashInstance.destroy();
-      (!dashInstance._loadPromise).should.be.true;
-      (!dashInstance._sourceObj).should.be.true;
-      (!dashInstance._config).should.be.true;
-      done();
+      dashInstance._buffering = true;
+      dashInstance.destroy().then(() => {
+        (!dashInstance._loadPromise).should.be.true;
+        (!dashInstance._sourceObj).should.be.true;
+        (!dashInstance._config).should.be.true;
+        dashInstance._buffering.should.be.false;
+        done();
+      });
     });
   });
 });
@@ -231,9 +237,11 @@ describe('DashAdapter: _getParsedTracks', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -286,9 +294,11 @@ describe('DashAdapter: selectVideoTrack', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -405,9 +415,11 @@ describe('DashAdapter: selectAudioTrack', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -497,9 +509,11 @@ describe('DashAdapter: selectTextTrack', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -613,9 +627,11 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -661,9 +677,11 @@ describe('DashAdapter: isLive', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -708,9 +726,11 @@ describe('DashAdapter: seekToLiveEdge', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -748,9 +768,11 @@ describe('DashAdapter: get currentTime', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -796,9 +818,11 @@ describe('DashAdapter: set currentTime', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -844,9 +868,11 @@ describe('DashAdapter: get duration', () => {
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -875,6 +901,124 @@ describe('DashAdapter: get duration', () => {
       dashInstance.duration.should.be.equal(dashInstance._shaka.seekRange().end - dashInstance._shaka.seekRange().start);
       done();
     });
+  });
+});
+
+describe('DashAdapter: _onBuffering', () => {
+  let video, dashInstance, config, sandbox;
+
+  beforeEach(() => {
+    video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
+    sandbox = sinon.sandbox.create();
+  });
+
+  afterEach(() => {
+    dashInstance.destroy();
+    dashInstance = null;
+    sandbox = sinon.sandbox.restore();
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should dispatch waiting event when buffering is true', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance._videoElement.addEventListener('waiting', () => {
+      done();
+    });
+    dashInstance._onBuffering({buffering: true});
+  });
+
+  it('should not dispatch waiting event when buffering is true but it has already been sent by the video element', (done) => {
+    let waitingCount = 0;
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance._init();
+    dashInstance._videoElement.addEventListener('waiting', () => {
+      waitingCount++;
+      waitingCount.should.equals(1);
+      setTimeout(done, 0);
+    });
+    dashInstance._videoElement.dispatchEvent(new window.Event('waiting'));
+    dashInstance._onBuffering({buffering: true});
+  });
+
+  it('should dispatch playing event when buffering is false and video is playing', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    let hasPlaying = false;
+    let onPlaying = () => {
+      if (hasPlaying) {
+        dashInstance._videoElement.removeEventListener('playing', onPlaying);
+        done();
+      } else {
+        hasPlaying = true;
+        dashInstance._onBuffering({buffering: false});
+      }
+    };
+    dashInstance._videoElement.addEventListener('playing', onPlaying);
+    dashInstance.load().then(() => {
+      dashInstance._videoElement.play();
+    });
+  });
+
+  it('should not dispatch playing event when buffering is false and video is playing but it has already been sent by the video element', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    sandbox.stub(dashInstance._videoElement, "paused").get(() => false);
+    let t = setTimeout(done, 0);
+    dashInstance._videoElement.addEventListener('playing', () => {
+      done(new Error("test fail"));
+      clearTimeout(t);
+    });
+    dashInstance._onPlaying();
+    dashInstance._onBuffering({buffering: false});
+  });
+
+  it('should not dispatch playing event when buffering is false but video is paused', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    let t = setTimeout(done, 0);
+    dashInstance._videoElement.addEventListener('playing', () => {
+      done(new Error("test fail"));
+      clearTimeout(t);
+    });
+    dashInstance._onBuffering({buffering: false});
+  });
+});
+
+describe('DashAdapter: _onPlaying', () => {
+  let video, dashInstance, config;
+
+  beforeEach(() => {
+    video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach(() => {
+    dashInstance.destroy();
+    dashInstance = null;
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should dispatch waiting event when buffering is true', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance._videoElement.addEventListener('waiting', () => {
+      done();
+    });
+    dashInstance._buffering = true;
+    dashInstance._onPlaying();
+  });
+
+  it('should not dispatch waiting event when buffering is false', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    let t = setTimeout(done, 0);
+    dashInstance._videoElement.addEventListener('waiting', () => {
+      done(new Error("test fail"));
+      clearTimeout(t);
+    });
+    dashInstance._onPlaying();
   });
 });
 
