@@ -166,7 +166,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: Object, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
-    this._playerError = new PlayerError();
   }
 
   /**
@@ -219,7 +218,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _removeBindings(): void {
     this._shaka.removeEventListener('adaptation', this._onAdaptation);
-    this._shaka.removeEventListener('error', this._onError);
+    this._shaka.removeEventListener('error', this._onError.bind(this));
     this._shaka.removeEventListener('buffering', this._onBuffering.bind(this));
     //TODO use events enum when available
     this._videoElement.removeEventListener('waiting', this._onWaiting.bind(this));
@@ -546,7 +545,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       code: error.code,
       args: {data: error.data}
     });
-    this._trigger(BaseMediaSourceAdapter.CustomEvents.ERROR, {message: message});
+    this._trigger(BaseMediaSourceAdapter.CustomEvents.ERROR, message);
     DashAdapter._logger.error(error);
   }
 
