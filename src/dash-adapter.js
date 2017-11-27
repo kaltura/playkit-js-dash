@@ -84,11 +84,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
-   * @member {string} - VIDEO_ERROR_CODE
-   * @type {string}
+   * @member {number} - VIDEO_ERROR_CODE
+   * @type {number}
    * @private
    */
-  VIDEO_ERROR_CODE: string = 3016;
+  VIDEO_ERROR_CODE: number = 3016;
 
   /**
    * debugMode
