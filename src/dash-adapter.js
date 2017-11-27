@@ -3,7 +3,7 @@ import shaka from 'shaka-player';
 import {BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
 import {Utils} from 'playkit-js'
-import {PlayerError} from 'playkit-js'
+import {Error, Severity} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 
@@ -81,6 +81,23 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _playingSent: boolean = false;
+
+  /**
+   * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
+   * @member {string} - VIDEO_ERROR_CODE
+   * @type {string}
+   * @private
+   */
+  VIDEO_ERROR_CODE: string = 3016;
+
+  /**
+   * debugMode
+   * @member {boolean} - debugMode
+   * @type {boolean}
+   * @private
+   */
+  _debugMode: boolean = true;
+
 
   /**
    * Factory method to create media source adapter.
@@ -242,8 +259,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             DashAdapter._logger.debug('The source has been loaded successfully');
             resolve(data);
           }).catch((error) => {
-            reject(error);
-            this._onError(error);
+            reject(this._createError(error));
           });
         }
       });
@@ -532,6 +548,22 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * creates an error object
+   * @function _createError
+   * @param {any} error - the error
+   * @returns {any} - error object
+   * @private
+   */
+  _createError(error: any): any{
+    return new Error(this._debugMode).createError({
+      severity: Severity.CRITICAL,
+      category: error.category,
+      code: error.code,
+      args: {data: error.data}
+    });
+  }
+
+  /**
    * An handler to shaka error event
    * @function _onError
    * @param {any} error - the error
@@ -539,13 +571,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onError(error: any): void {
-    const message = PlayerError.createError({
-      severity: PlayerError.Severity.CRITICAL,
-      category: error.category,
-      code: error.code,
-      args: {data: error.data}
-    });
-    this._trigger(BaseMediaSourceAdapter.CustomEvents.ERROR, message);
+    if (error.code === this.VIDEO_ERROR_CODE){
+      return;
+    }
+    this._trigger(BaseMediaSourceAdapter.CustomEvents.ERROR, this._createError(error));
     DashAdapter._logger.error(error);
   }
 
