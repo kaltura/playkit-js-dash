@@ -555,12 +555,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _createError(error: any): any{
-    return new Error(this._debugMode).createError({
-      severity: Severity.CRITICAL,
-      category: error.category,
-      code: error.code,
-      args: {data: error.data}
-    });
+    return new Error(Severity.CRITICAL, error.category, error.code, {data: error.data});
   }
 
   /**
