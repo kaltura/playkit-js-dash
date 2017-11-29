@@ -91,15 +91,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   VIDEO_ERROR_CODE: number = 3016;
 
   /**
-   * debugMode
-   * @member {boolean} - debugMode
-   * @type {boolean}
-   * @private
-   */
-  _debugMode: boolean = true;
-
-
-  /**
    * Factory method to create media source adapter.
    * @function createAdapter
    * @param {HTMLVideoElement} videoElement - The video element that the media source adapter work with.
