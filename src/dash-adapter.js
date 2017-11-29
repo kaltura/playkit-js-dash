@@ -554,7 +554,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {any} - error object
    * @private
    */
-  _createError(error: any): any{
+  _createError(error: any): any {
     return new Error(Severity.CRITICAL, error.category, error.code, {data: error.data});
   }
 
@@ -566,7 +566,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onError(error: any): void {
-    if (error.code === this.VIDEO_ERROR_CODE){
+    if (error.code === this.VIDEO_ERROR_CODE) {
       return;
     }
     this._trigger(BaseMediaSourceAdapter.CustomEvents.ERROR, this._createError(error));
