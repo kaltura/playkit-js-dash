@@ -3,7 +3,7 @@ import shaka from 'shaka-player';
 import {BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
 import {Utils} from 'playkit-js'
-import {Error, Severity} from 'playkit-js'
+import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 
@@ -546,7 +546,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _createError(error: any): any {
-    return new Error(Severity.CRITICAL, error.category, error.code, {data: error.data});
+    return new Error(Error.Severity.CRITICAL, error.category, error.code, {data: error.data}) ;
   }
 
   /**
