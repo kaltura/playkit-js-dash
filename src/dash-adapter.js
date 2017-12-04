@@ -217,7 +217,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._videoElement.addEventListener('playing', this._onPlaying.bind(this));
   }
 
-
   /**
    * Remove the bindings to shaka.
    * @function _removeBindings
@@ -546,7 +545,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _createError(error: any): any {
-    return new Error(Error.Severity.CRITICAL, error.category, error.code, {data: error.data}) ;
+    return new Error(Error.Severity.CRITICAL, error.category, error.code, error.data) ;
   }
 
   /**
