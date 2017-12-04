@@ -249,7 +249,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             DashAdapter._logger.debug('The source has been loaded successfully');
             resolve(data);
           }).catch((error) => {
-            reject(this._createError(error));
+            reject(new Error(
+              Error.Severity.CRITICAL,
+              error.category,
+              error.code,
+              error.data));
           });
         }
       });
@@ -538,17 +542,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * creates an error object
-   * @function _createError
-   * @param {any} error - the error
-   * @returns {any} - error object
-   * @private
-   */
-  _createError(error: any): any {
-    return new Error(Error.Severity.CRITICAL, error.category, error.code, error.data) ;
-  }
-
-  /**
    * An handler to shaka error event
    * @function _onError
    * @param {any} error - the error
@@ -556,10 +549,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onError(error: any): void {
+    //don't handle video element errors, they are already handled by the player
     if (error.code === this.VIDEO_ERROR_CODE) {
       return;
     }
-    this._trigger(BaseMediaSourceAdapter.CustomEvents.ERROR, this._createError(error));
+    this._trigger(BaseMediaSourceAdapter.CustomEvents.ERROR,
+      new Error(
+        Error.Severity.CRITICAL,
+        error.category,
+        error.code,
+        error.data));
     DashAdapter._logger.error(error);
   }
 
