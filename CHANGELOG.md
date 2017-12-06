@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.4.1"></a>
+## [1.4.1](https://github.com/kaltura/playkit-js-dash/compare/v1.4.0...v1.4.1) (2017-12-06)
+
+
+### Bug Fixes
+
+* **FEC-7476:** error handling ([#36](https://github.com/kaltura/playkit-js-dash/issues/36)) ([499914f](https://github.com/kaltura/playkit-js-dash/commit/499914f))
+
+
+
 <a name="1.4.0"></a>
 # [1.4.0](https://github.com/kaltura/playkit-js-dash/compare/v1.3.1...v1.4.0) (2017-11-16)
 

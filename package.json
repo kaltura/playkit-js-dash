@@ -1,6 +1,6 @@
 {
   "name": "playkit-js-dash",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "",
   "main": "dist/playkit-dash.js",
   "scripts": {
