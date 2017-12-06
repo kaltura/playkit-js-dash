@@ -250,7 +250,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             resolve(data);
           }).catch((error) => {
             reject(new Error(
-              error.severity.CRITICAL,
+              error.severity,
               error.category,
               error.code,
               error.data));
