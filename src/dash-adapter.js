@@ -3,6 +3,7 @@ import shaka from 'shaka-player';
 import {BaseMediaSourceAdapter} from 'playkit-js'
 import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
 import {Utils} from 'playkit-js'
+import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 
@@ -80,6 +81,14 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _playingSent: boolean = false;
+
+  /**
+   * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
+   * @member {number} - VIDEO_ERROR_CODE
+   * @type {number}
+   * @private
+   */
+  VIDEO_ERROR_CODE: number = 3016;
 
   /**
    * Factory method to create media source adapter.
@@ -165,7 +174,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: Object, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
-
   }
 
   /**
@@ -217,7 +225,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _removeBindings(): void {
     this._shaka.removeEventListener('adaptation', this._onAdaptation);
-    this._shaka.removeEventListener('error', this._onError);
+    this._shaka.removeEventListener('error', this._onError.bind(this));
     this._shaka.removeEventListener('buffering', this._onBuffering.bind(this));
     //TODO use events enum when available
     this._videoElement.removeEventListener('waiting', this._onWaiting.bind(this));
@@ -241,8 +249,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             DashAdapter._logger.debug('The source has been loaded successfully');
             resolve(data);
           }).catch((error) => {
-            reject(error);
-            this._onError(error);
+            reject(new Error(
+              error.severity,
+              error.category,
+              error.code,
+              error.data));
           });
         }
       });
@@ -533,12 +544,25 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * An handler to shaka error event
    * @function _onError
-   * @param {any} error - the error
+   * @param {any} event - the error event
    * @returns {void}
    * @private
    */
-  _onError(error: any): void {
-    DashAdapter._logger.error(error);
+  _onError(event: any): void {
+    if (event && event.detail) {
+      const error = event.detail;
+      //don't handle video element errors, they are already handled by the player
+      if (error.code === this.VIDEO_ERROR_CODE) {
+        return;
+      }
+      this._trigger(BaseMediaSourceAdapter.Html5Events.ERROR,
+        new Error(
+          error.severity,
+          error.category,
+          error.code,
+          error.data));
+      DashAdapter._logger.error(error);
+    }
   }
 
   /**
