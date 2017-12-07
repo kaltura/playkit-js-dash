@@ -59,7 +59,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @type {Object}
    * @private
    */
-  _adapterEventsBindings: Object = {};
+  _adapterEventsBindings: { [name: string]: Function } = {};
   /**
    * The load promise
    * @member {Promise<Object>} - _loadPromise
@@ -211,13 +211,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
 
-  _createAdapterFunctionBindings(): void{
-
-      this._adapterEventsBindings['error'] =  this._onError.bind(this);
-      this._adapterEventsBindings['adaption'] = this._onAdaptation.bind(this);
-      this._adapterEventsBindings['buffering'] = this._onBuffering.bind(this);
-      this._adapterEventsBindings['waiting'] = this._onWaiting.bind(this);
-      this._adapterEventsBindings['playing'] = this._onPlaying.bind(this);
+  _createAdapterFunctionBindings(): void {
+    this._adapterEventsBindings['error'] = (event) => this._onError(event);
+    this._adapterEventsBindings['adaption'] = () => this._onAdaptation();
+    this._adapterEventsBindings['buffering'] = (event) => this._onBuffering(event);
+    this._adapterEventsBindings['waiting'] = () => this._onWaiting();
+    this._adapterEventsBindings['playing'] = () => this._onPlaying();
   }
 
   /**
@@ -243,7 +242,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _removeBindings(): void {
     this._shaka.removeEventListener('adaptation', this._adapterEventsBindings.adaption);
-    this._shaka.removeEventListener('error',  this._adapterEventsBindings.error);
+    this._shaka.removeEventListener('error', this._adapterEventsBindings.error);
     this._shaka.removeEventListener('buffering', this._adapterEventsBindings.buffering);
     //TODO use events enum when available
     this._videoElement.removeEventListener('waiting', this._adapterEventsBindings.waiting);
@@ -300,6 +299,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._removeBindings();
         return this._shaka.destroy();
       }
+      this._adapterEventsBindings = {};
     });
   }
 
