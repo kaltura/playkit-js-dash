@@ -104,6 +104,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       dashConfig = config.playback.options.html5.dash;
     }
+    dashConfig['streaming'] = {ignoreTextStreamFailures: true};
     return new this(videoElement, source, dashConfig);
   }
 
