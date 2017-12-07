@@ -7,6 +7,22 @@ import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 
+
+type ShakaEventsType = { [event: string]: string };
+
+/**
+ * Shaka events enum
+ * @type {Object}
+ * @const
+ */
+const SHAKA_EVENTS: ShakaEventsType = {
+  ERROR: 'error' ,
+  ADAPTION: 'adaption',
+  BUFFERING: 'buffering',
+  WAITING: 'waiting',
+  PLAYING: 'playing'
+};
+
 /**
  * Adapter of shaka lib for dash content
  * @classdesc
@@ -212,11 +228,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
 
   _createAdapterFunctionBindings(): void {
-    this._adapterEventsBindings['error'] = (event) => this._onError(event);
-    this._adapterEventsBindings['adaption'] = () => this._onAdaptation();
-    this._adapterEventsBindings['buffering'] = (event) => this._onBuffering(event);
-    this._adapterEventsBindings['waiting'] = () => this._onWaiting();
-    this._adapterEventsBindings['playing'] = () => this._onPlaying();
+    this._adapterEventsBindings[SHAKA_EVENTS.ERROR] = (event) => this._onError(event);
+    this._adapterEventsBindings[SHAKA_EVENTS.ADAPTION] = () => this._onAdaptation();
+    this._adapterEventsBindings[SHAKA_EVENTS.BUFFERING] = (event) => this._onBuffering(event);
+    this._adapterEventsBindings[SHAKA_EVENTS.WAITING] = () => this._onWaiting();
+    this._adapterEventsBindings[SHAKA_EVENTS.PLAYING] = () => this._onPlaying();
   }
 
   /**
@@ -226,12 +242,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _addBindings(): void {
-    this._shaka.addEventListener('adaptation', this._adapterEventsBindings.adaption);
-    this._shaka.addEventListener('error', this._adapterEventsBindings.error);
-    this._shaka.addEventListener('buffering', this._adapterEventsBindings.buffering);
-    //TODO use events enum when available
-    this._videoElement.addEventListener('waiting', this._adapterEventsBindings.waiting);
-    this._videoElement.addEventListener('playing', this._adapterEventsBindings.playing);
+    this._shaka.addEventListener(SHAKA_EVENTS.ADAPTION, this._adapterEventsBindings.adaption);
+    this._shaka.addEventListener(SHAKA_EVENTS.ERROR, this._adapterEventsBindings.error);
+    this._shaka.addEventListener(SHAKA_EVENTS.BUFFERING, this._adapterEventsBindings.buffering);
+    this._videoElement.addEventListener(SHAKA_EVENTS.WAITING, this._adapterEventsBindings.waiting);
+    this._videoElement.addEventListener(SHAKA_EVENTS.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
@@ -241,12 +256,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _removeBindings(): void {
-    this._shaka.removeEventListener('adaptation', this._adapterEventsBindings.adaption);
-    this._shaka.removeEventListener('error', this._adapterEventsBindings.error);
-    this._shaka.removeEventListener('buffering', this._adapterEventsBindings.buffering);
-    //TODO use events enum when available
-    this._videoElement.removeEventListener('waiting', this._adapterEventsBindings.waiting);
-    this._videoElement.removeEventListener('playing', this._adapterEventsBindings.playing);
+    this._shaka.removeEventListener(SHAKA_EVENTS.ADAPTION, this._adapterEventsBindings.adaption);
+    this._shaka.removeEventListener(SHAKA_EVENTS.ERROR, this._adapterEventsBindings.error);
+    this._shaka.removeEventListener(SHAKA_EVENTS.BUFFERING, this._adapterEventsBindings.buffering);
+    this._videoElement.removeEventListener(SHAKA_EVENTS.WAITING, this._adapterEventsBindings.waiting);
+    this._videoElement.removeEventListener(SHAKA_EVENTS.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
