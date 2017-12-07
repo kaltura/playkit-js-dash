@@ -16,11 +16,9 @@ type ShakaEventsType = { [event: string]: string };
  * @const
  */
 const SHAKA_EVENTS: ShakaEventsType = {
-  ERROR: 'error' ,
+  ERROR: 'error',
   ADAPTION: 'adaption',
-  BUFFERING: 'buffering',
-  WAITING: 'waiting',
-  PLAYING: 'playing'
+  BUFFERING: 'buffering'
 };
 
 /**
@@ -231,8 +229,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._adapterEventsBindings[SHAKA_EVENTS.ERROR] = (event) => this._onError(event);
     this._adapterEventsBindings[SHAKA_EVENTS.ADAPTION] = () => this._onAdaptation();
     this._adapterEventsBindings[SHAKA_EVENTS.BUFFERING] = (event) => this._onBuffering(event);
-    this._adapterEventsBindings[SHAKA_EVENTS.WAITING] = () => this._onWaiting();
-    this._adapterEventsBindings[SHAKA_EVENTS.PLAYING] = () => this._onPlaying();
+    this._adapterEventsBindings[BaseMediaSourceAdapter.Html5Events.WAITING] = () => this._onWaiting();
+    this._adapterEventsBindings[BaseMediaSourceAdapter.Html5Events.PLAYING] = () => this._onPlaying();
   }
 
   /**
@@ -245,8 +243,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.addEventListener(SHAKA_EVENTS.ADAPTION, this._adapterEventsBindings.adaption);
     this._shaka.addEventListener(SHAKA_EVENTS.ERROR, this._adapterEventsBindings.error);
     this._shaka.addEventListener(SHAKA_EVENTS.BUFFERING, this._adapterEventsBindings.buffering);
-    this._videoElement.addEventListener(SHAKA_EVENTS.WAITING, this._adapterEventsBindings.waiting);
-    this._videoElement.addEventListener(SHAKA_EVENTS.PLAYING, this._adapterEventsBindings.playing);
+    this._videoElement.addEventListener(BaseMediaSourceAdapter.Html5Events.WAITING, this._adapterEventsBindings.waiting);
+    this._videoElement.addEventListener(BaseMediaSourceAdapter.Html5Events.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
@@ -259,8 +257,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.removeEventListener(SHAKA_EVENTS.ADAPTION, this._adapterEventsBindings.adaption);
     this._shaka.removeEventListener(SHAKA_EVENTS.ERROR, this._adapterEventsBindings.error);
     this._shaka.removeEventListener(SHAKA_EVENTS.BUFFERING, this._adapterEventsBindings.buffering);
-    this._videoElement.removeEventListener(SHAKA_EVENTS.WAITING, this._adapterEventsBindings.waiting);
-    this._videoElement.removeEventListener(SHAKA_EVENTS.PLAYING, this._adapterEventsBindings.playing);
+    this._videoElement.removeEventListener(BaseMediaSourceAdapter.Html5Events.WAITING, this._adapterEventsBindings.waiting);
+    this._videoElement.removeEventListener(BaseMediaSourceAdapter.Html5Events.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
