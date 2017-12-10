@@ -6,7 +6,7 @@ import {Utils} from 'playkit-js'
 import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
-import {defaultConfig} from "./default-config"
+import {defaultConfig} from './default-config'
 
 /**
  * Adapter of shaka lib for dash content
