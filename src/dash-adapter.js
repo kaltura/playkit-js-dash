@@ -6,7 +6,7 @@ import {Utils} from 'playkit-js'
 import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
-import {defaultConfig} from './default-config'
+import {DefaultConfig} from './default-config'
 
 /**
  * Adapter of shaka lib for dash content
@@ -175,7 +175,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: Object, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
-    this._config = Utils.Object.mergeDeep({}, this._config, defaultConfig);
+    this._config = Utils.Object.mergeDeep({}, this._config, DefaultConfig);
   }
 
   /**
