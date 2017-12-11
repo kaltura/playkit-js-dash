@@ -7,15 +7,14 @@ import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 
-
-type ShakaEventsType = { [event: string]: string };
+type ShakaEventType = { [event: string]: string };
 
 /**
  * Shaka events enum
  * @type {Object}
  * @const
  */
-const SHAKA_EVENTS: ShakaEventsType = {
+const ShakaEvent: ShakaEventType = {
   ERROR: 'error',
   ADAPTION: 'adaption',
   BUFFERING: 'buffering'
@@ -73,7 +72,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @type {Object}
    * @private
    */
-  _adapterEventsBindings: { [name: string]: Function } = {};
+  _adapterEventsBindings: { [name: string]: Function } = {
+    [ShakaEvent.ERROR]: (event) => this._onError(event),
+    [ShakaEvent.ADAPTION] : () => this._onAdaptation(),
+    [ShakaEvent.BUFFERING] : (event) => this._onBuffering(event),
+    [BaseMediaSourceAdapter.Html5Events.WAITING] : () => this._onWaiting(),
+    [BaseMediaSourceAdapter.Html5Events.PLAYING] : () => this._onPlaying()
+  };
   /**
    * The load promise
    * @member {Promise<Object>} - _loadPromise
@@ -195,7 +200,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: Object, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
-    this._createAdapterFunctionBindings();
   }
 
   /**
@@ -224,15 +228,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 
-
-  _createAdapterFunctionBindings(): void {
-    this._adapterEventsBindings[SHAKA_EVENTS.ERROR] = (event) => this._onError(event);
-    this._adapterEventsBindings[SHAKA_EVENTS.ADAPTION] = () => this._onAdaptation();
-    this._adapterEventsBindings[SHAKA_EVENTS.BUFFERING] = (event) => this._onBuffering(event);
-    this._adapterEventsBindings[BaseMediaSourceAdapter.Html5Events.WAITING] = () => this._onWaiting();
-    this._adapterEventsBindings[BaseMediaSourceAdapter.Html5Events.PLAYING] = () => this._onPlaying();
-  }
-
   /**
    * Add the required bindings to shaka.
    * @function _addBindings
@@ -240,9 +235,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _addBindings(): void {
-    this._shaka.addEventListener(SHAKA_EVENTS.ADAPTION, this._adapterEventsBindings.adaption);
-    this._shaka.addEventListener(SHAKA_EVENTS.ERROR, this._adapterEventsBindings.error);
-    this._shaka.addEventListener(SHAKA_EVENTS.BUFFERING, this._adapterEventsBindings.buffering);
+    this._shaka.addEventListener(ShakaEvent.ADAPTION, this._adapterEventsBindings.adaption);
+    this._shaka.addEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
+    this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._videoElement.addEventListener(BaseMediaSourceAdapter.Html5Events.WAITING, this._adapterEventsBindings.waiting);
     this._videoElement.addEventListener(BaseMediaSourceAdapter.Html5Events.PLAYING, this._adapterEventsBindings.playing);
   }
@@ -254,9 +249,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _removeBindings(): void {
-    this._shaka.removeEventListener(SHAKA_EVENTS.ADAPTION, this._adapterEventsBindings.adaption);
-    this._shaka.removeEventListener(SHAKA_EVENTS.ERROR, this._adapterEventsBindings.error);
-    this._shaka.removeEventListener(SHAKA_EVENTS.BUFFERING, this._adapterEventsBindings.buffering);
+    this._shaka.removeEventListener(ShakaEvent.ADAPTION, this._adapterEventsBindings.adaption);
+    this._shaka.removeEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
+    this._shaka.removeEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._videoElement.removeEventListener(BaseMediaSourceAdapter.Html5Events.WAITING, this._adapterEventsBindings.waiting);
     this._videoElement.removeEventListener(BaseMediaSourceAdapter.Html5Events.PLAYING, this._adapterEventsBindings.playing);
   }
