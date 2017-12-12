@@ -8,6 +8,19 @@ import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 import {DefaultConfig} from './default-config'
 
+type ShakaEventType = { [event: string]: string };
+
+/**
+ * Shaka events enum
+ * @type {Object}
+ * @const
+ */
+const ShakaEvent: ShakaEventType = {
+  ERROR: 'error',
+  ADAPTION: 'adaption',
+  BUFFERING: 'buffering'
+};
+
 /**
  * Adapter of shaka lib for dash content
  * @classdesc
@@ -54,6 +67,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _shaka: any;
+  /**
+   * an object containing all the events we bind and unbind to.
+   * @member {Object} - _adapterEventsBindings
+   * @type {Object}
+   * @private
+   */
+  _adapterEventsBindings: { [name: string]: Function } = {
+    [ShakaEvent.ERROR]: (event) => this._onError(event),
+    [ShakaEvent.ADAPTION] : () => this._onAdaptation(),
+    [ShakaEvent.BUFFERING] : (event) => this._onBuffering(event),
+    [BaseMediaSourceAdapter.Html5Events.WAITING] : () => this._onWaiting(),
+    [BaseMediaSourceAdapter.Html5Events.PLAYING] : () => this._onPlaying()
+  };
   /**
    * The load promise
    * @member {Promise<Object>} - _loadPromise
@@ -211,12 +237,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _addBindings(): void {
-    this._shaka.addEventListener('adaptation', this._onAdaptation.bind(this));
-    this._shaka.addEventListener('error', this._onError.bind(this));
-    this._shaka.addEventListener('buffering', this._onBuffering.bind(this));
-    //TODO use events enum when available
-    this._videoElement.addEventListener('waiting', this._onWaiting.bind(this));
-    this._videoElement.addEventListener('playing', this._onPlaying.bind(this));
+    this._shaka.addEventListener(ShakaEvent.ADAPTION, this._adapterEventsBindings.adaption);
+    this._shaka.addEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
+    this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
+    this._videoElement.addEventListener(BaseMediaSourceAdapter.Html5Events.WAITING, this._adapterEventsBindings.waiting);
+    this._videoElement.addEventListener(BaseMediaSourceAdapter.Html5Events.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
@@ -226,12 +251,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _removeBindings(): void {
-    this._shaka.removeEventListener('adaptation', this._onAdaptation);
-    this._shaka.removeEventListener('error', this._onError.bind(this));
-    this._shaka.removeEventListener('buffering', this._onBuffering.bind(this));
-    //TODO use events enum when available
-    this._videoElement.removeEventListener('waiting', this._onWaiting.bind(this));
-    this._videoElement.removeEventListener('playing', this._onPlaying.bind(this));
+    this._shaka.removeEventListener(ShakaEvent.ADAPTION, this._adapterEventsBindings.adaption);
+    this._shaka.removeEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
+    this._shaka.removeEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
+    this._videoElement.removeEventListener(BaseMediaSourceAdapter.Html5Events.WAITING, this._adapterEventsBindings.waiting);
+    this._videoElement.removeEventListener(BaseMediaSourceAdapter.Html5Events.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
@@ -284,6 +308,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._removeBindings();
         return this._shaka.destroy();
       }
+      this._adapterEventsBindings = {};
     });
   }
 
