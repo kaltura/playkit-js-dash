@@ -1,0 +1,5 @@
+{
+  "streaming": {
+    "ignoreTextStreamFailures": true
+  }
+}
