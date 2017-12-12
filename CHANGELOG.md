@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.5.0"></a>
+# [1.5.0](https://github.com/kaltura/playkit-js-dash/compare/v1.4.1...v1.5.0) (2017-12-12)
+
+
+### Bug Fixes
+
+* clear event binding function references ([#38](https://github.com/kaltura/playkit-js-dash/issues/38)) ([58beee8](https://github.com/kaltura/playkit-js-dash/commit/58beee8))
+
+
+### Features
+
+* add default-config json container ([#39](https://github.com/kaltura/playkit-js-dash/issues/39)) ([ad7a6dc](https://github.com/kaltura/playkit-js-dash/commit/ad7a6dc))
+
+
+
 <a name="1.4.1"></a>
 ## [1.4.1](https://github.com/kaltura/playkit-js-dash/compare/v1.4.0...v1.4.1) (2017-12-06)
 
