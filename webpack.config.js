@@ -22,7 +22,7 @@ module.exports = {
   output: {
     path: __dirname + "/dist",
     filename: '[name].js',
-    library: "PlaykitJsDash",
+    library: ["playkit", "dash"],
     libraryTarget: "umd",
     devtoolModuleFilenameTemplate: "./dash/[resource-path]",
   },
