@@ -126,7 +126,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {IMediaSourceAdapter} - New instance of the run time media source adapter.
    * @static
    */
-  static createAdapter(videoElement: HTMLVideoElement, source: Source, config: Object): IMediaSourceAdapter {
+  static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
     let dashConfig = {};
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       dashConfig = config.playback.options.html5.dash;
