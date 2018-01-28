@@ -67,7 +67,7 @@ module.exports = {
       commonjs: "playkit-js",
       commonjs2: "playkit-js",
       amd: "playkit-js",
-      root: "Playkit"
+      root: ["playkit", "core"]
     },
     "shaka-player": {
       commonjs: "shaka-player",
