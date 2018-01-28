@@ -6,7 +6,7 @@ import {Utils} from 'playkit-js'
 import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
-import {DefaultConfig} from './default-config'
+import DefaultConfig from './default-config'
 
 type ShakaEventType = { [event: string]: string };
 
