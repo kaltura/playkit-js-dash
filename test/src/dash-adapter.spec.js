@@ -14,7 +14,7 @@ let vodSource = {
 
 let liveSource = {
   mimetype: "application/dash+xml",
-  url: "https://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvtime.mpd"
+  url: "http://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvtime.mpd"
 };
 
 let dvrSource = {
@@ -741,9 +741,9 @@ describe('DashAdapter: seekToLiveEdge', () => {
     dashInstance = DashAdapter.createAdapter(video, liveSource, config);
     dashInstance.load().then(() => {
       video.currentTime = dashInstance._shaka.seekRange().start;
-      ((dashInstance._shaka.seekRange().end - video.currentTime) > 30).should.be.true;
+      ((dashInstance._shaka.seekRange().end - video.currentTime) >= 30).should.be.true;
       dashInstance.seekToLiveEdge();
-      ((dashInstance._shaka.seekRange().end - video.currentTime) < 1).should.be.true;
+      ((dashInstance._shaka.seekRange().end - video.currentTime) <= 1).should.be.true;
       done();
     });
   });
