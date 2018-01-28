@@ -121,12 +121,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * Factory method to create media source adapter.
    * @function createAdapter
    * @param {HTMLVideoElement} videoElement - The video element that the media source adapter work with.
-   * @param {Object} source - The source Object.
+   * @param {PKMediaSourceObject} source - The source Object.
    * @param {Object} config - The player configuration.
    * @returns {IMediaSourceAdapter} - New instance of the run time media source adapter.
    * @static
    */
-  static createAdapter(videoElement: HTMLVideoElement, source: Source, config: Object): IMediaSourceAdapter {
+  static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
     let dashConfig = {};
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       dashConfig = config.playback.options.html5.dash;
@@ -195,10 +195,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * @constructor
    * @param {HTMLVideoElement} videoElement - The video element which bind to the dash adapter
-   * @param {Object} source - The source object
+   * @param {PKMediaSourceObject} source - The source object
    * @param {Object} config - The media source adapter configuration
    */
-  constructor(videoElement: HTMLVideoElement, source: Object, config: Object = {}) {
+  constructor(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
     this._config = Utils.Object.mergeDeep({}, this._config, DefaultConfig);
