@@ -122,7 +122,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @function createAdapter
    * @param {HTMLVideoElement} videoElement - The video element that the media source adapter work with.
    * @param {PKMediaSourceObject} source - The source Object.
-   * @param {Object} config - The adapter configuration.
+   * @param {Object} config - The player configuration.
    * @returns {IMediaSourceAdapter} - New instance of the run time media source adapter.
    * @static
    */
