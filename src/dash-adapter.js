@@ -7,6 +7,7 @@ import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 import {DefaultConfig} from './default-config'
+import HttpCorsPlugin from './http-jsonp-plugin'
 
 type ShakaEventType = { [event: string]: string };
 
@@ -212,6 +213,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _init(): void {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
+    if (this._config.useJsonp){
+      this._callback =  this._config.callback;
+      shaka.net.NetworkingEngine.registerScheme('http', HttpCorsPlugin.bind(this._callback), shaka.net.NetworkingEngine.PluginPriority.APPLICATION);
+      shaka.net.NetworkingEngine.registerScheme('https', HttpCorsPlugin.bind(this._callback), shaka.net.NetworkingEngine.PluginPriority.APPLICATION);
+    }
     this._shaka = new shaka.Player(this._videoElement);
     this._maybeSetDrmConfig();
     this._shaka.configure(this._config);
