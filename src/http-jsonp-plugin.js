@@ -12,7 +12,6 @@ import {Error} from 'playkit-js'
  */
 export default function (uri: string, request: Object): Promise<*> {
   const _callback = this;
-  console.info("howdy!");
   const _executeXHR = function (uri, request) {
     return new Promise((resolve, reject) => {
       let xhr = new window.XMLHttpRequest();
