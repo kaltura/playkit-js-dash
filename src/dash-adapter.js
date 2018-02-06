@@ -62,6 +62,14 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static _drmProtocol: ?Function = null;
+
+  /**
+   * A counter to the number of failed manifest calls
+   * @type {number}
+   * @private
+   * @static
+   */
+  static _failedManifestRequestCounter: number = 0;
   /**
    * The shaka player instance
    * @member {any} _shaka
@@ -76,10 +84,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _adapterEventsBindings: { [name: string]: Function } = {
     [ShakaEvent.ERROR]: (event) => this._onError(event),
-    [ShakaEvent.ADAPTION] : () => this._onAdaptation(),
-    [ShakaEvent.BUFFERING] : (event) => this._onBuffering(event),
-    [BaseMediaSourceAdapter.Html5Events.WAITING] : () => this._onWaiting(),
-    [BaseMediaSourceAdapter.Html5Events.PLAYING] : () => this._onPlaying()
+    [ShakaEvent.ADAPTION]: () => this._onAdaptation(),
+    [ShakaEvent.BUFFERING]: (event) => this._onBuffering(event),
+    [BaseMediaSourceAdapter.Html5Events.WAITING]: () => this._onWaiting(),
+    [BaseMediaSourceAdapter.Html5Events.PLAYING]: () => this._onPlaying()
   };
   /**
    * The load promise
@@ -131,6 +139,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let dashConfig = {};
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       dashConfig = config.playback.options.html5.dash;
+    }
+    if (Utils.Object.hasPropertyPath(config, 'playback.options.adapters')) {
+      dashConfig = Utils.Object.mergeDeep(dashConfig, config.playback.options.adapters)
     }
     return new this(videoElement, source, dashConfig);
   }
@@ -213,8 +224,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _init(): void {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
-    if (this._config.useJsonp){
-      this._callback =  this._config.callback;
+    if (this._config.forceRedirectForExternalStreams || DashAdapter._failedManifestRequestCounter === 1) {
+      this._callback = this._config.redirectForExternalStreamsCallback;
       shaka.net.NetworkingEngine.registerScheme('http', HttpCorsPlugin.bind(this._callback), shaka.net.NetworkingEngine.PluginPriority.APPLICATION);
       shaka.net.NetworkingEngine.registerScheme('https', HttpCorsPlugin.bind(this._callback), shaka.net.NetworkingEngine.PluginPriority.APPLICATION);
     }
@@ -281,16 +292,59 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             DashAdapter._logger.debug('The source has been loaded successfully');
             resolve(data);
           }).catch((error) => {
-            reject(new Error(
-              error.severity,
-              error.category,
-              error.code,
-              error.data));
+            if (this._isManifestLoadError(error) && DashAdapter._failedManifestRequestCounter === 0) {
+              this._reloadWithRedirect(this._config, this._sourceObj, resolve, reject)
+            } else {
+              reject(new Error(
+                error.severity,
+                error.category,
+                error.code,
+                error.data));
+            }
           });
         }
-      });
+      })
+      ;
     }
     return this._loadPromise;
+  }
+
+  /**
+   * destroying the adapter and reconfiguring the adapter's config + source member, then calling load again so it can
+   * and reload with the manifest redirect.
+   * @param {Object} config  - adapters config
+   * @param {Object} sourceObj - adapters source object
+   * @param {Function} resolve - original load promise resolve function
+   * @param {Function} reject - original load promise reject function
+   * @returns {void}
+   * @private
+   */
+  _reloadWithRedirect(config: Object, sourceObj: PKMediaSourceObject, resolve: Function, reject: Function): void {
+    DashAdapter._failedManifestRequestCounter++;
+    this.destroy().then(() => {
+      this._config = config;
+      this._sourceObj = sourceObj;
+      this.load().then(data => {
+        resolve(data);
+      })
+        .catch((error) => {
+          reject(new Error(
+            error.severity,
+            error.category,
+            error.code,
+            error.data));
+        });
+    });
+  }
+
+  /**
+   * Checks if the error shaka returned is network error and the url is a play manifest.
+   * @param {Object} error - the error object
+   * @returns {boolean} - if the error is manifest network error
+   * @private
+   */
+  _isManifestLoadError(error: Object): boolean {
+    return error.code === Error.Code.HTTP_ERROR && error.category === Error.Category.NETWORK && error.data && error.data[0].indexOf("Manifest");
   }
 
   /**
