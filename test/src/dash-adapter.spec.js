@@ -718,6 +718,34 @@ describe('DashAdapter: isLive', () => {
   });
 });
 
+describe('DashAdapter: _getLiveEdge', () => {
+  let video, dashInstance, config;
+
+  beforeEach(() => {
+    video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should return the live edge', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+    dashInstance.load().then(() => {
+      dashInstance._getLiveEdge().should.equal(dashInstance._shaka.seekRange().end);
+      done();
+    });
+  });
+});
+
 describe('DashAdapter: seekToLiveEdge', () => {
   let video, dashInstance, config;
 
@@ -878,5 +906,39 @@ describe('DashAdapter: _onPlaying', () => {
   });
 });
 
+describe('DashAdapter: getStartTimeOfDvrWindow', () => {
+  let video, dashInstance, config;
 
+  beforeEach(() => {
+    video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should return 0 for VOD', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance.load().then(() => {
+      dashInstance.getStartTimeOfDvrWindow().should.equal(0);
+      done();
+    });
+  });
+
+  it('should return the start time of Dvr window for live', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+    dashInstance.load().then(() => {
+      dashInstance.getStartTimeOfDvrWindow().should.equal(dashInstance._shaka.seekRange().start);
+      done();
+    });
+  });
+});
 
