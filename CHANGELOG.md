@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.5.3"></a>
+## [1.5.3](https://github.com/kaltura/playkit-js-dash/compare/v1.5.2...v1.5.3) (2018-02-11)
+
+
+### Bug Fixes
+
+* **FEC-7882:** Live+DVR - unavailable time shown in the seekbar ([#45](https://github.com/kaltura/playkit-js-dash/issues/45)) ([6b04f2b](https://github.com/kaltura/playkit-js-dash/commit/6b04f2b))
+
+
+
 <a name="1.5.2"></a>
 ## [1.5.2](https://github.com/kaltura/playkit-js-dash/compare/v1.5.0...v1.5.2) (2018-02-06)
 
