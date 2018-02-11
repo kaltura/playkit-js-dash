@@ -531,6 +531,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Returns the live edge
+   * @returns {number} - live edge
+   * @private
+   */
+  _getLiveEdge(): number {
+    return this._shaka ? this._shaka.seekRange().end : NaN;
+  }
+
+  /**
    * Seeking to live edge.
    * @function seekToLiveEdge
    * @returns {void}
@@ -654,43 +663,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * Get the current time in seconds.
-   * @returns {Number} - The current playback time.
+   * Get the start time of DVR window in live playback in seconds.
+   * @returns {Number} - start time of DVR window.
    * @public
    */
-  get currentTime(): number {
-    if (this._shaka && this.isLive()) {
-      return this._videoElement.currentTime - this._shaka.seekRange().start;
+  getStartTimeOfDvrWindow(): number {
+    if (this.isLive() && this._shaka) {
+      return this._shaka.seekRange().start;
     } else {
-      return super.currentTime;
-    }
-  }
-
-  /**
-   * Set the current time in seconds.
-   * @param {Number} to - The number to set in seconds.
-   * @public
-   * @returns {void}
-   */
-  set currentTime(to: number): void {
-    if (this._shaka && this.isLive()) {
-      this._videoElement.currentTime = this._shaka.seekRange().start + to;
-    } else {
-      super.currentTime = to;
-    }
-  }
-
-  /**
-   * Get the duration in seconds.
-   * @returns {Number} - The playback duration.
-   * @public
-   */
-  get duration(): number {
-    if (this._shaka && this.isLive()) {
-      let seekRange = this._shaka.seekRange();
-      return seekRange.end - seekRange.start;
-    } else {
-      return super.duration;
+      return 0;
     }
   }
 }

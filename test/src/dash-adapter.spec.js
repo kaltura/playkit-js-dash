@@ -718,6 +718,34 @@ describe('DashAdapter: isLive', () => {
   });
 });
 
+describe('DashAdapter: _getLiveEdge', () => {
+  let video, dashInstance, config;
+
+  beforeEach(() => {
+    video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should return the live edge', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+    dashInstance.load().then(() => {
+      dashInstance._getLiveEdge().should.equal(dashInstance._shaka.seekRange().end);
+      done();
+    });
+  });
+});
+
 describe('DashAdapter: seekToLiveEdge', () => {
   let video, dashInstance, config;
 
@@ -755,150 +783,6 @@ describe('DashAdapter: seekToLiveEdge', () => {
       ((dashInstance._shaka.seekRange().end - video.currentTime) > 30).should.be.true;
       dashInstance.seekToLiveEdge();
       ((dashInstance._shaka.seekRange().end - video.currentTime) < 1).should.be.true;
-      done();
-    });
-  });
-});
-
-describe('DashAdapter: get currentTime', () => {
-  let video, dashInstance, config;
-
-  beforeEach(() => {
-    video = document.createElement("video");
-    config = {playback: {options: {html5: {dash: {}}}}};
-  });
-
-  afterEach((done) => {
-    dashInstance.destroy().then(() => {
-      dashInstance = null;
-      done();
-    });
-  });
-
-  after(() => {
-    TestUtils.removeVideoElementsFromTestPage();
-  });
-
-  it('should return video tag current time for VOD', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    dashInstance.load().then(() => {
-      dashInstance.currentTime.should.be.equal(video.currentTime);
-      video.currentTime += 15;
-      dashInstance.currentTime.should.be.equal(video.currentTime);
-      done();
-    });
-  });
-
-  it('should return live current time for live', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
-    dashInstance.load().then(() => {
-      dashInstance.currentTime.should.be.equal(video.currentTime - dashInstance._shaka.seekRange().start);
-      video.currentTime += 15;
-      dashInstance.currentTime.should.be.equal(video.currentTime - dashInstance._shaka.seekRange().start);
-      done();
-    });
-  });
-
-  it.skip('should return live current time for live + DVR', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
-    dashInstance.load().then(() => {
-      dashInstance.currentTime.should.be.equal(video.currentTime - dashInstance._shaka.seekRange().start);
-      video.currentTime += 15;
-      dashInstance.currentTime.should.be.equal(video.currentTime - dashInstance._shaka.seekRange().start);
-      done();
-    });
-  });
-});
-
-describe('DashAdapter: set currentTime', () => {
-  let video, dashInstance, config;
-
-  beforeEach(() => {
-    video = document.createElement("video");
-    config = {playback: {options: {html5: {dash: {}}}}};
-  });
-
-  afterEach((done) => {
-    dashInstance.destroy().then(() => {
-      dashInstance = null;
-      done();
-    });
-  });
-
-  after(() => {
-    TestUtils.removeVideoElementsFromTestPage();
-  });
-
-  it('should set current time for VOD', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    dashInstance.load().then(() => {
-      let ct = video.currentTime;
-      dashInstance.currentTime += 15;
-      video.currentTime.should.be.equal(ct + 15);
-      done();
-    });
-  });
-
-  it('should set live current time for live', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
-    dashInstance.load().then(() => {
-      let ct = video.currentTime;
-      dashInstance.currentTime += 15;
-      video.currentTime.should.be.equal(ct + 15);
-      done();
-    });
-  });
-
-  it.skip('should set live current time for live + DVR', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
-    dashInstance.load().then(() => {
-      let ct = video.currentTime;
-      dashInstance.currentTime += 15;
-      video.currentTime.should.be.equal(ct + 15);
-      done();
-    });
-  });
-});
-
-describe('DashAdapter: get duration', () => {
-  let video, dashInstance, config;
-
-  beforeEach(() => {
-    video = document.createElement("video");
-    config = {playback: {options: {html5: {dash: {}}}}};
-  });
-
-  afterEach((done) => {
-    dashInstance.destroy().then(() => {
-      dashInstance = null;
-      done();
-    });
-  });
-
-  after(() => {
-    TestUtils.removeVideoElementsFromTestPage();
-  });
-
-  it('should return video tag duration for VOD', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    dashInstance.load().then(() => {
-      dashInstance.duration.should.be.equal(video.duration);
-      done();
-    });
-  });
-
-  it('should return live duration for live', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
-    dashInstance.load().then(() => {
-      dashInstance.duration.should.be.equal(dashInstance._shaka.seekRange().end - dashInstance._shaka.seekRange().start);
-      done();
-    });
-  });
-
-  it.skip('should return live duration for live + DVR', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
-    dashInstance.load().then(() => {
-      dashInstance.duration.should.be.equal(dashInstance._shaka.seekRange().end - dashInstance._shaka.seekRange().start);
       done();
     });
   });
@@ -1022,5 +906,39 @@ describe('DashAdapter: _onPlaying', () => {
   });
 });
 
+describe('DashAdapter: getStartTimeOfDvrWindow', () => {
+  let video, dashInstance, config;
 
+  beforeEach(() => {
+    video = document.createElement("video");
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach((done) => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should return 0 for VOD', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance.load().then(() => {
+      dashInstance.getStartTimeOfDvrWindow().should.equal(0);
+      done();
+    });
+  });
+
+  it('should return the start time of Dvr window for live', (done) => {
+    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+    dashInstance.load().then(() => {
+      dashInstance.getStartTimeOfDvrWindow().should.equal(dashInstance._shaka.seekRange().start);
+      done();
+    });
+  });
+});
 
