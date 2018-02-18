@@ -4,6 +4,7 @@ import * as TestUtils from 'playkit-js/test/src/utils/test-utils'
 import {VideoTrack, AudioTrack, TextTrack} from 'playkit-js';
 import Widevine from '../../src/drm/widevine'
 import PlayReady from '../../src/drm/playready'
+import {EventType} from 'playkit-js'
 
 const targetId = 'player-placeholder_dash-adapter.spec';
 
@@ -809,7 +810,7 @@ describe('DashAdapter: _onBuffering', () => {
 
   it('should dispatch waiting event when buffering is true', (done) => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    dashInstance._videoElement.addEventListener('waiting', () => {
+    dashInstance._videoElement.addEventListener(EventType.WAITING, () => {
       done();
     });
     dashInstance._onBuffering({buffering: true});
@@ -819,12 +820,12 @@ describe('DashAdapter: _onBuffering', () => {
     let waitingCount = 0;
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance._init();
-    dashInstance._videoElement.addEventListener('waiting', () => {
+    dashInstance._videoElement.addEventListener(EventType.WAITING, () => {
       waitingCount++;
       waitingCount.should.equals(1);
       setTimeout(done, 0);
     });
-    dashInstance._videoElement.dispatchEvent(new window.Event('waiting'));
+    dashInstance._videoElement.dispatchEvent(new window.Event(EventType.WAITING));
     dashInstance._onBuffering({buffering: true});
   });
 
@@ -833,14 +834,14 @@ describe('DashAdapter: _onBuffering', () => {
     let hasPlaying = false;
     let onPlaying = () => {
       if (hasPlaying) {
-        dashInstance._videoElement.removeEventListener('playing', onPlaying);
+        dashInstance._videoElement.removeEventListener(EventType.PLAYING, onPlaying);
         done();
       } else {
         hasPlaying = true;
         dashInstance._onBuffering({buffering: false});
       }
     };
-    dashInstance._videoElement.addEventListener('playing', onPlaying);
+    dashInstance._videoElement.addEventListener(EventType.PLAYING, onPlaying);
     dashInstance.load().then(() => {
       dashInstance._videoElement.play();
     });
@@ -850,7 +851,7 @@ describe('DashAdapter: _onBuffering', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     sandbox.stub(dashInstance._videoElement, "paused").get(() => false);
     let t = setTimeout(done, 0);
-    dashInstance._videoElement.addEventListener('playing', () => {
+    dashInstance._videoElement.addEventListener(EventType.PLAYING, () => {
       done(new Error("test fail"));
       clearTimeout(t);
     });
@@ -861,7 +862,7 @@ describe('DashAdapter: _onBuffering', () => {
   it('should not dispatch playing event when buffering is false but video is paused', (done) => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     let t = setTimeout(done, 0);
-    dashInstance._videoElement.addEventListener('playing', () => {
+    dashInstance._videoElement.addEventListener(EventType.PLAYING, () => {
       done(new Error("test fail"));
       clearTimeout(t);
     });
@@ -888,7 +889,7 @@ describe('DashAdapter: _onPlaying', () => {
 
   it('should dispatch waiting event when buffering is true', (done) => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    dashInstance._videoElement.addEventListener('waiting', () => {
+    dashInstance._videoElement.addEventListener(EventType.WAITING, () => {
       done();
     });
     dashInstance._buffering = true;
@@ -898,7 +899,7 @@ describe('DashAdapter: _onPlaying', () => {
   it('should not dispatch waiting event when buffering is false', (done) => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     let t = setTimeout(done, 0);
-    dashInstance._videoElement.addEventListener('waiting', () => {
+    dashInstance._videoElement.addEventListener(EventType.WAITING, () => {
       done(new Error("test fail"));
       clearTimeout(t);
     });
