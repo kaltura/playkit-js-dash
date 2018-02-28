@@ -64,12 +64,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   static _drmProtocol: ?Function = null;
 
   /**
-   * A counter to the number of failed manifest calls
-   * @type {number}
+   * indicate if external redirect was performed
+   * @type {boolean}
    * @private
-   * @static
    */
-  static _failedManifestRequestCounter: number = 0;
+  _triedReloadWithRedirect: boolean = false;
   /**
    * The shaka player instance
    * @member {any} _shaka
@@ -136,14 +135,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
-    let dashConfig = {};
+    let adapterConfig = {};
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
-      dashConfig = config.playback.options.html5.dash;
+      adapterConfig.shakaConfig = config.playback.options.html5.dash;
     }
-    if (Utils.Object.hasPropertyPath(config, 'playback.options.adapters')) {
-      dashConfig = Utils.Object.mergeDeep(dashConfig, config.playback.options.adapters)
+    if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
+      const options = config.sources.options;
+      adapterConfig.forceRedirectExternalStreams = options.forceRedirectExternalStreams;
+      adapterConfig.redirectExternalStreamsCallback = options.redirectExternalStreamsCallback;
     }
-    return new this(videoElement, source, dashConfig);
+    return new this(videoElement, source, adapterConfig);
   }
 
   /**
@@ -224,16 +225,28 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _init(): void {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
-    if (this._config.forceRedirectForExternalStreams || DashAdapter._failedManifestRequestCounter === 1) {
-      this._callback = this._config.redirectForExternalStreamsCallback;
-      shaka.net.NetworkingEngine.registerScheme('http', HttpCorsPlugin.bind(this._callback), shaka.net.NetworkingEngine.PluginPriority.APPLICATION);
-      shaka.net.NetworkingEngine.registerScheme('https', HttpCorsPlugin.bind(this._callback), shaka.net.NetworkingEngine.PluginPriority.APPLICATION);
+    if (this._config.forceRedirectExternalStreams) {
+      this._installShakaRedirectScheme();
     }
     this._shaka = new shaka.Player(this._videoElement);
     this._maybeSetDrmConfig();
-    this._shaka.configure(this._config);
+    this._shaka.configure(this._config.shakaConfig);
     this._shaka.setTextTrackVisibility(false);
     this._addBindings();
+  }
+
+  /**
+   * Add scheme plugin to register external live redirect
+   * @returns {void}
+   * @private
+   */
+  _installShakaRedirectScheme(): void {
+    const callback = this._config.redirectExternalStreamsCallback;
+    ['http', 'https'].forEach(scheme =>
+      shaka.net.NetworkingEngine.registerScheme(
+        scheme,
+        (uri, request) => HttpCorsPlugin(uri, request, callback),
+        shaka.net.NetworkingEngine.PluginPriority.APPLICATION));
   }
 
   /**
@@ -243,7 +256,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeSetDrmConfig(): void {
     if (DashAdapter._drmProtocol && this._sourceObj && this._sourceObj.drmData) {
-      DashAdapter._drmProtocol.setDrmPlayback(this._config, this._sourceObj.drmData);
+      DashAdapter._drmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
     }
   }
 
@@ -292,8 +305,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             DashAdapter._logger.debug('The source has been loaded successfully');
             resolve(data);
           }).catch((error) => {
-            if (this._isManifestLoadError(error) && DashAdapter._failedManifestRequestCounter === 0) {
-              this._reloadWithRedirect(this._config, this._sourceObj, resolve, reject)
+            if (!this._config.forceRedirectExternalStreams &&
+              !this._triedReloadWithRedirect &&
+              this._isManifestLoadError(error)) {
+              this._reloadWithRedirect(startTime, resolve, reject)
             } else {
               reject(new Error(
                 error.severity,
@@ -312,29 +327,28 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * destroying the adapter and reconfiguring the adapter's config + source member, then calling load again so it can
    * and reload with the manifest redirect.
-   * @param {Object} config  - adapters config
-   * @param {Object} sourceObj - adapters source object
+   * @param {number} startTime - Optional time to start the video from.
    * @param {Function} resolve - original load promise resolve function
    * @param {Function} reject - original load promise reject function
    * @returns {void}
    * @private
    */
-  _reloadWithRedirect(config: Object, sourceObj: PKMediaSourceObject, resolve: Function, reject: Function): void {
-    DashAdapter._failedManifestRequestCounter++;
-    this.destroy().then(() => {
-      this._config = config;
-      this._sourceObj = sourceObj;
-      this.load().then(data => {
+  _reloadWithRedirect(startTime: ?number, resolve: Function, reject: Function): void {
+    this._triedReloadWithRedirect = true;
+    this._installShakaRedirectScheme();
+    this.reset()
+      .then(this.load)
+      .then(data => {
         resolve(data);
       })
-        .catch((error) => {
-          reject(new Error(
-            error.severity,
-            error.category,
-            error.code,
-            error.data));
-        });
-    });
+      .catch((error) => {
+        reject(new Error(
+          error.severity,
+          error.category,
+          error.code,
+          error.data));
+      });
+    // });
   }
 
   /**
@@ -344,7 +358,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _isManifestLoadError(error: Object): boolean {
-    return error.code === Error.Code.HTTP_ERROR && error.category === Error.Category.NETWORK && error.data && error.data[0].indexOf("Manifest");
+    return (error.code === Error.Code.HTTP_ERROR) &&
+      (error.category === Error.Category.NETWORK && error.data) &&
+      (error.data[0].indexOf("Manifest"));
   }
 
   /**
@@ -357,19 +373,23 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return super.destroy().then(() => {
       DashAdapter._logger.debug('destroy');
       this._loadPromise = null;
-      this._buffering = false;
-      this._waitingSent = false;
-      this._playingSent = false;
-      if (DashAdapter._drmProtocol) {
-        DashAdapter._drmProtocol.destroy();
-        DashAdapter._drmProtocol = null;
-      }
-      if (this._shaka) {
-        this._removeBindings();
-        return this._shaka.destroy();
-      }
-      this._adapterEventsBindings = {};
+      return this._reset();
     });
+  }
+
+  _reset(): ?Promise<*> {
+    this._buffering = false;
+    this._waitingSent = false;
+    this._playingSent = false;
+    if (DashAdapter._drmProtocol) {
+      DashAdapter._drmProtocol.destroy();
+      DashAdapter._drmProtocol = null;
+    }
+    if (this._shaka) {
+      this._removeBindings();
+      return this._shaka.destroy();
+    }
+    this._adapterEventsBindings = {};
   }
 
   /**

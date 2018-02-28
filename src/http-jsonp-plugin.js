@@ -1,17 +1,17 @@
 //@flow
 
-import {Jsonp as jsonp} from 'playkit-js'
+import {jsonp} from 'playkit-js'
 import {Error} from 'playkit-js'
 
 /**
  *  A networking plugin to handle http and https URIs via XHR and for playmanifest using jsonp
  * @param {string} uri - url pf the request
  * @param {Object} request - request object
+ * @param {Function} callback - external redirect callback function
  * @return {Promise<*>} - a promise with the response
  * @export
  */
-export default function (uri: string, request: Object): Promise<*> {
-  const _callback = this;
+export default function (uri: string, request: Object, callback: Function): Promise<*> {
   const _executeXHR = function (uri, request) {
     return new Promise((resolve, reject) => {
       let xhr = new window.XMLHttpRequest();
@@ -82,7 +82,7 @@ export default function (uri: string, request: Object): Promise<*> {
   const _getDirectUri = uri => {
     return new Promise(function (resolve) {
       if (uri.indexOf("playManifest") > -1 && true) {
-        jsonp(uri, _callback).then(url => {
+        jsonp(uri, callback).then(url => {
           resolve(url);
         });
       } else {
