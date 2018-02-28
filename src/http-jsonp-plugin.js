@@ -1,6 +1,6 @@
 //@flow
 
-import {jsonp} from 'playkit-js'
+import {Utils} from 'playkit-js'
 import {Error} from 'playkit-js'
 
 /**
@@ -82,7 +82,7 @@ export default function (uri: string, request: Object, callback: Function): Prom
   const _getDirectUri = uri => {
     return new Promise(function (resolve) {
       if (uri.indexOf("playManifest") > -1 && true) {
-        jsonp(uri, callback).then(url => {
+        Utils.jsonp(uri, callback).then(url => {
           resolve(url);
         });
       } else {
