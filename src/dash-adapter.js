@@ -8,6 +8,7 @@ import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 import {DefaultConfig} from './default-config'
 import HttpCorsPlugin from './http-jsonp-plugin'
+import {EventType} from 'playkit-js'
 
 type ShakaEventType = { [event: string]: string };
 
@@ -83,10 +84,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _adapterEventsBindings: { [name: string]: Function } = {
     [ShakaEvent.ERROR]: (event) => this._onError(event),
-    [ShakaEvent.ADAPTION]: () => this._onAdaptation(),
-    [ShakaEvent.BUFFERING]: (event) => this._onBuffering(event),
-    [BaseMediaSourceAdapter.Html5Events.WAITING]: () => this._onWaiting(),
-    [BaseMediaSourceAdapter.Html5Events.PLAYING]: () => this._onPlaying()
+    [ShakaEvent.ADAPTION] : () => this._onAdaptation(),
+    [ShakaEvent.BUFFERING] : (event) => this._onBuffering(event),
+    [EventType.WAITING] : () => this._onWaiting(),
+    [EventType.PLAYING] : () => this._onPlaying()
   };
   /**
    * The load promise
@@ -270,8 +271,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.addEventListener(ShakaEvent.ADAPTION, this._adapterEventsBindings.adaption);
     this._shaka.addEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
-    this._videoElement.addEventListener(BaseMediaSourceAdapter.Html5Events.WAITING, this._adapterEventsBindings.waiting);
-    this._videoElement.addEventListener(BaseMediaSourceAdapter.Html5Events.PLAYING, this._adapterEventsBindings.playing);
+    this._videoElement.addEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
+    this._videoElement.addEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
@@ -284,8 +285,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.removeEventListener(ShakaEvent.ADAPTION, this._adapterEventsBindings.adaption);
     this._shaka.removeEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._shaka.removeEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
-    this._videoElement.removeEventListener(BaseMediaSourceAdapter.Html5Events.WAITING, this._adapterEventsBindings.waiting);
-    this._videoElement.removeEventListener(BaseMediaSourceAdapter.Html5Events.PLAYING, this._adapterEventsBindings.playing);
+    this._videoElement.removeEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
+    this._videoElement.removeEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
@@ -299,7 +300,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._init();
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
-          this._trigger(BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
+          this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
           this._shaka.load(this._sourceObj.url, startTime).then(() => {
             let data = {tracks: this._getParsedTracks()};
             DashAdapter._logger.debug('The source has been loaded successfully');
@@ -531,7 +532,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         if (selectedVideoTrack) {
           if (this.isAdaptiveBitrateEnabled()) {
             this._shaka.configure({abr: {enabled: false}});
-            this._trigger(BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, {mode: 'manual'});
+            this._trigger(EventType.ABR_MODE_CHANGED, {mode: 'manual'});
           }
           if (!selectedVideoTrack.active) {
             this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
@@ -591,7 +592,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   enableAdaptiveBitrate(): void {
     if (this._shaka && !this.isAdaptiveBitrateEnabled()) {
-      this._trigger(BaseMediaSourceAdapter.CustomEvents.ABR_MODE_CHANGED, {mode: 'auto'});
+      this._trigger(EventType.ABR_MODE_CHANGED, {mode: 'auto'});
       this._shaka.configure({abr: {enabled: true}});
     }
   }
@@ -608,6 +609,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       return shakaConfig.abr.enabled;
     }
     return false;
+  }
+
+  /**
+   * Returns the live edge
+   * @returns {number} - live edge
+   * @private
+   */
+  _getLiveEdge(): number {
+    return this._shaka ? this._shaka.seekRange().end : NaN;
   }
 
   /**
@@ -662,7 +672,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (error.code === this.VIDEO_ERROR_CODE) {
         return;
       }
-      this._trigger(BaseMediaSourceAdapter.Html5Events.ERROR,
+      this._trigger(EventType.ERROR,
         new Error(
           error.severity,
           error.category,
@@ -683,13 +693,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (event.buffering) {
       if (!this._waitingSent) { //the player enters the buffering state. and 'waiting' event hasn't been sent by the HTMLVideoElement.
         //TODO use events enum when available
-        this._videoElement.dispatchEvent(new window.Event('waiting'));
+        this._videoElement.dispatchEvent(new window.Event(EventType.WAITING));
         this._buffering = true;
       }
     } else {
       this._buffering = false;
       if (!this._videoElement.paused && !this._playingSent) { //the player leaves the buffering state. and 'playing' event hasn't been sent by the HTMLVideoElement.
-        this._videoElement.dispatchEvent(new window.Event('playing'));
+        this._videoElement.dispatchEvent(new window.Event(EventType.PLAYING));
       }
     }
   }
@@ -716,7 +726,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._waitingSent = false;
     if (this._buffering) { //the player is in buffering state.
       //TODO use events enum when available
-      this._videoElement.dispatchEvent(new window.Event('waiting'));
+      this._videoElement.dispatchEvent(new window.Event(EventType.WAITING));
     }
   }
 
@@ -734,43 +744,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * Get the current time in seconds.
-   * @returns {Number} - The current playback time.
+   * Get the start time of DVR window in live playback in seconds.
+   * @returns {Number} - start time of DVR window.
    * @public
    */
-  get currentTime(): number {
-    if (this._shaka && this.isLive()) {
-      return this._videoElement.currentTime - this._shaka.seekRange().start;
+  getStartTimeOfDvrWindow(): number {
+    if (this.isLive() && this._shaka) {
+      return this._shaka.seekRange().start;
     } else {
-      return super.currentTime;
-    }
-  }
-
-  /**
-   * Set the current time in seconds.
-   * @param {Number} to - The number to set in seconds.
-   * @public
-   * @returns {void}
-   */
-  set currentTime(to: number): void {
-    if (this._shaka && this.isLive()) {
-      this._videoElement.currentTime = this._shaka.seekRange().start + to;
-    } else {
-      super.currentTime = to;
-    }
-  }
-
-  /**
-   * Get the duration in seconds.
-   * @returns {Number} - The playback duration.
-   * @public
-   */
-  get duration(): number {
-    if (this._shaka && this.isLive()) {
-      let seekRange = this._shaka.seekRange();
-      return seekRange.end - seekRange.start;
-    } else {
-      return super.duration;
+      return 0;
     }
   }
 }

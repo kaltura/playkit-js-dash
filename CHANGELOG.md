@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.5.4"></a>
+## [1.5.4](https://github.com/kaltura/playkit-js-dash/compare/v1.5.3...v1.5.4) (2018-02-19)
+
+
+
+<a name="1.5.3"></a>
+## [1.5.3](https://github.com/kaltura/playkit-js-dash/compare/v1.5.2...v1.5.3) (2018-02-11)
+
+
+### Bug Fixes
+
+* **FEC-7882:** Live+DVR - unavailable time shown in the seekbar ([#45](https://github.com/kaltura/playkit-js-dash/issues/45)) ([6b04f2b](https://github.com/kaltura/playkit-js-dash/commit/6b04f2b))
+
+
+
+<a name="1.5.2"></a>
+## [1.5.2](https://github.com/kaltura/playkit-js-dash/compare/v1.5.0...v1.5.2) (2018-02-06)
+
+
+### Bug Fixes
+
+* build ([#43](https://github.com/kaltura/playkit-js-dash/issues/43)) ([a632a7e](https://github.com/kaltura/playkit-js-dash/commit/a632a7e))
+* source type update ([#41](https://github.com/kaltura/playkit-js-dash/issues/41)) ([1360fdc](https://github.com/kaltura/playkit-js-dash/commit/1360fdc))
+* update env (docs and namespace) ([c2b016b](https://github.com/kaltura/playkit-js-dash/commit/c2b016b))
+* **FEC-7672:** 4XX VTT captions results in a critical error ([#40](https://github.com/kaltura/playkit-js-dash/issues/40)) ([e323606](https://github.com/kaltura/playkit-js-dash/commit/e323606))
+* **webpack:** playkit core externals root value ([#42](https://github.com/kaltura/playkit-js-dash/issues/42)) ([4395e42](https://github.com/kaltura/playkit-js-dash/commit/4395e42))
+
+
+
+<a name="1.5.1"></a>
+## [1.5.1](https://github.com/kaltura/playkit-js-dash/compare/v1.5.0...v1.5.1) (2018-02-06)
+
+
+### Bug Fixes
+
+* build ([#43](https://github.com/kaltura/playkit-js-dash/issues/43)) ([a632a7e](https://github.com/kaltura/playkit-js-dash/commit/a632a7e))
+* source type update ([#41](https://github.com/kaltura/playkit-js-dash/issues/41)) ([1360fdc](https://github.com/kaltura/playkit-js-dash/commit/1360fdc))
+* update env (docs and namespace) ([c2b016b](https://github.com/kaltura/playkit-js-dash/commit/c2b016b))
+* **FEC-7672:** 4XX VTT captions results in a critical error ([#40](https://github.com/kaltura/playkit-js-dash/issues/40)) ([e323606](https://github.com/kaltura/playkit-js-dash/commit/e323606))
+* **webpack:** playkit core externals root value ([#42](https://github.com/kaltura/playkit-js-dash/issues/42)) ([4395e42](https://github.com/kaltura/playkit-js-dash/commit/4395e42))
+
+
+
 <a name="1.5.1"></a>
 ## [1.5.1](https://github.com/kaltura/playkit-js-dash/compare/v1.5.0...v1.5.1) (2018-01-10)
 
