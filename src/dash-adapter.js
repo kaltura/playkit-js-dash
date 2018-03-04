@@ -76,10 +76,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _adapterEventsBindings: { [name: string]: Function } = {
     [ShakaEvent.ERROR]: (event) => this._onError(event),
-    [ShakaEvent.ADAPTION] : () => this._onAdaptation(),
-    [ShakaEvent.BUFFERING] : (event) => this._onBuffering(event),
-    [EventType.WAITING] : () => this._onWaiting(),
-    [EventType.PLAYING] : () => this._onPlaying()
+    [ShakaEvent.ADAPTION]: () => this._onAdaptation(),
+    [ShakaEvent.BUFFERING]: (event) => this._onBuffering(event),
+    [EventType.WAITING]: () => this._onWaiting(),
+    [EventType.PLAYING]: () => this._onPlaying()
   };
   /**
    * The load promise
@@ -301,10 +301,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._buffering = false;
       this._waitingSent = false;
       this._playingSent = false;
-      if (DashAdapter._drmProtocol) {
-        DashAdapter._drmProtocol.destroy();
-        DashAdapter._drmProtocol = null;
-      }
       if (this._shaka) {
         this._removeBindings();
         return this._shaka.destroy();
