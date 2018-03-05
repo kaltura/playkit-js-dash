@@ -1,6 +1,6 @@
 {
   "name": "playkit-js-dash",
-  "version": "1.5.4",
+  "version": "1.5.5-offline",
   "description": "",
   "main": "dist/playkit-dash.js",
   "scripts": {
@@ -66,7 +66,7 @@
   "license": "AGPL-3.0",
   "peerDependencies": {
     "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.21.2",
-    "shaka-player": "2.2.2"
+    "shaka-player": "https://gihub.com/kaltura/shaka-player#2.3.3"
   },
   "repository": {
     "type": "git",
