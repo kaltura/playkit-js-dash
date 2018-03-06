@@ -7,6 +7,7 @@ import {Error} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 import DefaultConfig from './default-config'
+import TextDisplayer from './text-displayer'
 import {EventType} from 'playkit-js'
 
 type ShakaEventType = { [event: string]: string };
@@ -202,7 +203,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
-    this._config = Utils.Object.mergeDeep({}, this._config, DefaultConfig);
+    const textDisplayerConfig = {
+      textDisplayFactory: function (videoEl) {
+        return new TextDisplayer(videoEl);
+      }.bind(null, videoElement)
+    };
+    this._config = Utils.Object.mergeDeep(textDisplayerConfig, this._config, DefaultConfig);
   }
 
   /**
@@ -483,7 +489,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   selectTextTrack(textTrack: TextTrack): void {
     if (this._shaka && (textTrack instanceof TextTrack) && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
       this._shaka.selectTextLanguage(textTrack.language);
-      this._shaka.setTextTrackVisibility(false);
       this._onTrackChanged(textTrack);
     }
   }
