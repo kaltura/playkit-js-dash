@@ -203,10 +203,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
+    this._setShakaConfig();
+  }
+
+  /**
+   * Sets the shaka config.
+   * @private
+   * @returns {void}
+   */
+  _setShakaConfig(): void {
     const textDisplayerConfig = {
       textDisplayFactory: function (videoEl) {
         return new TextDisplayer(videoEl);
-      }.bind(null, videoElement)
+      }.bind(null, this._videoElement)
     };
     this._config = Utils.Object.mergeDeep(textDisplayerConfig, this._config, DefaultConfig);
   }
