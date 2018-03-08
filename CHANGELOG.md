@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.5.6"></a>
+## [1.5.6](https://github.com/kaltura/playkit-js-dash/compare/v1.5.5...v1.5.6) (2018-03-08)
+
+
+### Bug Fixes
+
+* **FEC-7034:** player gets stuck at the end after replay - ie11 ([#49](https://github.com/kaltura/playkit-js-dash/issues/49)) ([c8943bd](https://github.com/kaltura/playkit-js-dash/commit/c8943bd))
+
+
+
 <a name="1.5.5"></a>
 ## [1.5.5](https://github.com/kaltura/playkit-js-dash/compare/v1.5.4...v1.5.5) (2018-03-05)
 
