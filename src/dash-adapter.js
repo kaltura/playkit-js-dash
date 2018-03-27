@@ -1,14 +1,10 @@
 // @flow
 import shaka from 'shaka-player';
-import {BaseMediaSourceAdapter} from 'playkit-js'
-import {Track, VideoTrack, AudioTrack, TextTrack} from 'playkit-js'
-import {Utils} from 'playkit-js'
-import {Error} from 'playkit-js'
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 import DefaultConfig from './default-config'
 import TextDisplayer from './text-displayer'
-import {EventType} from 'playkit-js'
 
 type ShakaEventType = { [event: string]: string };
 
@@ -621,8 +617,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _onBuffering(event: any): void {
     if (event.buffering) {
-      if (!this._waitingSent) { //the player enters the buffering state. and 'waiting' event hasn't been sent by the HTMLVideoElement.
-        //TODO use events enum when available
+      if (!this._waitingSent) {
+        // The player enters the buffering state and 'waiting' event hasn't been sent by the HTMLVideoElement.
         this._videoElement.dispatchEvent(new window.Event(EventType.WAITING));
         this._buffering = true;
       }
@@ -654,23 +650,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _onPlaying(): void {
     this._playingSent = true;
     this._waitingSent = false;
-    if (this._buffering) { //the player is in buffering state.
-      //TODO use events enum when available
+    if (this._buffering) {
+      // The player is in buffering state.
       this._videoElement.dispatchEvent(new window.Event(EventType.WAITING));
     }
-  }
-
-  /**
-   * Getter for the src that the adapter plays on the video element.
-   * In case the adapter preformed a load it will return the manifest url.
-   * @public
-   * @returns {string} - The src url.
-   */
-  get src(): string {
-    if (this._loadPromise && this._sourceObj) {
-      return this._sourceObj.url;
-    }
-    return "";
   }
 
   /**
