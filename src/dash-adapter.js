@@ -387,7 +387,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           width: videoTracks[i].width,
           height: videoTracks[i].height,
           active: videoTracks[i].active,
-          label: videoTracks[i].label,
           index: i
         };
         parsedTracks.push(new VideoTrack(settings));
