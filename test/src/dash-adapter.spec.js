@@ -261,7 +261,6 @@ describe('DashAdapter: _getParsedTracks', () => {
           track.id.should.equal(videoTracks[track.index].id);
           track.active.should.equal(videoTracks[track.index].active);
           track.bandwidth.should.equal(videoTracks[track.index].bandwidth);
-          (track.label === videoTracks[track.index].label).should.be.true;
         }
         if (track instanceof AudioTrack) {
           track.id.should.equal(audioTracks[track.index].id);
