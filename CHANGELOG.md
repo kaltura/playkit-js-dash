@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.6.0"></a>
+# [1.6.0](https://github.com/kaltura/playkit-js-dash/compare/v1.5.7...v1.6.0) (2018-04-10)
+
+
+### Features
+
+* **FEC-7330:** enable setting custom track labels by app ([#51](https://github.com/kaltura/playkit-js-dash/issues/51)) ([025d1a1](https://github.com/kaltura/playkit-js-dash/commit/025d1a1))
+
+
+
 <a name="1.5.7"></a>
 ## [1.5.7](https://github.com/kaltura/playkit-js-dash/compare/v1.5.6...v1.5.7) (2018-03-27)
 
