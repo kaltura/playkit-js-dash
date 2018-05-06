@@ -15,7 +15,7 @@ type ShakaEventType = { [event: string]: string };
  */
 const ShakaEvent: ShakaEventType = {
   ERROR: 'error',
-  ADAPTION: 'adaption',
+  ADAPTATION: 'adaptation',
   BUFFERING: 'buffering'
 };
 
@@ -73,7 +73,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _adapterEventsBindings: { [name: string]: Function } = {
     [ShakaEvent.ERROR]: (event) => this._onError(event),
-    [ShakaEvent.ADAPTION]: () => this._onAdaptation(),
+    [ShakaEvent.ADAPTATION]: () => this._onAdaptation(),
     [ShakaEvent.BUFFERING]: (event) => this._onBuffering(event),
     [EventType.WAITING]: () => this._onWaiting(),
     [EventType.PLAYING]: () => this._onPlaying()
@@ -249,7 +249,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _addBindings(): void {
-    this._shaka.addEventListener(ShakaEvent.ADAPTION, this._adapterEventsBindings.adaption);
+    this._shaka.addEventListener(ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
     this._shaka.addEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._videoElement.addEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
@@ -263,7 +263,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _removeBindings(): void {
-    this._shaka.removeEventListener(ShakaEvent.ADAPTION, this._adapterEventsBindings.adaption);
+    this._shaka.removeEventListener(ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
     this._shaka.removeEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._shaka.removeEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._videoElement.removeEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
