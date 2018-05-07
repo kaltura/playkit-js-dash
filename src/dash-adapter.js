@@ -282,7 +282,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
-          this._shaka.load(this._sourceObj.url, startTime).then(() => {
+          this._shaka.load(this._sourceObj.url, startTime > -1 ? startTime : undefined).then(() => {
             let data = {tracks: this._getParsedTracks()};
             DashAdapter._logger.debug('The source has been loaded successfully');
             resolve(data);
