@@ -54,7 +54,7 @@
     "mocha": "^3.2.0",
     "mocha-cli": "^1.0.1",
     "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.27.0",
-    "shaka-player": "2.3.3",
+    "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-1",
     "sinon": "^2.0.0",
     "sinon-chai": "^2.8.0",
     "standard-version": "^4.0.0",
@@ -66,7 +66,7 @@
   "license": "AGPL-3.0",
   "peerDependencies": {
     "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.27.0",
-    "shaka-player": "2.3.3"
+    "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-1"
   },
   "repository": {
     "type": "git",
