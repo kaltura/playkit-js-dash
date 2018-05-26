@@ -23,7 +23,7 @@ const ShakaEvent: ShakaEventType = {
  * Adapter of shaka lib for dash content
  * @classdesc
  */
-export default class DashAdapter extends BaseMediaSourceAdapter {
+export class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * The id of Adapter
    * @member {string} id
@@ -669,3 +669,5 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 }
+
+export {DashAdapter as Adapter, shaka};

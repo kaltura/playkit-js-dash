@@ -1,14 +1,17 @@
 // @flow
 import {registerMediaSourceAdapter} from 'playkit-js'
-import DashAdapter from './dash-adapter'
+import {Adapter, shaka} from './dash-adapter'
 
 declare var __VERSION__: string;
 declare var __NAME__: string;
 
-export default DashAdapter;
-export {__VERSION__ as VERSION, __NAME__ as NAME};
+const VERSION = __VERSION__;
+const NAME = __NAME__;
+
+export {VERSION, NAME};
+export {Adapter, shaka};
 
 // Register DashAdapter to the media source adapter manager
-if (DashAdapter.isSupported()) {
-  registerMediaSourceAdapter(DashAdapter);
+if (Adapter.isSupported()) {
+  registerMediaSourceAdapter(Adapter);
 }
