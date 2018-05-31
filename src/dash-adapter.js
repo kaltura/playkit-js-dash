@@ -1,6 +1,7 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from 'playkit-js'
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack,FragmentData,
+  RequestTypes} from 'playkit-js'
 import Widevine from './drm/widevine'
 import PlayReady from './drm/playready'
 import DefaultConfig from './default-config'
@@ -254,6 +255,27 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._videoElement.addEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
     this._videoElement.addEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
+    this._shaka.getNetworkingEngine().registerResponseFilter((type,data) =>{
+      let stats = this._shaka.getStats();
+      let fragData = new FragmentData();
+      fragData.requestType = RequestTypes.RESPONSE;
+      fragData.time = data.timeMS;
+      fragData.url = data.uri;
+      fragData.bwEstimation = stats.estimatedBandwidth;
+      fragData.duration = this._shaka.getManifest().presentationTimeline.getMaxSegmentDuration();
+      fragData.size = data.data.byteLength;
+      this._trigger(EventType.FRAG_LOADED,fragData);
+    });
+    this._shaka.getNetworkingEngine().registerRequestFilter((type,data) =>{
+      let stats = this._shaka.getStats();
+      let fragData = new FragmentData();
+      fragData.requestType = RequestTypes.REQUEST;
+      fragData.url = data.uri[0];
+      fragData.bwEstimation = stats.estimatedBandwidth;
+      fragData.duration = this._shaka.getManifest().presentationTimeline.getMaxSegmentDuration();
+      this._trigger(EventType.FRAG_LOADING,fragData);
+
+    });
   }
 
   /**
@@ -268,6 +290,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.removeEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._videoElement.removeEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
     this._videoElement.removeEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
+    this._shaka.getNetworkingEngine().clearAllResponseFilters();
+    this._shaka.getNetworkingEngine().clearAllRequestFilters();
   }
 
   /**
