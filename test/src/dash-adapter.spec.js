@@ -179,6 +179,8 @@ describe('DashAdapter: load', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance.load().then(() => {
       done();
+    }).catch(e => {
+      done(e)
     });
   });
 
@@ -309,8 +311,12 @@ describe('DashAdapter: selectVideoTrack', () => {
     let inactiveTrack;
     let onVideoTrackChanged = (event) => {
       dashInstance.removeEventListener('videotrackchanged', onVideoTrackChanged);
-      event.payload.selectedVideoTrack.id.should.be.equal(inactiveTrack.id);
-      done();
+      try {
+        event.payload.selectedVideoTrack.id.should.be.equal(inactiveTrack.id);
+        done();
+      } catch (e) {
+        done(e);
+      }
     };
     dashInstance.load().then(() => {
       dashInstance.addEventListener('videotrackchanged', onVideoTrackChanged);
@@ -453,8 +459,12 @@ describe('DashAdapter: selectAudioTrack', () => {
         return track.active;
       })[0].id);
       setTimeout(() => {
-        eventIsFired.should.be.false;
-        done();
+        try {
+          eventIsFired.should.be.false;
+          done();
+        } catch (e) {
+          done(e);
+        }
       }, 1000)
     });
   });
@@ -551,8 +561,12 @@ describe('DashAdapter: selectTextTrack', () => {
         return track.active;
       })[0].language);
       setTimeout(() => {
-        eventCounter.should.equals(1);
-        done();
+        try {
+          eventCounter.should.equals(1);
+          done();
+        } catch (e) {
+          done(e);
+        }
       }, 1000)
     });
   });
@@ -638,13 +652,16 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should enable ABR', () => {
+  it('should enable ABR', (done) => {
     dashInstance.load().then(() => {
       dashInstance._shaka.getConfiguration().abr.enabled.should.be.false;
       dashInstance.enableAdaptiveBitrate();
       dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
       dashInstance.isAdaptiveBitrateEnabled().should.be.true;
+      done();
     });
+  }).catch((e)=> {
+    done(e)
   });
 
   it('should fire abr mode changed event', (done) => {
@@ -693,6 +710,8 @@ describe('DashAdapter: isLive', () => {
     dashInstance.load().then(() => {
       dashInstance.isLive().should.be.false;
       done();
+    }).catch(e => {
+      done(e);
     });
   });
 
@@ -773,6 +792,8 @@ describe('DashAdapter: seekToLiveEdge', () => {
       dashInstance.seekToLiveEdge();
       ((dashInstance._shaka.seekRange().end - video.currentTime) <= 1).should.be.true;
       done();
+    }).catch((e)=> {
+      done(e)
     });
   });
 
@@ -784,6 +805,8 @@ describe('DashAdapter: seekToLiveEdge', () => {
       dashInstance.seekToLiveEdge();
       ((dashInstance._shaka.seekRange().end - video.currentTime) < 1).should.be.true;
       done();
+    }).catch((e)=> {
+      done(e)
     });
   });
 });
