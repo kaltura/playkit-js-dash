@@ -327,7 +327,12 @@ describe('DashAdapter: selectVideoTrack', () => {
       let activeTrack = dashInstance._getVideoTracks().filter((track) => {
         return track.active;
       })[0];
-      activeTrack.id.should.be.equal(inactiveTrack.id);
+      try {
+        activeTrack.id.should.be.equal(inactiveTrack.id);
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
   });
 
