@@ -227,6 +227,8 @@ describe('DashAdapter: destroy', () => {
         dashInstance._buffering.should.be.false;
         done();
       });
+    }).catch(e => {
+      done(e);
     });
   });
 });
@@ -309,11 +311,12 @@ describe('DashAdapter: selectVideoTrack', () => {
 
   it('should select a new video track', (done) => {
     let inactiveTrack;
+    let error;
     let onVideoTrackChanged = (event) => {
       dashInstance.removeEventListener('videotrackchanged', onVideoTrackChanged);
       try {
         event.payload.selectedVideoTrack.id.should.be.equal(inactiveTrack.id);
-        done();
+        done(error);
       } catch (e) {
         done(e);
       }
@@ -329,9 +332,8 @@ describe('DashAdapter: selectVideoTrack', () => {
       })[0];
       try {
         activeTrack.id.should.be.equal(inactiveTrack.id);
-        done();
       } catch (e) {
-        done(e);
+        error = e;
       }
     });
   });
@@ -673,10 +675,14 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
     let mode = 'manual';
     let counter = 0;
     dashInstance.addEventListener('abrmodechanged', (event) => {
-      event.payload.mode.should.equal(mode);
-      counter++;
-      if (counter === 3) {
-        done();
+      try {
+        event.payload.mode.should.equal(mode);
+        counter++;
+        if (counter === 3) {
+          done();
+        }
+      } catch (e){
+        done(e);
       }
     });
     dashInstance.load().then(() => {
