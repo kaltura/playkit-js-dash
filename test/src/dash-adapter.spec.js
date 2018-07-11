@@ -659,9 +659,9 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
       dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
       dashInstance.isAdaptiveBitrateEnabled().should.be.true;
       done();
+    }).catch((e)=> {
+      done(e)
     });
-  }).catch((e)=> {
-    done(e)
   });
 
   it('should fire abr mode changed event', (done) => {
