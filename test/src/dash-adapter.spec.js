@@ -666,7 +666,7 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
       dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
       dashInstance.isAdaptiveBitrateEnabled().should.be.true;
       done();
-    }).catch((e)=> {
+    }).catch((e) => {
       done(e)
     });
   });
@@ -681,7 +681,7 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
         if (counter === 3) {
           done();
         }
-      } catch (e){
+      } catch (e) {
         done(e);
       }
     });
@@ -799,11 +799,11 @@ describe('DashAdapter: seekToLiveEdge', () => {
     dashInstance = DashAdapter.createAdapter(video, liveSource, config);
     dashInstance.load().then(() => {
       video.currentTime = dashInstance._shaka.seekRange().start;
-      ((dashInstance._shaka.seekRange().end - video.currentTime) >= 30).should.be.true;
+      ((dashInstance._shaka.seekRange().end - video.currentTime) >= 20).should.be.true;
       dashInstance.seekToLiveEdge();
       ((dashInstance._shaka.seekRange().end - video.currentTime) <= 1).should.be.true;
       done();
-    }).catch((e)=> {
+    }).catch((e) => {
       done(e)
     });
   });
@@ -816,7 +816,7 @@ describe('DashAdapter: seekToLiveEdge', () => {
       dashInstance.seekToLiveEdge();
       ((dashInstance._shaka.seekRange().end - video.currentTime) < 1).should.be.true;
       done();
-    }).catch((e)=> {
+    }).catch((e) => {
       done(e)
     });
   });
