@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.6.3"></a>
+## [1.6.3](https://github.com/kaltura/playkit-js-dash/compare/v1.6.2...v1.6.3) (2018-07-12)
+
+
+### Bug Fixes
+
+* **FEC-7935:** fix text selection logic ([#55](https://github.com/kaltura/playkit-js-dash/issues/55)) ([cefc2ce](https://github.com/kaltura/playkit-js-dash/commit/cefc2ce))
+* **FEC-8396:** media source adapters default config overrides the player supplied config ([#56](https://github.com/kaltura/playkit-js-dash/issues/56)) ([a9d41ca](https://github.com/kaltura/playkit-js-dash/commit/a9d41ca))
+
+
+
 <a name="1.6.2"></a>
 ## [1.6.2](https://github.com/kaltura/playkit-js-dash/compare/v1.6.1...v1.6.2) (2018-05-10)
 

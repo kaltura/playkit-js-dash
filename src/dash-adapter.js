@@ -130,6 +130,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       dashConfig = config.playback.options.html5.dash;
     }
+    if (Utils.Object.hasPropertyPath(config, 'playback.useNativeTextTrack')) {
+      dashConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
+    }
     return new this(videoElement, source, dashConfig);
   }
 
@@ -214,7 +217,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         return new TextDisplayer(videoEl);
       }.bind(null, this._videoElement)
     };
-    this._config = Utils.Object.mergeDeep(textDisplayerConfig, this._config, DefaultConfig);
+    this._config = Utils.Object.mergeDeep(textDisplayerConfig, DefaultConfig, this._config);
   }
 
   /**
@@ -228,7 +231,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka = new shaka.Player(this._videoElement);
     this._maybeSetDrmConfig();
     this._shaka.configure(this._config);
-    this._shaka.setTextTrackVisibility(false);
     this._addBindings();
   }
 
@@ -517,6 +519,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   selectTextTrack(textTrack: TextTrack): void {
     if (this._shaka && (textTrack instanceof TextTrack) && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
+      this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
       this._shaka.selectTextLanguage(textTrack.language);
       this._onTrackChanged(textTrack);
     }
