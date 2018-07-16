@@ -1,33 +1,32 @@
-import loadPlayer from 'playkit-js'
+import loadPlayer from 'playkit-js';
 import DashAdapter from '../../src';
-import * as TestUtils from 'playkit-js/test/src/utils/test-utils'
+import * as TestUtils from 'playkit-js/test/src/utils/test-utils';
 import {VideoTrack, AudioTrack, TextTrack} from 'playkit-js';
-import Widevine from '../../src/drm/widevine'
-import PlayReady from '../../src/drm/playready'
-import {EventType} from 'playkit-js'
+import Widevine from '../../src/drm/widevine';
+import PlayReady from '../../src/drm/playready';
+import {EventType} from 'playkit-js';
 
 const targetId = 'player-placeholder_dash-adapter.spec';
 
 let vodSource = {
-  mimetype: "application/dash+xml",
-  url: "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
+  mimetype: 'application/dash+xml',
+  url: 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd'
 };
 
 let liveSource = {
-  mimetype: "application/dash+xml",
-  url: "http://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvtime.mpd"
+  mimetype: 'application/dash+xml',
+  url: 'http://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvtime.mpd'
 };
 
 let dvrSource = {
-  mimetype: "application/dash+xml",
-  url: "http://klive-a.akamaihd.net/dc-1/live/dash/p/1897241/e/1_gffgxm38/t/e83cor13pmTGTQ7kPZiopg/manifest.mpd"
+  mimetype: 'application/dash+xml',
+  url: 'http://klive-a.akamaihd.net/dc-1/live/dash/p/1897241/e/1_gffgxm38/t/e83cor13pmTGTQ7kPZiopg/manifest.mpd'
 };
 
 describe.skip('DashAdapter [debugging and testing manually]', () => {
-
   let player, tracks, videoTracks, textTracks, audioTracks;
 
-  before(function () {
+  before(function() {
     TestUtils.createElement('DIV', targetId);
   });
 
@@ -40,7 +39,7 @@ describe.skip('DashAdapter [debugging and testing manually]', () => {
     videoTracks = [];
     textTracks = [];
     audioTracks = [];
-    tracks.filter((track) => {
+    tracks.filter(track => {
       if (track instanceof AudioTrack) {
         audioTracks.push(track);
       } else if (track instanceof VideoTrack) {
@@ -80,21 +79,21 @@ describe('DashAdapter: canPlayDrm', () => {
     DashAdapter._drmProtocol = null;
   });
 
-  it('should return true since widevine can play drm', function () {
+  it('should return true since widevine can play drm', function() {
     sandbox.stub(Widevine, 'canPlayDrm', () => true);
     sandbox.stub(PlayReady, 'canPlayDrm', () => false);
     DashAdapter.canPlayDrm().should.be.true;
     DashAdapter._drmProtocol.should.equal(Widevine);
   });
 
-  it('should return true since playready can play drm', function () {
+  it('should return true since playready can play drm', function() {
     sandbox.stub(Widevine, 'canPlayDrm', () => false);
     sandbox.stub(PlayReady, 'canPlayDrm', () => true);
     DashAdapter.canPlayDrm().should.be.true;
     DashAdapter._drmProtocol.should.equal(PlayReady);
   });
 
-  it('should return false since no drm can be played', function () {
+  it('should return false since no drm can be played', function() {
     sandbox.stub(Widevine, 'canPlayDrm', () => false);
     sandbox.stub(PlayReady, 'canPlayDrm', () => false);
     DashAdapter.canPlayDrm().should.be.false;
@@ -103,7 +102,6 @@ describe('DashAdapter: canPlayDrm', () => {
 });
 
 describe('DashAdapter: canPlayType', () => {
-
   it('should return true for application/dash+xml', () => {
     DashAdapter.canPlayType('application/dash+xml').should.be.true;
   });
@@ -112,35 +110,35 @@ describe('DashAdapter: canPlayType', () => {
     DashAdapter.canPlayType('APPLICATION/DASH+XML').should.be.true;
   });
 
-  it('should return false to video/mp4', function () {
+  it('should return false to video/mp4', function() {
     DashAdapter.canPlayType('video/mp4').should.be.false;
   });
 
-  it('should return false to invalid mimetype', function () {
+  it('should return false to invalid mimetype', function() {
     DashAdapter.canPlayType('dummy').should.be.false;
   });
 
-  it('should return false to null mimetype', function () {
+  it('should return false to null mimetype', function() {
     DashAdapter.canPlayType(null).should.be.false;
   });
 
-  it('should return false to empty mimetype', function () {
-    DashAdapter.canPlayType("").should.be.false;
+  it('should return false to empty mimetype', function() {
+    DashAdapter.canPlayType('').should.be.false;
   });
 
-  it('should return false to no mimetype', function () {
+  it('should return false to no mimetype', function() {
     DashAdapter.canPlayType().should.be.false;
   });
 });
 
 describe('DashAdapter: isSupported', () => {
-  it('should return true', function () {
+  it('should return true', function() {
     DashAdapter.isSupported().should.be.true;
   });
 });
 
 describe('DashAdapter: id', () => {
-  it('should be named DashAdapter', function () {
+  it('should be named DashAdapter', function() {
     DashAdapter.id.should.equal('DashAdapter');
   });
 });
@@ -149,11 +147,11 @@ describe('DashAdapter: load', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -164,7 +162,7 @@ describe('DashAdapter: load', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should create all dash adapter properties', (done) => {
+  it('should create all dash adapter properties', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance.load().then(() => {
       dashInstance._shaka.should.exist;
@@ -175,22 +173,29 @@ describe('DashAdapter: load', () => {
     });
   });
 
-  it('should success', (done) => {
+  it('should success', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    dashInstance.load().then(() => {
-      done();
-    }).catch(e => {
-      done(e)
-    });
+    dashInstance
+      .load()
+      .then(() => {
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
   });
 
-  it('should failed', (done) => {
-    dashInstance = DashAdapter.createAdapter(video, {
-      mimetype: 'application/dash+xml',
-      url: 'some/corrupted/url'
-    }, config);
+  it('should failed', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      {
+        mimetype: 'application/dash+xml',
+        url: 'some/corrupted/url'
+      },
+      config
+    );
 
-    dashInstance.load().catch((error) => {
+    dashInstance.load().catch(error => {
       error.should.be.exist;
       done();
     });
@@ -201,7 +206,7 @@ describe('DashAdapter: destroy', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
@@ -210,26 +215,29 @@ describe('DashAdapter: destroy', () => {
     dashInstance = null;
   });
 
-  after(function () {
+  after(function() {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should destroyed', (done) => {
-    dashInstance.load().then(() => {
-      dashInstance._loadPromise.should.be.exist;
-      dashInstance._sourceObj.should.be.exist;
-      dashInstance._config.should.be.exist;
-      dashInstance._buffering = true;
-      dashInstance.destroy().then(() => {
-        (!dashInstance._loadPromise).should.be.true;
-        (!dashInstance._sourceObj).should.be.true;
-        (!dashInstance._config).should.be.true;
-        dashInstance._buffering.should.be.false;
-        done();
+  it('should destroyed', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        dashInstance._loadPromise.should.be.exist;
+        dashInstance._sourceObj.should.be.exist;
+        dashInstance._config.should.be.exist;
+        dashInstance._buffering = true;
+        dashInstance.destroy().then(() => {
+          (!dashInstance._loadPromise).should.be.true;
+          (!dashInstance._sourceObj).should.be.true;
+          (!dashInstance._config).should.be.true;
+          dashInstance._buffering.should.be.false;
+          done();
+        });
+      })
+      .catch(e => {
+        done(e);
       });
-    }).catch(e => {
-      done(e);
-    });
   });
 });
 
@@ -237,12 +245,12 @@ describe('DashAdapter: _getParsedTracks', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -253,14 +261,14 @@ describe('DashAdapter: _getParsedTracks', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should return the parsed tracks', (done) => {
-    dashInstance.load().then((data) => {
+  it('should return the parsed tracks', done => {
+    dashInstance.load().then(data => {
       let videoTracks = dashInstance._getVideoTracks();
       let audioTracks = dashInstance._getAudioTracks();
       let textTracks = dashInstance._shaka.getTextTracks();
       let totalTracksLength = videoTracks.length + audioTracks.length + textTracks.length;
       data.tracks.length.should.be.equal(totalTracksLength);
-      data.tracks.map((track) => {
+      data.tracks.map(track => {
         if (track instanceof VideoTrack) {
           track.id.should.equal(videoTracks[track.index].id);
           track.active.should.equal(videoTracks[track.index].active);
@@ -293,12 +301,12 @@ describe('DashAdapter: selectVideoTrack', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {abr: {enabled: false}}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -309,10 +317,10 @@ describe('DashAdapter: selectVideoTrack', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should select a new video track', (done) => {
+  it('should select a new video track', done => {
     let inactiveTrack;
     let error;
-    let onVideoTrackChanged = (event) => {
+    let onVideoTrackChanged = event => {
       dashInstance.removeEventListener('videotrackchanged', onVideoTrackChanged);
       try {
         event.payload.selectedVideoTrack.id.should.be.equal(inactiveTrack.id);
@@ -323,11 +331,11 @@ describe('DashAdapter: selectVideoTrack', () => {
     };
     dashInstance.load().then(() => {
       dashInstance.addEventListener('videotrackchanged', onVideoTrackChanged);
-      inactiveTrack = dashInstance._getParsedVideoTracks().filter((track) => {
+      inactiveTrack = dashInstance._getParsedVideoTracks().filter(track => {
         return !track.active;
       })[0];
       dashInstance.selectVideoTrack(inactiveTrack);
-      let activeTrack = dashInstance._getVideoTracks().filter((track) => {
+      let activeTrack = dashInstance._getVideoTracks().filter(track => {
         return track.active;
       })[0];
       try {
@@ -338,83 +346,91 @@ describe('DashAdapter: selectVideoTrack', () => {
     });
   });
 
-  it('should not change the already selected video track but disable ABR', (done) => {
+  it('should not change the already selected video track but disable ABR', done => {
     dashInstance.load().then(() => {
       dashInstance.addEventListener('videotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedVideoTracks().filter((track) => {
+      let activeTrack = dashInstance._getParsedVideoTracks().filter(track => {
         return track.active;
       })[0];
       let eventIsFired = false;
       dashInstance.selectVideoTrack(activeTrack);
-      activeTrack.id.should.be.equal(dashInstance._getVideoTracks().filter((track) => {
-        return track.active;
-      })[0].id);
+      activeTrack.id.should.be.equal(
+        dashInstance._getVideoTracks().filter(track => {
+          return track.active;
+        })[0].id
+      );
       setTimeout(() => {
         eventIsFired.should.be.false;
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 
-  it('should not change the selected and ABR enabling for non exist video track', (done) => {
+  it('should not change the selected and ABR enabling for non exist video track', done => {
     dashInstance.load().then(() => {
       dashInstance.addEventListener('videotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedVideoTracks().filter((track) => {
+      let activeTrack = dashInstance._getParsedVideoTracks().filter(track => {
         return track.active;
       })[0];
       let eventIsFired = false;
       dashInstance.selectVideoTrack(new VideoTrack({index: 5}));
-      activeTrack.id.should.be.equal(dashInstance._getVideoTracks().filter((track) => {
-        return track.active;
-      })[0].id);
+      activeTrack.id.should.be.equal(
+        dashInstance._getVideoTracks().filter(track => {
+          return track.active;
+        })[0].id
+      );
       setTimeout(() => {
         eventIsFired.should.be.false;
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 
-  it('should not change the selected and ABR enabling for audio track given', (done) => {
+  it('should not change the selected and ABR enabling for audio track given', done => {
     dashInstance.load().then(() => {
       dashInstance.addEventListener('videotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedVideoTracks().filter((track) => {
+      let activeTrack = dashInstance._getParsedVideoTracks().filter(track => {
         return track.active;
       })[0];
       let eventIsFired = false;
       dashInstance.selectVideoTrack(new AudioTrack({index: 0}));
-      activeTrack.id.should.be.equal(dashInstance._getVideoTracks().filter((track) => {
-        return track.active;
-      })[0].id);
+      activeTrack.id.should.be.equal(
+        dashInstance._getVideoTracks().filter(track => {
+          return track.active;
+        })[0].id
+      );
       setTimeout(() => {
         eventIsFired.should.be.false;
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 
-  it('should not change the selected and ABR enabling for no video track given', (done) => {
+  it('should not change the selected and ABR enabling for no video track given', done => {
     dashInstance.load().then(() => {
       dashInstance.addEventListener('videotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedVideoTracks().filter((track) => {
+      let activeTrack = dashInstance._getParsedVideoTracks().filter(track => {
         return track.active;
       })[0];
       let eventIsFired = false;
       dashInstance.selectVideoTrack();
-      activeTrack.id.should.be.equal(dashInstance._getVideoTracks().filter((track) => {
-        return track.active;
-      })[0].id);
+      activeTrack.id.should.be.equal(
+        dashInstance._getVideoTracks().filter(track => {
+          return track.active;
+        })[0].id
+      );
       setTimeout(() => {
         eventIsFired.should.be.false;
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 });
@@ -423,12 +439,12 @@ describe('DashAdapter: selectAudioTrack', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -439,32 +455,34 @@ describe('DashAdapter: selectAudioTrack', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should select a new audio track', (done) => {
+  it('should select a new audio track', done => {
     dashInstance.load().then(() => {
-      dashInstance.addEventListener('audiotrackchanged', (event) => {
+      dashInstance.addEventListener('audiotrackchanged', event => {
         event.payload.selectedAudioTrack.id.should.be.equal(inactiveTrack.id);
         done();
       });
-      let inactiveTrack = dashInstance._getParsedAudioTracks().filter((track) => {
+      let inactiveTrack = dashInstance._getParsedAudioTracks().filter(track => {
         return !track.active;
       })[0];
       dashInstance.selectAudioTrack(inactiveTrack);
     });
   });
 
-  it('should not change the already selected audio track', (done) => {
+  it('should not change the already selected audio track', done => {
     dashInstance.load().then(() => {
       dashInstance.addEventListener('audiotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedAudioTracks().filter((track) => {
+      let activeTrack = dashInstance._getParsedAudioTracks().filter(track => {
         return track.active;
       })[0];
       let eventIsFired = false;
       dashInstance.selectAudioTrack(activeTrack);
-      activeTrack.id.should.be.equal(dashInstance._shaka.getVariantTracks().filter((track) => {
-        return track.active;
-      })[0].id);
+      activeTrack.id.should.be.equal(
+        dashInstance._shaka.getVariantTracks().filter(track => {
+          return track.active;
+        })[0].id
+      );
       setTimeout(() => {
         try {
           eventIsFired.should.be.false;
@@ -472,47 +490,51 @@ describe('DashAdapter: selectAudioTrack', () => {
         } catch (e) {
           done(e);
         }
-      }, 1000)
+      }, 1000);
     });
   });
 
-  it('should not change the selected for video track given', (done) => {
+  it('should not change the selected for video track given', done => {
     dashInstance.load().then(() => {
       dashInstance.addEventListener('audiotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedAudioTracks().filter((track) => {
+      let activeTrack = dashInstance._getParsedAudioTracks().filter(track => {
         return track.active;
       })[0];
       let eventIsFired = false;
       dashInstance.selectAudioTrack(new VideoTrack({index: 0}));
-      activeTrack.id.should.be.equal(dashInstance._shaka.getVariantTracks().filter((track) => {
-        return track.active;
-      })[0].id);
+      activeTrack.id.should.be.equal(
+        dashInstance._shaka.getVariantTracks().filter(track => {
+          return track.active;
+        })[0].id
+      );
       setTimeout(() => {
         eventIsFired.should.be.false;
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 
-  it('should not change the selected for no audio track given', (done) => {
+  it('should not change the selected for no audio track given', done => {
     dashInstance.load().then(() => {
       dashInstance.addEventListener('audiotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedAudioTracks().filter((track) => {
+      let activeTrack = dashInstance._getParsedAudioTracks().filter(track => {
         return track.active;
       })[0];
       let eventIsFired = false;
       dashInstance.selectAudioTrack();
-      activeTrack.id.should.be.equal(dashInstance._shaka.getVariantTracks().filter((track) => {
-        return track.active;
-      })[0].id);
+      activeTrack.id.should.be.equal(
+        dashInstance._shaka.getVariantTracks().filter(track => {
+          return track.active;
+        })[0].id
+      );
       setTimeout(() => {
         eventIsFired.should.be.false;
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 });
@@ -521,12 +543,12 @@ describe('DashAdapter: selectTextTrack', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -537,24 +559,24 @@ describe('DashAdapter: selectTextTrack', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should select a new text track', (done) => {
+  it('should select a new text track', done => {
     dashInstance.load().then(() => {
-      dashInstance.addEventListener('texttrackchanged', (event) => {
+      dashInstance.addEventListener('texttrackchanged', event => {
         event.payload.selectedTextTrack.language.should.be.equal(inactiveTrack.language);
         done();
       });
-      let inactiveTrack = dashInstance._getParsedTextTracks().filter((track) => {
+      let inactiveTrack = dashInstance._getParsedTextTracks().filter(track => {
         return !track.active;
       })[0];
       dashInstance.selectTextTrack(inactiveTrack);
-      let activeTrack = dashInstance._shaka.getTextTracks().filter((track) => {
+      let activeTrack = dashInstance._shaka.getTextTracks().filter(track => {
         return track.active;
       })[0];
       activeTrack.language.should.be.equal(inactiveTrack.language);
     });
   });
 
-  it('should not change the already selected text track', (done) => {
+  it('should not change the already selected text track', done => {
     let eventCounter = 0;
     dashInstance.load().then(() => {
       dashInstance.addEventListener('texttrackchanged', () => {
@@ -564,9 +586,11 @@ describe('DashAdapter: selectTextTrack', () => {
       let activeTrack = dashInstance._getParsedTextTracks()[0];
       dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(activeTrack);
-      activeTrack.language.should.be.equal(dashInstance._shaka.getTextTracks().filter((track) => {
-        return track.active;
-      })[0].language);
+      activeTrack.language.should.be.equal(
+        dashInstance._shaka.getTextTracks().filter(track => {
+          return track.active;
+        })[0].language
+      );
       setTimeout(() => {
         try {
           eventCounter.should.equals(1);
@@ -574,11 +598,11 @@ describe('DashAdapter: selectTextTrack', () => {
         } catch (e) {
           done(e);
         }
-      }, 1000)
+      }, 1000);
     });
   });
 
-  it('should not change the selected for video track given', (done) => {
+  it('should not change the selected for video track given', done => {
     let eventCounter = 0;
     dashInstance.load().then(() => {
       dashInstance.addEventListener('texttrackchanged', () => {
@@ -588,17 +612,19 @@ describe('DashAdapter: selectTextTrack', () => {
       let activeTrack = dashInstance._getParsedTextTracks()[0];
       dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(new VideoTrack({index: 0}));
-      activeTrack.language.should.be.equal(dashInstance._shaka.getTextTracks().filter((track) => {
-        return track.active;
-      })[0].language);
+      activeTrack.language.should.be.equal(
+        dashInstance._shaka.getTextTracks().filter(track => {
+          return track.active;
+        })[0].language
+      );
       setTimeout(() => {
         eventCounter.should.equals(1);
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 
-  it('should not change the selected for no text track given', (done) => {
+  it('should not change the selected for no text track given', done => {
     let eventCounter = 0;
     dashInstance.load().then(() => {
       dashInstance.addEventListener('texttrackchanged', () => {
@@ -608,17 +634,19 @@ describe('DashAdapter: selectTextTrack', () => {
       let activeTrack = dashInstance._getParsedTextTracks()[0];
       dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack();
-      activeTrack.language.should.be.equal(dashInstance._shaka.getTextTracks().filter((track) => {
-        return track.active;
-      })[0].language);
+      activeTrack.language.should.be.equal(
+        dashInstance._shaka.getTextTracks().filter(track => {
+          return track.active;
+        })[0].language
+      );
       setTimeout(() => {
         eventCounter.should.equals(1);
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 
-  it('should not change the selected for no subtitle or captions given', (done) => {
+  it('should not change the selected for no subtitle or captions given', done => {
     let eventCounter = 0;
     dashInstance.load().then(() => {
       dashInstance.addEventListener('texttrackchanged', () => {
@@ -628,13 +656,15 @@ describe('DashAdapter: selectTextTrack', () => {
       let activeTrack = dashInstance._getParsedTextTracks()[0];
       dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(new TextTrack({kind: 'metadata'}));
-      activeTrack.language.should.be.equal(dashInstance._shaka.getTextTracks().filter((track) => {
-        return track.active;
-      })[0].language);
+      activeTrack.language.should.be.equal(
+        dashInstance._shaka.getTextTracks().filter(track => {
+          return track.active;
+        })[0].language
+      );
       setTimeout(() => {
         eventCounter.should.equals(1);
         done();
-      }, 1000)
+      }, 1000);
     });
   });
 });
@@ -643,12 +673,12 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {abr: {enabled: false}}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -659,22 +689,25 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should enable ABR', (done) => {
-    dashInstance.load().then(() => {
-      dashInstance._shaka.getConfiguration().abr.enabled.should.be.false;
-      dashInstance.enableAdaptiveBitrate();
-      dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
-      dashInstance.isAdaptiveBitrateEnabled().should.be.true;
-      done();
-    }).catch((e) => {
-      done(e)
-    });
+  it('should enable ABR', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        dashInstance._shaka.getConfiguration().abr.enabled.should.be.false;
+        dashInstance.enableAdaptiveBitrate();
+        dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
+        dashInstance.isAdaptiveBitrateEnabled().should.be.true;
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
   });
 
-  it('should fire abr mode changed event', (done) => {
+  it('should fire abr mode changed event', done => {
     let mode = 'manual';
     let counter = 0;
-    dashInstance.addEventListener('abrmodechanged', (event) => {
+    dashInstance.addEventListener('abrmodechanged', event => {
       try {
         event.payload.mode.should.equal(mode);
         counter++;
@@ -688,7 +721,7 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
     dashInstance.load().then(() => {
       mode = 'auto';
       dashInstance.enableAdaptiveBitrate();
-      let inactiveTrack = dashInstance._getParsedVideoTracks().filter((track) => {
+      let inactiveTrack = dashInstance._getParsedVideoTracks().filter(track => {
         return !track.active;
       })[0];
       mode = 'manual';
@@ -701,11 +734,11 @@ describe('DashAdapter: isLive', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -716,14 +749,17 @@ describe('DashAdapter: isLive', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should return false for VOD', (done) => {
+  it('should return false for VOD', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    dashInstance.load().then(() => {
-      dashInstance.isLive().should.be.false;
-      done();
-    }).catch(e => {
-      done(e);
-    });
+    dashInstance
+      .load()
+      .then(() => {
+        dashInstance.isLive().should.be.false;
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
   });
 
   it('should return false for live before load', () => {
@@ -731,7 +767,7 @@ describe('DashAdapter: isLive', () => {
     dashInstance.isLive().should.be.false;
   });
 
-  it('should return true for live', (done) => {
+  it('should return true for live', done => {
     dashInstance = DashAdapter.createAdapter(video, liveSource, config);
     dashInstance.load().then(() => {
       dashInstance.isLive().should.be.true;
@@ -739,7 +775,7 @@ describe('DashAdapter: isLive', () => {
     });
   });
 
-  it.skip('should return true for live + DVR', (done) => {
+  it.skip('should return true for live + DVR', done => {
     dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
     dashInstance.load().then(() => {
       dashInstance.isLive().should.be.true;
@@ -752,11 +788,11 @@ describe('DashAdapter: _getLiveEdge', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -767,7 +803,7 @@ describe('DashAdapter: _getLiveEdge', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should return the live edge', (done) => {
+  it('should return the live edge', done => {
     dashInstance = DashAdapter.createAdapter(video, liveSource, config);
     dashInstance.load().then(() => {
       dashInstance._getLiveEdge().should.equal(dashInstance._shaka.seekRange().end);
@@ -780,11 +816,11 @@ describe('DashAdapter: seekToLiveEdge', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -795,30 +831,36 @@ describe('DashAdapter: seekToLiveEdge', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should seek to live edge', (done) => {
+  it('should seek to live edge', done => {
     dashInstance = DashAdapter.createAdapter(video, liveSource, config);
-    dashInstance.load().then(() => {
-      video.currentTime = dashInstance._shaka.seekRange().start;
-      ((dashInstance._shaka.seekRange().end - video.currentTime) >= 20).should.be.true;
-      dashInstance.seekToLiveEdge();
-      ((dashInstance._shaka.seekRange().end - video.currentTime) <= 1).should.be.true;
-      done();
-    }).catch((e) => {
-      done(e)
-    });
+    dashInstance
+      .load()
+      .then(() => {
+        video.currentTime = dashInstance._shaka.seekRange().start;
+        (dashInstance._shaka.seekRange().end - video.currentTime >= 20).should.be.true;
+        dashInstance.seekToLiveEdge();
+        (dashInstance._shaka.seekRange().end - video.currentTime <= 1).should.be.true;
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
   });
 
-  it.skip('should seek to live edge - DVR', (done) => {
+  it.skip('should seek to live edge - DVR', done => {
     dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
-    dashInstance.load().then(() => {
-      video.currentTime = dashInstance._shaka.seekRange().start;
-      ((dashInstance._shaka.seekRange().end - video.currentTime) > 30).should.be.true;
-      dashInstance.seekToLiveEdge();
-      ((dashInstance._shaka.seekRange().end - video.currentTime) < 1).should.be.true;
-      done();
-    }).catch((e) => {
-      done(e)
-    });
+    dashInstance
+      .load()
+      .then(() => {
+        video.currentTime = dashInstance._shaka.seekRange().start;
+        (dashInstance._shaka.seekRange().end - video.currentTime > 30).should.be.true;
+        dashInstance.seekToLiveEdge();
+        (dashInstance._shaka.seekRange().end - video.currentTime < 1).should.be.true;
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
   });
 });
 
@@ -826,7 +868,7 @@ describe('DashAdapter: _onBuffering', () => {
   let video, dashInstance, config, sandbox;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
     sandbox = sinon.sandbox.create();
   });
@@ -841,7 +883,7 @@ describe('DashAdapter: _onBuffering', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should dispatch waiting event when buffering is true', (done) => {
+  it('should dispatch waiting event when buffering is true', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance._videoElement.addEventListener(EventType.WAITING, () => {
       done();
@@ -849,7 +891,7 @@ describe('DashAdapter: _onBuffering', () => {
     dashInstance._onBuffering({buffering: true});
   });
 
-  it('should not dispatch waiting event when buffering is true but it has already been sent by the video element', (done) => {
+  it('should not dispatch waiting event when buffering is true but it has already been sent by the video element', done => {
     let waitingCount = 0;
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance._init();
@@ -862,7 +904,7 @@ describe('DashAdapter: _onBuffering', () => {
     dashInstance._onBuffering({buffering: true});
   });
 
-  it('should dispatch playing event when buffering is false and video is playing', (done) => {
+  it('should dispatch playing event when buffering is false and video is playing', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     let hasPlaying = false;
     let onPlaying = () => {
@@ -880,23 +922,23 @@ describe('DashAdapter: _onBuffering', () => {
     });
   });
 
-  it('should not dispatch playing event when buffering is false and video is playing but it has already been sent by the video element', (done) => {
+  it('should not dispatch playing event when buffering is false and video is playing but it has already been sent by the video element', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    sandbox.stub(dashInstance._videoElement, "paused").get(() => false);
+    sandbox.stub(dashInstance._videoElement, 'paused').get(() => false);
     let t = setTimeout(done, 0);
     dashInstance._videoElement.addEventListener(EventType.PLAYING, () => {
-      done(new Error("test fail"));
+      done(new Error('test fail'));
       clearTimeout(t);
     });
     dashInstance._onPlaying();
     dashInstance._onBuffering({buffering: false});
   });
 
-  it('should not dispatch playing event when buffering is false but video is paused', (done) => {
+  it('should not dispatch playing event when buffering is false but video is paused', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     let t = setTimeout(done, 0);
     dashInstance._videoElement.addEventListener(EventType.PLAYING, () => {
-      done(new Error("test fail"));
+      done(new Error('test fail'));
       clearTimeout(t);
     });
     dashInstance._onBuffering({buffering: false});
@@ -907,7 +949,7 @@ describe('DashAdapter: _onPlaying', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -920,7 +962,7 @@ describe('DashAdapter: _onPlaying', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should dispatch waiting event when buffering is true', (done) => {
+  it('should dispatch waiting event when buffering is true', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance._videoElement.addEventListener(EventType.WAITING, () => {
       done();
@@ -929,11 +971,11 @@ describe('DashAdapter: _onPlaying', () => {
     dashInstance._onPlaying();
   });
 
-  it('should not dispatch waiting event when buffering is false', (done) => {
+  it('should not dispatch waiting event when buffering is false', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     let t = setTimeout(done, 0);
     dashInstance._videoElement.addEventListener(EventType.WAITING, () => {
-      done(new Error("test fail"));
+      done(new Error('test fail'));
       clearTimeout(t);
     });
     dashInstance._onPlaying();
@@ -944,11 +986,11 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement("video");
+    video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach((done) => {
+  afterEach(done => {
     dashInstance.destroy().then(() => {
       dashInstance = null;
       done();
@@ -959,7 +1001,7 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should return 0 for VOD', (done) => {
+  it('should return 0 for VOD', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance.load().then(() => {
       dashInstance.getStartTimeOfDvrWindow().should.equal(0);
@@ -967,7 +1009,7 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
     });
   });
 
-  it('should return the start time of Dvr window for live', (done) => {
+  it('should return the start time of Dvr window for live', done => {
     dashInstance = DashAdapter.createAdapter(video, liveSource, config);
     dashInstance.load().then(() => {
       dashInstance.getStartTimeOfDvrWindow().should.equal(dashInstance._shaka.seekRange().start);
@@ -975,4 +1017,3 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
     });
   });
 });
-
