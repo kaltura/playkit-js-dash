@@ -342,16 +342,21 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * Get the original audio tracks
    * @function _getAudioTracks
-   * @returns {Array<Object>} - The original audio tracks
+   * @returns {Array<Object>} - Array of objects with unique language and label.
    * @private
    */
   _getAudioTracks(): Array<Object> {
-    let variantTracks = this._shaka.getVariantTracks();
-    let activeVariantTrack = variantTracks.filter(variantTrack => {
+    const variantTracks = this._shaka.getVariantTracks();
+    const activeVariantTrack = variantTracks.filter(variantTrack => {
       return variantTrack.active;
     })[0];
-    let audioTracks = variantTracks.filter(variantTrack => {
+    const matchingVariantTracks = variantTracks.filter(variantTrack => {
       return variantTrack.videoId === activeVariantTrack.videoId;
+    });
+    let audioTracks = this._shaka.getAudioLanguagesAndRoles();
+    audioTracks.forEach(track => {
+      const sameLangVariant = matchingVariantTracks.find(variant => variant.language === track.language);
+      track.label = sameLangVariant.label;
     });
     return audioTracks;
   }
@@ -409,8 +414,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (audioTracks) {
       for (let i = 0; i < audioTracks.length; i++) {
         let settings = {
-          id: audioTracks[i].id,
-          active: audioTracks[i].active,
           label: audioTracks[i].label,
           language: audioTracks[i].language,
           index: i
