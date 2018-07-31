@@ -349,14 +349,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const variantTracks = this._shaka.getVariantTracks();
     let audioTracks = this._shaka.getAudioLanguagesAndRoles();
     audioTracks.forEach(track => {
-      track.id = '';
-      variantTracks.forEach(variant => {
-        if (variant.language === track.language) {
-          track.id += variant.id;
-          track.label = variant.label;
-          track.active = variant.active;
-        }
-      });
+      const sameLangAudioVariants = variantTracks.filter(vt => vt.language === track.language);
+      const id = sameLangAudioVariants.map(variant => variant.id).join('_');
+      const active = sameLangAudioVariants.some(variant => variant.active);
+      track.id = id;
+      track.label = sameLangAudioVariants[0].label;
+      track.active = active;
     });
     return audioTracks;
   }
