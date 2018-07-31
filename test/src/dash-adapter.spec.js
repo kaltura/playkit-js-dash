@@ -230,7 +230,7 @@ describe('DashAdapter: destroy', () => {
         dashInstance.destroy().then(() => {
           (!dashInstance._loadPromise).should.be.true;
           (!dashInstance._sourceObj).should.be.true;
-          (!dashInstance._config).should.be.true;
+          Object.keys(dashInstance._config).length.should.equal(0);
           dashInstance._buffering.should.be.false;
           done();
         });
@@ -275,8 +275,6 @@ describe('DashAdapter: _getParsedTracks', () => {
           track.bandwidth.should.equal(videoTracks[track.index].bandwidth);
         }
         if (track instanceof AudioTrack) {
-          track.id.should.equal(audioTracks[track.index].id);
-          track.active.should.equal(audioTracks[track.index].active);
           track.language.should.equal(audioTracks[track.index].language);
           (track.label === audioTracks[track.index].label).should.be.true;
         }
@@ -458,7 +456,7 @@ describe('DashAdapter: selectAudioTrack', () => {
   it('should select a new audio track', done => {
     dashInstance.load().then(() => {
       dashInstance.addEventListener('audiotrackchanged', event => {
-        event.payload.selectedAudioTrack.id.should.be.equal(inactiveTrack.id);
+        event.payload.selectedAudioTrack.language.should.be.equal(inactiveTrack.language);
         done();
       });
       let inactiveTrack = dashInstance._getParsedAudioTracks().filter(track => {
@@ -473,15 +471,16 @@ describe('DashAdapter: selectAudioTrack', () => {
       dashInstance.addEventListener('audiotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedAudioTracks().filter(track => {
-        return track.active;
+      let englishTrack = dashInstance._getParsedAudioTracks().filter(track => {
+        return track.language === 'en';
       })[0];
       let eventIsFired = false;
-      dashInstance.selectAudioTrack(activeTrack);
-      activeTrack.id.should.be.equal(
+      englishTrack.active = true;
+      dashInstance.selectAudioTrack(englishTrack);
+      englishTrack.language.should.be.equal(
         dashInstance._shaka.getVariantTracks().filter(track => {
-          return track.active;
-        })[0].id
+          return track.language === 'en';
+        })[0].language
       );
       setTimeout(() => {
         try {
@@ -499,15 +498,15 @@ describe('DashAdapter: selectAudioTrack', () => {
       dashInstance.addEventListener('audiotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedAudioTracks().filter(track => {
-        return track.active;
+      let englishTrack = dashInstance._getParsedAudioTracks().filter(track => {
+        return track.language === 'en';
       })[0];
       let eventIsFired = false;
       dashInstance.selectAudioTrack(new VideoTrack({index: 0}));
-      activeTrack.id.should.be.equal(
+      englishTrack.language.should.be.equal(
         dashInstance._shaka.getVariantTracks().filter(track => {
-          return track.active;
-        })[0].id
+          return track.language === 'en';
+        })[0].language
       );
       setTimeout(() => {
         eventIsFired.should.be.false;
@@ -521,15 +520,15 @@ describe('DashAdapter: selectAudioTrack', () => {
       dashInstance.addEventListener('audiotrackchanged', () => {
         eventIsFired = true;
       });
-      let activeTrack = dashInstance._getParsedAudioTracks().filter(track => {
-        return track.active;
+      let englishTrack = dashInstance._getParsedAudioTracks().filter(track => {
+        return track.language === 'en';
       })[0];
       let eventIsFired = false;
       dashInstance.selectAudioTrack();
-      activeTrack.id.should.be.equal(
+      englishTrack.language.should.be.equal(
         dashInstance._shaka.getVariantTracks().filter(track => {
-          return track.active;
-        })[0].id
+          return track.language === 'en';
+        })[0].language
       );
       setTimeout(() => {
         eventIsFired.should.be.false;

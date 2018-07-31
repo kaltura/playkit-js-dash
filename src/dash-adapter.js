@@ -342,16 +342,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * Get the original audio tracks
    * @function _getAudioTracks
-   * @returns {Array<Object>} - The original audio tracks
+   * @returns {Array<Object>} - Array of objects with unique language and label.
    * @private
    */
   _getAudioTracks(): Array<Object> {
-    let variantTracks = this._shaka.getVariantTracks();
-    let activeVariantTrack = variantTracks.filter(variantTrack => {
-      return variantTrack.active;
-    })[0];
-    let audioTracks = variantTracks.filter(variantTrack => {
-      return variantTrack.videoId === activeVariantTrack.videoId;
+    const variantTracks = this._shaka.getVariantTracks();
+    let audioTracks = this._shaka.getAudioLanguagesAndRoles();
+    audioTracks.forEach(track => {
+      const sameLangAudioVariants = variantTracks.filter(vt => vt.language === track.language);
+      const id = sameLangAudioVariants.map(variant => variant.id).join('_');
+      const active = sameLangAudioVariants.some(variant => variant.active);
+      track.id = id;
+      track.label = sameLangAudioVariants[0].label;
+      track.active = active;
     });
     return audioTracks;
   }
