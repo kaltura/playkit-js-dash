@@ -1,6 +1,6 @@
 {
   "name": "playkit-js-dash",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "",
   "main": "dist/playkit-dash.js",
   "scripts": {
@@ -14,7 +14,18 @@
     "publish": "git push --follow-tags --no-verify origin master",
     "eslint": "eslint . --color",
     "flow": "flow check",
-    "commit:dist": "git add --force --all dist && (git commit -m 'chore: update dist' || exit 0)"
+    "commit:dist": "git add --force --all dist && (git commit -m 'chore: update dist' || exit 0)",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{json,md,scss}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "standard-version": {
     "scripts": {
@@ -34,11 +45,14 @@
     "chai": "^3.5.0",
     "cross-env": "^3.1.4",
     "eslint": "^3.10.0",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-loader": "^1.6.1",
     "eslint-plugin-flowtype": "^2.30.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-mocha-no-only": "^0.0.5",
+    "eslint-plugin-prettier": "^2.6.2",
     "flow-bin": "latest",
+    "husky": "^0.14.3",
     "istanbul": "^0.4.5",
     "karma": "^1.5.0",
     "karma-chai": "^0.1.0",
@@ -52,9 +66,11 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.2",
+    "lint-staged": "^7.2.0",
     "mocha": "^3.2.0",
     "mocha-cli": "^1.0.1",
-    "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.27.1",
+    "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.32.4",
+    "prettier": "^1.13.7",
     "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-3",
     "sinon": "^2.0.0",
     "sinon-chai": "^2.8.0",
@@ -66,7 +82,7 @@
   "keywords": [],
   "license": "AGPL-3.0",
   "peerDependencies": {
-    "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.27.1",
+    "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.32.4",
     "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-3"
   },
   "repository": {

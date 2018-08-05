@@ -1,6 +1,6 @@
 // @flow
-import {registerMediaSourceAdapter} from 'playkit-js'
-import DashAdapter from './dash-adapter'
+import {registerMediaSourceAdapter} from 'playkit-js';
+import DashAdapter from './dash-adapter';
 
 declare var __VERSION__: string;
 declare var __NAME__: string;
