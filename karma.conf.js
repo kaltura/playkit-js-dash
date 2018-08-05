@@ -41,7 +41,7 @@ module.exports = function (config) {
       ]
     },
     reporters: [
-      'progress',
+      'mocha',
       'coverage'
     ],
     webpack: webpackConfig,
