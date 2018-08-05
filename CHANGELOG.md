@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.6.4"></a>
+## [1.6.4](https://github.com/kaltura/playkit-js-dash/compare/v1.6.3...v1.6.4) (2018-08-05)
+
+
+### Bug Fixes
+
+* **FEC-7590:** filter Shaka audio tracks by language and not bitrate ([#58](https://github.com/kaltura/playkit-js-dash/issues/58)) ([e88747c](https://github.com/kaltura/playkit-js-dash/commit/e88747c))
+
+
+
 <a name="1.6.3"></a>
 ## [1.6.3](https://github.com/kaltura/playkit-js-dash/compare/v1.6.2...v1.6.3) (2018-07-12)
 
