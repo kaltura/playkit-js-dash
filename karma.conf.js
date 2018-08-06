@@ -27,7 +27,10 @@ module.exports = function(config) {
       'src/**/*.js': ['webpack', 'sourcemap'],
       'test/setup/karma.js': ['webpack', 'sourcemap']
     },
-    reporters: ['progress', 'coverage'],
+    reporters: [
+      'mocha',
+      'coverage'
+    ],
     webpack: webpackConfig,
     webpackServer: {
       noInfo: true
