@@ -316,9 +316,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._playingSent = false;
       if (this._shaka) {
         this._removeBindings();
+        this._adapterEventsBindings = {};
         return this._shaka.destroy();
       }
-      this._adapterEventsBindings = {};
     });
   }
 

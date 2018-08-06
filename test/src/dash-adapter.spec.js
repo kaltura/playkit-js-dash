@@ -251,7 +251,7 @@ describe('DashAdapter: destroy', () => {
               dashInstance._buffering.should.be.false;
               dashInstance._waitingSent.should.be.false;
               dashInstance._playingSent.should.be.false;
-              dashInstance._adapterEventsBindings.should.equal({});
+              Object.keys(dashInstance._adapterEventsBindings).length.should.equal(0);
               done();
             } catch (e) {
               done(e);
