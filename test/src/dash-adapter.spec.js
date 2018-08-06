@@ -245,11 +245,12 @@ describe('DashAdapter: destroy', () => {
           .destroy()
           .then(() => {
             try {
-              (dashInstance._loadPromise === null).should.be.true;
+              (!dashInstance._loadPromise).should.be.true;
+              (!dashInstance._sourceObj).should.be.true;
+              Object.keys(dashInstance._config).length.should.equal(0);
+              dashInstance._buffering.should.be.false;
               dashInstance._waitingSent.should.be.false;
               dashInstance._playingSent.should.be.false;
-              (!dashInstance._sourceObj).should.be.true;
-              dashInstance._buffering.should.be.false;
               dashInstance._adapterEventsBindings.should.equal({});
               done();
             } catch (e) {
