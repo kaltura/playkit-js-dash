@@ -1,10 +1,8 @@
-import loadPlayer from 'playkit-js';
-import DashAdapter from '../../src';
+import loadPlayer, {AudioTrack, EventType, TextTrack, VideoTrack} from 'playkit-js';
+import {DashAdapter} from '../../src';
 import * as TestUtils from 'playkit-js/test/src/utils/test-utils';
-import {VideoTrack, AudioTrack, TextTrack} from 'playkit-js';
-import Widevine from '../../src/drm/widevine';
-import PlayReady from '../../src/drm/playready';
-import {EventType} from 'playkit-js';
+import {Widevine} from '../../src/drm/widevine';
+import {PlayReady} from '../../src/drm/playready';
 
 const targetId = 'player-placeholder_dash-adapter.spec';
 

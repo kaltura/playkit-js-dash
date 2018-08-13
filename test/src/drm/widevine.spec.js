@@ -1,4 +1,4 @@
-import Widevine from '../../../src/drm/widevine';
+import {Widevine} from '../../../src/drm/widevine';
 import {BaseDrmProtocol, Env} from 'playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
 
