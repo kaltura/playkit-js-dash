@@ -1,10 +1,10 @@
 // @flow
 import shaka from 'shaka-player';
 import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from 'playkit-js';
-import Widevine from './drm/widevine';
-import PlayReady from './drm/playready';
+import {Widevine} from './drm/widevine';
+import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
-import TextDisplayer from './text-displayer';
+import {TextDisplayer} from './text-displayer';
 
 type ShakaEventType = {[event: string]: string};
 
@@ -23,7 +23,7 @@ const ShakaEvent: ShakaEventType = {
  * Adapter of shaka lib for dash content
  * @classdesc
  */
-export default class DashAdapter extends BaseMediaSourceAdapter {
+class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * The id of Adapter
    * @member {string} id
@@ -670,3 +670,5 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 }
+
+export {DashAdapter};

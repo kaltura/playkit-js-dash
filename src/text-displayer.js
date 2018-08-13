@@ -6,7 +6,7 @@ import shaka from 'shaka-player';
  * This stops us to handle the caption by ourself by setting the native caption hidden.
  * So we have to override the shaka text displayer to cause shaka handles hidden caption.
  */
-export default class TextDisplayer extends shaka.text.SimpleTextDisplayer {
+class TextDisplayer extends shaka.text.SimpleTextDisplayer {
   /**
    *
    * @return {boolean} - isTextVisible
@@ -15,3 +15,5 @@ export default class TextDisplayer extends shaka.text.SimpleTextDisplayer {
     return true;
   }
 }
+
+export {TextDisplayer};

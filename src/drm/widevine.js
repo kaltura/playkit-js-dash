@@ -4,7 +4,7 @@ import {BaseDrmProtocol, Env} from 'playkit-js';
 const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 
-export default class Widevine extends BaseDrmProtocol {
+class Widevine extends BaseDrmProtocol {
   static _logger = BaseDrmProtocol.getLogger('Widevine');
 
   /**
@@ -47,3 +47,5 @@ export default class Widevine extends BaseDrmProtocol {
     }
   }
 }
+
+export {Widevine};
