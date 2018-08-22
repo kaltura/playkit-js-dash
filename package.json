@@ -26,6 +26,9 @@
       "git add"
     ]
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-core": "^6.18.2",
@@ -95,5 +98,8 @@
   "bugs": {
     "url": "https://github.com/kaltura/playkit-js-dash/issues"
   },
-  "homepage": "https://github.com/kaltura/playkit-js-dash#readme"
+  "homepage": "https://github.com/kaltura/playkit-js-dash#readme",
+  "kcc": {
+    "name": "playkit-dash"
+  }
 }
