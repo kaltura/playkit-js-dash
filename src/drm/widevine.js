@@ -1,5 +1,5 @@
 // @flow
-import {BaseDrmProtocol, Env} from 'playkit-js';
+import {BaseDrmProtocol, Env} from '@playkit-js/playkit-js';
 
 const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;

@@ -1,4 +1,4 @@
-import {BaseDrmProtocol} from 'playkit-js';
+import {BaseDrmProtocol} from '@playkit-js/playkit-js';
 
 export const wwDrmData = [
   {

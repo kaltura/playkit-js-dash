@@ -1,6 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from 'playkit-js';
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
 import Widevine from './drm/widevine';
 import PlayReady from './drm/playready';
 import DefaultConfig from './default-config';
