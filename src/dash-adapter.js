@@ -149,6 +149,33 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Get the current bandiwidth that is playing
+   * @returns {number} the current bandwidth
+   */
+  getCurrentQuality(): number {
+    const sortedTracks = this._getSortedTracks();
+    let activeTrackBandwidth = 0;
+    for (let index = 0; index < sortedTracks.length; index++) {
+      if (sortedTracks[index].active) {
+        activeTrackBandwidth = sortedTracks[index].bandwidth;
+      }
+    }
+    return activeTrackBandwidth;
+  }
+
+  _getSortedTracks(): Array {
+    const tracks = this._shaka.getVariantTracks();
+    const sortedTracks = tracks
+      .map(obj => ({
+        id: obj.id,
+        bandwidth: obj.bandwidth,
+        active: obj.active
+      }))
+      .sort((obj1, obj2) => obj1.bandwidth - obj2.bandwidth);
+    return sortedTracks;
+  }
+
+  /**
    * Checks if dash adapter can play a given drm data.
    * @param {Array<Object>} drmData - The drm data to check.
    * @returns {boolean} - Whether the dash adapter can play a specific drm data.
