@@ -163,7 +163,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return activeTrackBandwidth;
   }
 
-  _getSortedTracks(): Array {
+  _getSortedTracks(): Array<Object> {
     const tracks = this._shaka.getVariantTracks();
     const sortedTracks = tracks
       .map(obj => ({
