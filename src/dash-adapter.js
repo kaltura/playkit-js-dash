@@ -149,18 +149,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * Get the current bandiwidth that is playing
-   * @returns {number} the current bandwidth
+   * restrict the bandwidth to below the current one
+   * @returns {void}
    */
-  getCurrentQuality(): number {
-    const sortedTracks = this._getSortedTracks();
-    let activeTrackBandwidth = 0;
-    for (let index = 0; index < sortedTracks.length; index++) {
-      if (sortedTracks[index].active) {
-        activeTrackBandwidth = sortedTracks[index].bandwidth;
-      }
-    }
-    return activeTrackBandwidth;
+  restrictBandwidth(): void {
+    const bandWidthToRemove = this._getCurrentQuality();
+    this._shaka.configure({abr: {restrictions: {maxBandwidth: bandWidthToRemove - 1}}});
   }
 
   _getSortedTracks(): Array<Object> {
@@ -173,6 +167,17 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }))
       .sort((obj1, obj2) => obj1.bandwidth - obj2.bandwidth);
     return sortedTracks;
+  }
+
+  _getCurrentQuality(): number {
+    const sortedTracks = this._getSortedTracks();
+    let activeTrackBandwidth = 0;
+    for (let index = 0; index < sortedTracks.length; index++) {
+      if (sortedTracks[index].active) {
+        activeTrackBandwidth = sortedTracks[index].bandwidth;
+      }
+    }
+    return activeTrackBandwidth;
   }
 
   /**
