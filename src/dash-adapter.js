@@ -149,12 +149,14 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * restrict the bandwidth to below the current one
+   * set 'bitrate' the max bandwidth (if possible)
+   * @param {number} bitrate the max bitrate allowed
    * @returns {void}
    */
-  restrictBandwidth(): void {
-    const bandWidthToRemove = this._getCurrentQuality();
-    this._shaka.configure({abr: {restrictions: {maxBandwidth: bandWidthToRemove - 1}}});
+  setMaxBitrate(bitrate: number): void {
+    if (this._hasLowerOrEqualBitrate(bitrate)) {
+      this._shaka.configure({abr: {restrictions: {maxBandwidth: bitrate}}});
+    }
   }
 
   _getSortedTracks(): Array<Object> {
@@ -169,15 +171,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return sortedTracks;
   }
 
-  _getCurrentQuality(): number {
+  _hasLowerOrEqualBitrate(maxBitrate: number): boolean {
     const sortedTracks = this._getSortedTracks();
-    let activeTrackBandwidth = 0;
-    for (let index = 0; index < sortedTracks.length; index++) {
-      if (sortedTracks[index].active) {
-        activeTrackBandwidth = sortedTracks[index].bandwidth;
-      }
+    if (sortedTracks[0].bandwidth <= maxBitrate) {
+      return true;
     }
-    return activeTrackBandwidth;
+    return false;
   }
 
   /**
