@@ -149,6 +149,37 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * set 'bitrate' the max bandwidth (if possible)
+   * @param {number} bitrate the max bitrate allowed
+   * @returns {void}
+   */
+  setMaxBitrate(bitrate: number): void {
+    if (this._hasLowerOrEqualBitrate(bitrate)) {
+      this._shaka.configure({abr: {restrictions: {maxBandwidth: bitrate}}});
+    }
+  }
+
+  _getSortedTracks(): Array<Object> {
+    const tracks = this._shaka.getVariantTracks();
+    const sortedTracks = tracks
+      .map(obj => ({
+        id: obj.id,
+        bandwidth: obj.bandwidth,
+        active: obj.active
+      }))
+      .sort((obj1, obj2) => obj1.bandwidth - obj2.bandwidth);
+    return sortedTracks;
+  }
+
+  _hasLowerOrEqualBitrate(maxBitrate: number): boolean {
+    const sortedTracks = this._getSortedTracks();
+    if (sortedTracks[0].bandwidth <= maxBitrate) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Checks if dash adapter can play a given drm data.
    * @param {Array<Object>} drmData - The drm data to check.
    * @returns {boolean} - Whether the dash adapter can play a specific drm data.
