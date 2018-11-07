@@ -125,14 +125,20 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
-    let dashConfig = {};
+    let adapterConfig = {};
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
-      dashConfig = config.playback.options.html5.dash;
+      adapterConfig.shakaConfig = config.playback.options.html5.dash;
     }
     if (Utils.Object.hasPropertyPath(config, 'playback.useNativeTextTrack')) {
-      dashConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
+      adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
     }
-    return new this(videoElement, source, dashConfig);
+    if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
+      const options = config.sources.options;
+      adapterConfig.forceRedirectExternalStreams = options.forceRedirectExternalStreams;
+      adapterConfig.redirectExternalStreamsHandler = options.redirectExternalStreamsHandler;
+      adapterConfig.redirectExternalStreamsTimeout = options.redirectExternalStreamsTimeout;
+    }
+    return new this(videoElement, source, adapterConfig);
   }
 
   /**
@@ -260,8 +266,32 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player(this._videoElement);
     this._maybeSetDrmConfig();
-    this._shaka.configure(this._config);
+    this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
+  }
+
+  /**
+   * get the redirected URL
+   * @param {string} url - The url to check for redirection
+   * @returns {Promise<string>} - the resolved url
+   * @private
+   */
+  _maybeGetRedirectedUrl(url: string): Promise<string> {
+    const shouldRedirect = this._config.forceRedirectExternalStreams;
+    const timeout = this._config.redirectExternalStreamsTimeout;
+    const callback = this._config.redirectExternalStreamsHandler;
+    return new Promise(resolve => {
+      if (!shouldRedirect) {
+        return resolve(url);
+      }
+      Utils.Http.jsonp(url, callback, {
+        timeout: timeout
+      })
+        .then(uri => {
+          resolve(uri);
+        })
+        .catch(() => resolve(url));
+    });
   }
 
   /**
@@ -316,8 +346,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
           const shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
-          this._shaka
-            .load(this._sourceObj.url, shakaStartTime)
+          this._maybeGetRedirectedUrl(this._sourceObj.url)
+            .then(url => {
+              return this._shaka.load(url, shakaStartTime);
+            })
             .then(() => {
               let data = {tracks: this._getParsedTracks()};
               DashAdapter._logger.debug('The source has been loaded successfully');
