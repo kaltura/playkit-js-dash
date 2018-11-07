@@ -348,7 +348,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           const shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(url => {
-              this._shaka.load(url, shakaStartTime);
+              return this._shaka.load(url, shakaStartTime);
             })
             .then(() => {
               let data = {tracks: this._getParsedTracks()};
