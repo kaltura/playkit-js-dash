@@ -1,5 +1,8 @@
 {
-  "streaming": {
-    "ignoreTextStreamFailures": true
-  }
+  "shakaConfig": {
+    "streaming": {
+      "ignoreTextStreamFailures": true
+    }
+  },
+  "forceRedirectExternalStreams": false
 }
