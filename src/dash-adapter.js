@@ -282,7 +282,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const callback = this._config.redirectExternalStreamsHandler;
     return new Promise(resolve => {
       if (!shouldRedirect) {
-        resolve(url);
+        return resolve(url);
       }
       Utils.Http.jsonp(url, callback, {
         timeout: timeout
