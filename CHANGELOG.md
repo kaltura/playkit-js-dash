@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.8.0"></a>
+# [1.8.0](https://github.com/kaltura/playkit-js-dash/compare/v1.7.0...v1.8.0) (2018-11-07)
+
+
+### Features
+
+* **FEC-8553:** add ability to force redirect kaltura playManifest urls ([#64](https://github.com/kaltura/playkit-js-dash/issues/64)) ([5d9cc5c](https://github.com/kaltura/playkit-js-dash/commit/5d9cc5c))
+
+
+
 <a name="1.7.0"></a>
 # [1.7.0](https://github.com/kaltura/playkit-js-dash/compare/v1.6.3...v1.7.0) (2018-11-05)
 
