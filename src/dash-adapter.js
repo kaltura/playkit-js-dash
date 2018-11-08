@@ -249,9 +249,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _setShakaConfig(): void {
     const textDisplayerConfig = {
-      textDisplayFactory: function(videoEl) {
-        return new TextDisplayer(videoEl);
-      }.bind(null, this._videoElement)
+      shakaConfig: {
+        textDisplayFactory: function(videoEl) {
+          return new TextDisplayer(videoEl);
+        }.bind(null, this._videoElement)
+      }
     };
     this._config = Utils.Object.mergeDeep(textDisplayerConfig, DefaultConfig, this._config);
   }
@@ -301,7 +303,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeSetDrmConfig(): void {
     if (DashAdapter._drmProtocol && this._sourceObj && this._sourceObj.drmData) {
-      DashAdapter._drmProtocol.setDrmPlayback(this._config, this._sourceObj.drmData);
+      DashAdapter._drmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
     }
   }
 
