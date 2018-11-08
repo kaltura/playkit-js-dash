@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.8.1"></a>
+## [1.8.1](https://github.com/kaltura/playkit-js-dash/compare/v1.8.0...v1.8.1) (2018-11-08)
+
+
+### Bug Fixes
+
+* **FEC-8666:** cannot play dash drm ([#65](https://github.com/kaltura/playkit-js-dash/issues/65)) ([8d724ac](https://github.com/kaltura/playkit-js-dash/commit/8d724ac))
+
+
+
 <a name="1.8.0"></a>
 # [1.8.0](https://github.com/kaltura/playkit-js-dash/compare/v1.7.0...v1.8.0) (2018-11-07)
 
