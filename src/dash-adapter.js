@@ -623,7 +623,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   seekToLiveEdge(): void {
-    if (this._shaka) {
+    if (this._shaka && this._loadPromise) {
       this._loadPromise.then(() => {
         this._videoElement.currentTime = this._shaka.seekRange().end;
       });
