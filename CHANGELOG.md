@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.8.2"></a>
+## [1.8.2](https://github.com/kaltura/playkit-js-dash/compare/v1.8.1...v1.8.2) (2018-11-19)
+
+
+### Bug Fixes
+
+* **FEC-8684:** IE11 live dash playback is stuck ([#66](https://github.com/kaltura/playkit-js-dash/issues/66)) ([c543921](https://github.com/kaltura/playkit-js-dash/commit/c543921))
+
+
+
 <a name="1.8.1"></a>
 ## [1.8.1](https://github.com/kaltura/playkit-js-dash/compare/v1.8.0...v1.8.1) (2018-11-08)
 
