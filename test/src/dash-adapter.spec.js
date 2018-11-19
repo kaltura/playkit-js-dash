@@ -953,10 +953,12 @@ describe('DashAdapter: seekToLiveEdge', () => {
           video.currentTime = dashInstance._shaka.seekRange().start;
           const initialTimeShift = dashInstance._shaka.seekRange().end - video.currentTime;
           dashInstance.seekToLiveEdge();
-          const timeShift = dashInstance._shaka.seekRange().end - video.currentTime;
-          timeShift.should.be.lessThan(3);
-          timeShift.should.be.lessThan(initialTimeShift);
-          done();
+          dashInstance._loadPromise.then(() => {
+            const timeShift = dashInstance._shaka.seekRange().end - video.currentTime;
+            timeShift.should.be.lessThan(3);
+            timeShift.should.be.lessThan(initialTimeShift);
+            done();
+          });
         } catch (e) {
           done(e);
         }
