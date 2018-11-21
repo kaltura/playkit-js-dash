@@ -950,10 +950,10 @@ describe('DashAdapter: seekToLiveEdge', () => {
       .load()
       .then(() => {
         try {
-          video.currentTime = dashInstance._shaka.seekRange().start;
-          const initialTimeShift = dashInstance._shaka.seekRange().end - video.currentTime;
-          dashInstance.seekToLiveEdge();
-          dashInstance._loadPromise.then(() => {
+          video.play().then(() => {
+            video.currentTime = dashInstance._shaka.seekRange().start;
+            const initialTimeShift = dashInstance._shaka.seekRange().end - video.currentTime;
+            dashInstance.seekToLiveEdge();
             const timeShift = dashInstance._shaka.seekRange().end - video.currentTime;
             timeShift.should.be.lessThan(3);
             timeShift.should.be.lessThan(initialTimeShift);
