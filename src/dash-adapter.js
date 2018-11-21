@@ -344,9 +344,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   load(startTime: ?number): Promise<Object> {
     if (!this._loadPromise) {
       this._init();
-      this._metadataLoadedPromise = new Promise(resolve => {
-        this._videoElement.addEventListener(EventType.LOADED_METADATA, () => resolve());
-      });
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
@@ -379,7 +376,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return super.destroy().then(() => {
       DashAdapter._logger.debug('destroy');
       this._loadPromise = null;
-      this._metadataLoadedPromise = null;
       this._buffering = false;
       this._waitingSent = false;
       this._playingSent = false;
@@ -627,10 +623,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   seekToLiveEdge(): void {
-    if (this._shaka && this._loadPromise) {
-      this._metadataLoadedPromise.then(() => {
-        this._videoElement.currentTime = this._shaka.seekRange().end;
-      });
+    if (this._shaka && this._videoElement.readyState > 0) {
+      this._videoElement.currentTime = this._shaka.seekRange().end;
     }
   }
 
