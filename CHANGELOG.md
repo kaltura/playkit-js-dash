@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.8.3"></a>
+## [1.8.3](https://github.com/kaltura/playkit-js-dash/compare/v1.8.2...v1.8.3) (2018-11-22)
+
+
+### Bug Fixes
+
+* **FEC-8711:** live in IE has a small jump in the stream after a second ([#67](https://github.com/kaltura/playkit-js-dash/issues/67)) ([ceb4063](https://github.com/kaltura/playkit-js-dash/commit/ceb4063))
+
+
+
 <a name="1.8.2"></a>
 ## [1.8.2](https://github.com/kaltura/playkit-js-dash/compare/v1.8.1...v1.8.2) (2018-11-19)
 
