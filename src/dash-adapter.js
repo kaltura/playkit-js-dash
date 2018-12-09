@@ -294,10 +294,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       const minWidth = getMinDimensions("width");
       const minHeight = getMinDimensions("height");
       const updateAbrRestrictions = () => {
-        const curHeight = this.videoHeight;
-        const curWidth = this.videoWidth;
+        const curHeight = this._videoHeight;
+        const curWidth = this._videoWidth;
         if (typeof curWidth === "number" && typeof curHeight === "number"){
-          DashAdapter._logger.debug(curHeight, curWidth);
           //check if current player size is smaller than smallest rendition
           //setting restriction below smallest rendition size will result in shaka emitting restriction unmet error
           if ((curHeight >= minHeight) && (curWidth >= minWidth)) {
@@ -331,27 +330,27 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 
-  get videoWidth (): ?number {
+  get _videoWidth (): ?number {
     let width;
     const videoElement = this._videoElement;
     if (videoElement) {
       width = videoElement.width || videoElement.clientWidth || videoElement.offsetWidth;
-      width *= DashAdapter.contentScaleFactor;
+      width *= this._contentScaleFactor;
     }
     return width;
   }
 
-  get videoHeight (): ?number {
+  get _videoHeight (): ?number {
     let height;
     const videoElement = this._videoElement;
     if (videoElement) {
       height = videoElement.height || videoElement.clientHeight || videoElement.offsetHeight;
-      height *= DashAdapter.contentScaleFactor;
+      height *= this._contentScaleFactor;
     }
     return height;
   }
 
-  static get contentScaleFactor (): number {
+  get _contentScaleFactor (): number {
     let pixelRatio = 1;
     try {
       pixelRatio = window.devicePixelRatio;
