@@ -139,9 +139,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
-    let adapterConfig = {
-      shakaConfig: {}
-    };
+    let adapterConfig = {};
     if (Utils.Object.hasPropertyPath(config, 'playback.useNativeTextTrack')) {
       adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
     }
@@ -167,10 +165,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (abr.defaultBandwidthEstimate) {
         shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
       }
-      if (abr.restrictions.minBitrate) {
+      if (abr.restrictions.minBitrate > 0) {
         shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
       }
-      if (abr.restrictions.maxBitrate) {
+      if (abr.restrictions.maxBitrate < Infinity) {
         //You can either set capping by size or bitrate, if bitrate is set then disable size capping
         adapterConfig.capLevelToPlayerSize = false;
         shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
@@ -178,6 +176,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       adapterConfig.shakaConfig = shakaConfig;
     }
 
+    //Merge shaka config with override config, override takes precedence
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       Utils.Object.mergeDeep(adapterConfig.shakaConfig, config.playback.options.html5.dash);
     }
@@ -370,12 +369,22 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           //check if current player size is smaller than smallest rendition
           //setting restriction below smallest rendition size will result in shaka emitting restriction unmet error
           if (curHeight >= minHeight && curWidth >= minWidth) {
-            DashAdapter._logger.debug(`applying dimension restriction: width < ${curWidth} or height < ${curHeight}`);
+            DashAdapter._logger.debug(`applying dimension restriction: width < ${curWidth}, height < ${curHeight}`);
             this._shaka.configure({
               abr: {
                 restrictions: {
                   maxHeight: curHeight,
                   maxWidth: curWidth
+                }
+              }
+            });
+          } else {
+            DashAdapter._logger.debug(`applying dimension restriction: width < ${minHeight}, height < ${minWidth}`);
+            this._shaka.configure({
+              abr: {
+                restrictions: {
+                  maxHeight: minHeight,
+                  maxWidth: minWidth
                 }
               }
             });
