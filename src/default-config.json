@@ -1,5 +1,9 @@
 {
   "streaming": {
     "ignoreTextStreamFailures": true
+  },
+  "abr": {
+    "enabled": true,
+    "restrictions": {}
   }
 }
