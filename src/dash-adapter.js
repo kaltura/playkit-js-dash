@@ -1,12 +1,12 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from 'playkit-js'
-import Widevine from './drm/widevine'
-import PlayReady from './drm/playready'
-import DefaultConfig from './default-config'
-import TextDisplayer from './text-displayer'
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
+import Widevine from './drm/widevine';
+import PlayReady from './drm/playready';
+import DefaultConfig from './default-config';
+import TextDisplayer from './text-displayer';
 
-type ShakaEventType = { [event: string]: string };
+type ShakaEventType = {[event: string]: string};
 
 /**
  * Shaka events enum
@@ -78,10 +78,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @type {Object}
    * @private
    */
-  _adapterEventsBindings: { [name: string]: Function } = {
-    [ShakaEvent.ERROR]: (event) => this._onError(event),
+  _adapterEventsBindings: {[name: string]: Function} = {
+    [ShakaEvent.ERROR]: event => this._onError(event),
     [ShakaEvent.ADAPTATION]: () => this._onAdaptation(),
-    [ShakaEvent.BUFFERING]: (event) => this._onBuffering(event),
+    [ShakaEvent.BUFFERING]: event => this._onBuffering(event),
     [EventType.WAITING]: () => this._onWaiting(),
     [EventType.PLAYING]: () => this._onPlaying()
   };
@@ -139,36 +139,50 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
-    let dashConfig: Object = {};
+    let adapterConfig = {
+      shakaConfig: {}
+    };
+    if (Utils.Object.hasPropertyPath(config, 'playback.useNativeTextTrack')) {
+      adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
+    }
+    if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
+      const options = config.sources.options;
+      adapterConfig.forceRedirectExternalStreams = options.forceRedirectExternalStreams;
+      adapterConfig.redirectExternalStreamsHandler = options.redirectExternalStreamsHandler;
+      adapterConfig.redirectExternalStreamsTimeout = options.redirectExternalStreamsTimeout;
+    }
     if (Utils.Object.hasPropertyPath(config, 'abr')) {
-      const abrObject: Object = {
-        restrictions: {}
+      const shakaConfig: Object = {
+        abr: {
+          restrictions: {}
+        }
       };
-      dashConfig.abr = abrObject;
       const abr = config.abr;
-      if (typeof abr.enabled === "boolean") {
-        dashConfig.abr.enabled = abr.enabled;
+      if (typeof abr.enabled === 'boolean') {
+        shakaConfig.abr.enabled = abr.enabled;
       }
-      if (typeof abr.capLevelToPlayerSize === "boolean") {
-        dashConfig.capLevelToPlayerSize = abr.capLevelToPlayerSize;
+      if (typeof abr.capLevelToPlayerSize === 'boolean') {
+        adapterConfig.capLevelToPlayerSize = abr.capLevelToPlayerSize;
       }
-      if (abr.defaultBandwidthEstimate){
-        dashConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate
+      if (abr.defaultBandwidthEstimate) {
+        shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
       }
-      if (abr.restrictions.minBitrate){
-        dashConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
+      if (abr.restrictions.minBitrate) {
+        shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
       }
-      if (abr.restrictions.maxBitrate){
+      if (abr.restrictions.maxBitrate) {
         //You can either set capping by size or bitrate, if bitrate is set then disable size capping
-        dashConfig.capLevelToPlayerSize = false;
-        dashConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
+        adapterConfig.capLevelToPlayerSize = false;
+        shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
       }
+      adapterConfig.shakaConfig = shakaConfig;
     }
 
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
-      Utils.Object.mergeDeep(dashConfig, config.playback.options.html5.dash);
+      Utils.Object.mergeDeep(adapterConfig.shakaConfig, config.playback.options.html5.dash);
     }
-    return new this(videoElement, source, dashConfig);
+
+    return new this(videoElement, source, adapterConfig);
   }
 
   /**
@@ -182,6 +196,37 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let canPlayType = typeof mimeType === 'string' ? mimeType.toLowerCase() === DashAdapter._dashMimeType : false;
     DashAdapter._logger.debug('canPlayType result for mimeType: ' + mimeType + ' is ' + canPlayType.toString());
     return canPlayType;
+  }
+
+  /**
+   * set 'bitrate' the max bandwidth (if possible)
+   * @param {number} bitrate the max bitrate allowed
+   * @returns {void}
+   */
+  setMaxBitrate(bitrate: number): void {
+    if (this._hasLowerOrEqualBitrate(bitrate)) {
+      this._shaka.configure({abr: {restrictions: {maxBandwidth: bitrate}}});
+    }
+  }
+
+  _getSortedTracks(): Array<Object> {
+    const tracks = this._shaka.getVariantTracks();
+    const sortedTracks = tracks
+      .map(obj => ({
+        id: obj.id,
+        bandwidth: obj.bandwidth,
+        active: obj.active
+      }))
+      .sort((obj1, obj2) => obj1.bandwidth - obj2.bandwidth);
+    return sortedTracks;
+  }
+
+  _hasLowerOrEqualBitrate(maxBitrate: number): boolean {
+    const sortedTracks = this._getSortedTracks();
+    if (sortedTracks[0].bandwidth <= maxBitrate) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -248,11 +293,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _setShakaConfig(): void {
     const textDisplayerConfig = {
-      textDisplayFactory: function (videoEl) {
-        return new TextDisplayer(videoEl);
-      }.bind(null, this._videoElement)
+      shakaConfig: {
+        textDisplayFactory: function(videoEl) {
+          return new TextDisplayer(videoEl);
+        }.bind(null, this._videoElement)
+      }
     };
-    this._config = Utils.Object.mergeDeep(textDisplayerConfig, this._config, DefaultConfig);
+    this._config = Utils.Object.mergeDeep(textDisplayerConfig, DefaultConfig, this._config);
   }
 
   /**
@@ -265,9 +312,32 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player(this._videoElement);
     this._maybeSetDrmConfig();
-    this._shaka.configure(this._config);
-    this._shaka.setTextTrackVisibility(false);
+    this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
+  }
+
+  /**
+   * get the redirected URL
+   * @param {string} url - The url to check for redirection
+   * @returns {Promise<string>} - the resolved url
+   * @private
+   */
+  _maybeGetRedirectedUrl(url: string): Promise<string> {
+    const shouldRedirect = this._config.forceRedirectExternalStreams;
+    const timeout = this._config.redirectExternalStreamsTimeout;
+    const callback = this._config.redirectExternalStreamsHandler;
+    return new Promise(resolve => {
+      if (!shouldRedirect) {
+        return resolve(url);
+      }
+      Utils.Http.jsonp(url, callback, {
+        timeout: timeout
+      })
+        .then(uri => {
+          resolve(uri);
+        })
+        .catch(() => resolve(url));
+    });
   }
 
   /**
@@ -277,7 +347,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeSetDrmConfig(): void {
     if (DashAdapter._drmProtocol && this._sourceObj && this._sourceObj.drmData) {
-      DashAdapter._drmProtocol.setDrmPlayback(this._config, this._sourceObj.drmData);
+      DashAdapter._drmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
     }
   }
 
@@ -287,19 +357,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _maybeApplyAbrRestrictions(): void {
-    if (this._config.capLevelToPlayerSize){
+    if (this._config.capLevelToPlayerSize) {
       const videoTracks = this._getVideoTracks();
-      const getMinDimensions = (dim): number => Math.min.apply(null, (videoTracks.map((variant)=>variant[dim])));
+      const getMinDimensions = (dim): number => Math.min.apply(null, videoTracks.map(variant => variant[dim]));
       //Get minimal allowed dimensions
-      const minWidth = getMinDimensions("width");
-      const minHeight = getMinDimensions("height");
+      const minWidth = getMinDimensions('width');
+      const minHeight = getMinDimensions('height');
       const updateAbrRestrictions = () => {
         const curHeight = this._videoHeight;
         const curWidth = this._videoWidth;
-        if (typeof curWidth === "number" && typeof curHeight === "number"){
+        if (typeof curWidth === 'number' && typeof curHeight === 'number') {
           //check if current player size is smaller than smallest rendition
           //setting restriction below smallest rendition size will result in shaka emitting restriction unmet error
-          if ((curHeight >= minHeight) && (curWidth >= minWidth)) {
+          if (curHeight >= minHeight && curWidth >= minWidth) {
             DashAdapter._logger.debug(`applying dimension restriction: width < ${curWidth} or height < ${curHeight}`);
             this._shaka.configure({
               abr: {
@@ -330,7 +400,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 
-  get _videoWidth (): ?number {
+  get _videoWidth(): ?number {
     let width;
     const videoElement = this._videoElement;
     if (videoElement) {
@@ -340,7 +410,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return width;
   }
 
-  get _videoHeight (): ?number {
+  get _videoHeight(): ?number {
     let height;
     const videoElement = this._videoElement;
     if (videoElement) {
@@ -350,12 +420,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return height;
   }
 
-  get _contentScaleFactor (): number {
+  get _contentScaleFactor(): number {
     let pixelRatio = 1;
     try {
       pixelRatio = window.devicePixelRatio;
     } catch (e) {
-      DashAdapter._logger.debug("failed reading devicePixelRatio, assume 1");
+      DashAdapter._logger.debug('failed reading devicePixelRatio, assume 1');
     }
     return pixelRatio;
   }
@@ -400,18 +470,20 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
-          this._shaka.load(this._sourceObj.url, startTime).then(() => {
-            let data = {tracks: this._getParsedTracks()};
-            this._maybeApplyAbrRestrictions();
-            DashAdapter._logger.debug('The source has been loaded successfully');
-            resolve(data);
-          }).catch((error) => {
-            reject(new Error(
-              error.severity,
-              error.category,
-              error.code,
-              error.data));
-          });
+          const shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
+          this._maybeGetRedirectedUrl(this._sourceObj.url)
+            .then(url => {
+              return this._shaka.load(url, shakaStartTime);
+            })
+            .then(() => {
+              let data = {tracks: this._getParsedTracks()};
+              this._maybeApplyAbrRestrictions();
+              DashAdapter._logger.debug('The source has been loaded successfully');
+              resolve(data);
+            })
+            .catch(error => {
+              reject(new Error(error.severity, error.category, error.code, error.data));
+            });
         }
       });
     }
@@ -434,9 +506,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._playingSent = false;
       if (this._shaka) {
         this._removeBindings();
+        this._adapterEventsBindings = {};
         return this._shaka.destroy();
       }
-      this._adapterEventsBindings = {};
     });
   }
 
@@ -448,10 +520,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _getVideoTracks(): Array<Object> {
     let variantTracks = this._shaka.getVariantTracks();
-    let activeVariantTrack = variantTracks.filter((variantTrack) => {
+    let activeVariantTrack = variantTracks.filter(variantTrack => {
       return variantTrack.active;
     })[0];
-    let videoTracks = variantTracks.filter((variantTrack) => {
+    let videoTracks = variantTracks.filter(variantTrack => {
       return variantTrack.audioId === activeVariantTrack.audioId;
     });
     return videoTracks;
@@ -460,16 +532,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * Get the original audio tracks
    * @function _getAudioTracks
-   * @returns {Array<Object>} - The original audio tracks
+   * @returns {Array<Object>} - Array of objects with unique language and label.
    * @private
    */
   _getAudioTracks(): Array<Object> {
-    let variantTracks = this._shaka.getVariantTracks();
-    let activeVariantTrack = variantTracks.filter((variantTrack) => {
-      return variantTrack.active;
-    })[0];
-    let audioTracks = variantTracks.filter((variantTrack) => {
-      return variantTrack.videoId === activeVariantTrack.videoId;
+    const variantTracks = this._shaka.getVariantTracks();
+    let audioTracks = this._shaka.getAudioLanguagesAndRoles();
+    audioTracks.forEach(track => {
+      const sameLangAudioVariants = variantTracks.filter(vt => vt.language === track.language);
+      const id = sameLangAudioVariants.map(variant => variant.id).join('_');
+      const active = sameLangAudioVariants.some(variant => variant.active);
+      track.id = id;
+      track.label = sameLangAudioVariants[0].label;
+      track.active = active;
     });
     return audioTracks;
   }
@@ -551,7 +626,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (textTracks) {
       for (let i = 0; i < textTracks.length; i++) {
         let settings = {
-          kind: textTracks[i].kind ? textTracks[i].kind + 's' : "",
+          kind: textTracks[i].kind ? textTracks[i].kind + 's' : '',
           active: false,
           label: textTracks[i].label,
           language: textTracks[i].language,
@@ -573,7 +648,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   selectVideoTrack(videoTrack: VideoTrack): void {
     if (this._shaka) {
       let videoTracks = this._getVideoTracks();
-      if ((videoTrack instanceof VideoTrack) && videoTracks) {
+      if (videoTrack instanceof VideoTrack && videoTracks) {
         let selectedVideoTrack = videoTracks[videoTrack.index];
         if (selectedVideoTrack) {
           if (this.isAdaptiveBitrateEnabled()) {
@@ -597,7 +672,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   selectAudioTrack(audioTrack: AudioTrack): void {
-    if (this._shaka && (audioTrack instanceof AudioTrack) && !audioTrack.active) {
+    if (this._shaka && audioTrack instanceof AudioTrack && !audioTrack.active) {
       this._shaka.selectAudioLanguage(audioTrack.language);
       this._onTrackChanged(audioTrack);
     }
@@ -611,7 +686,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   selectTextTrack(textTrack: TextTrack): void {
-    if (this._shaka && (textTrack instanceof TextTrack) && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
+    if (this._shaka && textTrack instanceof TextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
+      this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
       this._shaka.selectTextLanguage(textTrack.language);
       this._onTrackChanged(textTrack);
     }
@@ -672,7 +748,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   seekToLiveEdge(): void {
-    if (this._shaka) {
+    if (this._shaka && this._videoElement.readyState > 0) {
       this._videoElement.currentTime = this._shaka.seekRange().end;
     }
   }
@@ -697,7 +773,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onAdaptation(): void {
-    let selectedVideoTrack = this._getParsedVideoTracks().filter(function (videoTrack) {
+    let selectedVideoTrack = this._getParsedVideoTracks().filter(function(videoTrack) {
       return videoTrack.active;
     })[0];
     DashAdapter._logger.debug('Video track changed', selectedVideoTrack);
@@ -718,12 +794,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (error.code === this.VIDEO_ERROR_CODE) {
         return;
       }
-      this._trigger(EventType.ERROR,
-        new Error(
-          error.severity,
-          error.category,
-          error.code,
-          error.data));
+      this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
       DashAdapter._logger.error(error);
     }
   }
@@ -744,7 +815,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
     } else {
       this._buffering = false;
-      if (!this._videoElement.paused && !this._playingSent) { //the player leaves the buffering state. and 'playing' event hasn't been sent by the HTMLVideoElement.
+      if (!this._videoElement.paused && !this._playingSent) {
+        //the player leaves the buffering state. and 'playing' event hasn't been sent by the HTMLVideoElement.
         this._videoElement.dispatchEvent(new window.Event(EventType.PLAYING));
       }
     }
