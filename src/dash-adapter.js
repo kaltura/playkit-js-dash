@@ -165,13 +165,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (abr.defaultBandwidthEstimate) {
         shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
       }
-      if (abr.restrictions.minBitrate > 0) {
-        shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
-      }
-      if (abr.restrictions.maxBitrate < Infinity) {
-        //You can either set capping by size or bitrate, if bitrate is set then disable size capping
-        adapterConfig.capLevelToPlayerSize = false;
-        shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
+      if (abr.restrictions) {
+        if (abr.restrictions.minBitrate > 0) {
+          shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
+        }
+        if (abr.restrictions.maxBitrate < Infinity) {
+          //You can either set capping by size or bitrate, if bitrate is set then disable size capping
+          adapterConfig.capLevelToPlayerSize = false;
+          shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
+        }
       }
       adapterConfig.shakaConfig = shakaConfig;
     }
