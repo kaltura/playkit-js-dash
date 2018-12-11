@@ -166,7 +166,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         }
         if (abr.restrictions.maxBitrate < Infinity) {
           //You can either set capping by size or bitrate, if bitrate is set then disable size capping
-          adapterConfig.adapterConfig.capLevelToPlayerSize = false;
+          adapterConfig.capLevelToPlayerSize = false;
           adapterConfig.shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
         }
       }
