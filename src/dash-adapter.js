@@ -139,7 +139,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
-    let adapterConfig = {};
+    let adapterConfig: Object = Utils.Object.copyDeep(DefaultConfig);
     if (Utils.Object.hasPropertyPath(config, 'playback.useNativeTextTrack')) {
       adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
     }
@@ -150,32 +150,26 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       adapterConfig.redirectExternalStreamsTimeout = options.redirectExternalStreamsTimeout;
     }
     if (Utils.Object.hasPropertyPath(config, 'abr')) {
-      const shakaConfig: Object = {
-        abr: {
-          restrictions: {}
-        }
-      };
       const abr = config.abr;
       if (typeof abr.enabled === 'boolean') {
-        shakaConfig.abr.enabled = abr.enabled;
+        adapterConfig.shakaConfig.abr.enabled = abr.enabled;
       }
       if (typeof abr.capLevelToPlayerSize === 'boolean') {
         adapterConfig.capLevelToPlayerSize = abr.capLevelToPlayerSize;
       }
       if (abr.defaultBandwidthEstimate) {
-        shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
+        adapterConfig.shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
       }
       if (abr.restrictions) {
         if (abr.restrictions.minBitrate > 0) {
-          shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
+          adapterConfig.shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
         }
         if (abr.restrictions.maxBitrate < Infinity) {
           //You can either set capping by size or bitrate, if bitrate is set then disable size capping
-          adapterConfig.capLevelToPlayerSize = false;
-          shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
+          adapterConfig.adapterConfig.capLevelToPlayerSize = false;
+          adapterConfig.shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
         }
       }
-      adapterConfig.shakaConfig = shakaConfig;
     }
 
     //Merge shaka config with override config, override takes precedence
