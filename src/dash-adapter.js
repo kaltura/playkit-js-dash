@@ -20,6 +20,13 @@ const ShakaEvent: ShakaEventType = {
 };
 
 /**
+ * the interval in which to sample player size changes
+ * @type {number}
+ * @const
+ */
+const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
+
+/**
  * Adapter of shaka lib for dash content
  * @classdesc
  */
@@ -108,6 +115,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _playingSent: boolean = false;
 
   /**
+   * Video size update timer
+   * @type {null|number}
+   * @private
+   */
+  _videoSizeUpdateTimer: ?number = null;
+
+  /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
    * @member {number} - VIDEO_ERROR_CODE
    * @type {number}
@@ -125,10 +139,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
-    let adapterConfig = {};
-    if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
-      adapterConfig.shakaConfig = config.playback.options.html5.dash;
-    }
+    let adapterConfig: Object = Utils.Object.copyDeep(DefaultConfig);
     if (Utils.Object.hasPropertyPath(config, 'playback.useNativeTextTrack')) {
       adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
     }
@@ -138,6 +149,34 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       adapterConfig.redirectExternalStreamsHandler = options.redirectExternalStreamsHandler;
       adapterConfig.redirectExternalStreamsTimeout = options.redirectExternalStreamsTimeout;
     }
+    if (Utils.Object.hasPropertyPath(config, 'abr')) {
+      const abr = config.abr;
+      if (typeof abr.enabled === 'boolean') {
+        adapterConfig.shakaConfig.abr.enabled = abr.enabled;
+      }
+      if (typeof abr.capLevelToPlayerSize === 'boolean') {
+        adapterConfig.capLevelToPlayerSize = abr.capLevelToPlayerSize;
+      }
+      if (abr.defaultBandwidthEstimate) {
+        adapterConfig.shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
+      }
+      if (abr.restrictions) {
+        if (abr.restrictions.minBitrate > 0) {
+          adapterConfig.shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
+        }
+        if (abr.restrictions.maxBitrate < Infinity) {
+          //You can either set capping by size or bitrate, if bitrate is set then disable size capping
+          adapterConfig.capLevelToPlayerSize = false;
+          adapterConfig.shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
+        }
+      }
+    }
+
+    //Merge shaka config with override config, override takes precedence
+    if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
+      Utils.Object.mergeDeep(adapterConfig.shakaConfig, config.playback.options.html5.dash);
+    }
+
     return new this(videoElement, source, adapterConfig);
   }
 
@@ -308,6 +347,95 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * apply ABR restrictions
+   * @private
+   * @returns {void}
+   */
+  _maybeApplyAbrRestrictions(): void {
+    if (this._config.capLevelToPlayerSize) {
+      const videoTracks = this._getVideoTracks();
+      const getMinDimensions = (dim): number => Math.min.apply(null, videoTracks.map(variant => variant[dim]));
+      //Get minimal allowed dimensions
+      const minWidth = getMinDimensions('width');
+      const minHeight = getMinDimensions('height');
+      const updateAbrRestrictions = () => {
+        const curHeight = this._videoHeight;
+        const curWidth = this._videoWidth;
+        if (typeof curWidth === 'number' && typeof curHeight === 'number') {
+          //check if current player size is smaller than smallest rendition
+          //setting restriction below smallest rendition size will result in shaka emitting restriction unmet error
+          if (curHeight >= minHeight && curWidth >= minWidth) {
+            DashAdapter._logger.debug(`applying dimension restriction: width < ${curWidth}, height < ${curHeight}`);
+            this._shaka.configure({
+              abr: {
+                restrictions: {
+                  maxHeight: curHeight,
+                  maxWidth: curWidth
+                }
+              }
+            });
+          } else {
+            DashAdapter._logger.debug(`applying dimension restriction: width < ${minHeight}, height < ${minWidth}`);
+            this._shaka.configure({
+              abr: {
+                restrictions: {
+                  maxHeight: minHeight,
+                  maxWidth: minWidth
+                }
+              }
+            });
+          }
+        }
+      };
+      this._clearVideoUpdateTimer();
+      this._videoSizeUpdateTimer = setInterval(updateAbrRestrictions, ABR_RESTRICTION_UPDATE_INTERVAL);
+      updateAbrRestrictions();
+    }
+  }
+
+  /**
+   * Clear the video update timer
+   * @private
+   * @returns {void}
+   */
+  _clearVideoUpdateTimer(): void {
+    if (this._videoSizeUpdateTimer) {
+      clearInterval(this._videoSizeUpdateTimer);
+      this._videoSizeUpdateTimer = null;
+    }
+  }
+
+  get _videoWidth(): ?number {
+    let width;
+    const videoElement = this._videoElement;
+    if (videoElement) {
+      width = videoElement.width || videoElement.clientWidth || videoElement.offsetWidth;
+      width *= this._contentScaleFactor;
+    }
+    return width;
+  }
+
+  get _videoHeight(): ?number {
+    let height;
+    const videoElement = this._videoElement;
+    if (videoElement) {
+      height = videoElement.height || videoElement.clientHeight || videoElement.offsetHeight;
+      height *= this._contentScaleFactor;
+    }
+    return height;
+  }
+
+  get _contentScaleFactor(): number {
+    let pixelRatio = 1;
+    try {
+      pixelRatio = window.devicePixelRatio;
+    } catch (e) {
+      DashAdapter._logger.debug('failed reading devicePixelRatio, assume 1');
+    }
+    return pixelRatio;
+  }
+
+  /**
    * Add the required bindings to shaka.
    * @function _addBindings
    * @private
@@ -354,6 +482,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             })
             .then(() => {
               let data = {tracks: this._getParsedTracks()};
+              this._maybeApplyAbrRestrictions();
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
             })
@@ -375,6 +504,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   destroy(): Promise<*> {
     return super.destroy().then(() => {
       DashAdapter._logger.debug('destroy');
+      this._clearVideoUpdateTimer();
       this._loadPromise = null;
       this._buffering = false;
       this._waitingSent = false;
@@ -651,6 +781,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let selectedVideoTrack = this._getParsedVideoTracks().filter(function(videoTrack) {
       return videoTrack.active;
     })[0];
+    DashAdapter._logger.debug('Video track changed', selectedVideoTrack);
     this._onTrackChanged(selectedVideoTrack);
   }
 

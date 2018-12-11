@@ -2,6 +2,10 @@
   "shakaConfig": {
     "streaming": {
       "ignoreTextStreamFailures": true
+    },
+    "abr": {
+      "enabled": true,
+      "restrictions": {}
     }
   },
   "forceRedirectExternalStreams": false
