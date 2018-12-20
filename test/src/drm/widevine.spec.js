@@ -14,6 +14,20 @@ function isValidEnvForWidevine() {
 }
 
 describe('Widevine', function() {
+  describe('isConfigured', function() {
+    it('should return true for widevine data if configured', function() {
+      Widevine.isConfigured(wwDrmData, {keySystem: DrmScheme.WIDEVINE}).should.be.true;
+    });
+
+    it('should return false for widevine data if not configured', function() {
+      Widevine.isConfigured(wwDrmData, {keySystem: DrmScheme.PLAYREADY}).should.be.false;
+    });
+
+    it('should return false for non-widevine data even configured', function() {
+      Widevine.isConfigured(prDrmData, {keySystem: DrmScheme.WIDEVINE}).should.be.false;
+    });
+  });
+
   describe('canPlayDrm', function() {
     it('should return true for widevine data on valid widevine env and false otherwise', function() {
       if (isValidEnvForWidevine()) {

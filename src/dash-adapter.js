@@ -227,16 +227,26 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * Checks if dash adapter can play a given drm data.
    * @param {Array<Object>} drmData - The drm data to check.
+   * @param {PKDrmConfigObject} drmConfig - The drm config.
    * @returns {boolean} - Whether the dash adapter can play a specific drm data.
    * @static
    */
-  static canPlayDrm(drmData: Array<Object>): boolean {
+  static canPlayDrm(drmData: Array<Object>, drmConfig: PKDrmConfigObject): boolean {
     let canPlayDrm = false;
     for (let drmProtocol of DashAdapter._drmProtocols) {
-      if (drmProtocol.canPlayDrm(drmData)) {
+      if (drmProtocol.isConfigured(drmData, drmConfig)) {
         DashAdapter._drmProtocol = drmProtocol;
         canPlayDrm = true;
         break;
+      }
+    }
+    if (!canPlayDrm) {
+      for (let drmProtocol of DashAdapter._drmProtocols) {
+        if (drmProtocol.canPlayDrm(drmData)) {
+          DashAdapter._drmProtocol = drmProtocol;
+          canPlayDrm = true;
+          break;
+        }
       }
     }
     DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString(), drmData);

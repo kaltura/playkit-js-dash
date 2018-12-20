@@ -14,6 +14,20 @@ function isValidEnvForPlayReady() {
 }
 
 describe('PlayReady', function() {
+  describe('isConfigured', function() {
+    it('should return true for playready data if configured', function() {
+      PlayReady.isConfigured(prDrmData, {keySystem: DrmScheme.PLAYREADY}).should.be.true;
+    });
+
+    it('should return false for playready data if not configured', function() {
+      PlayReady.isConfigured(prDrmData, {keySystem: DrmScheme.WIDEVINE}).should.be.false;
+    });
+
+    it('should return false for non-playready data even configured', function() {
+      PlayReady.isConfigured(wwDrmData, {keySystem: DrmScheme.PLAYREADY}).should.be.false;
+    });
+  });
+
   describe('canPlayDrm', function() {
     it('should return true for playready data on valid playready env and false otherwise', function() {
       if (isValidEnvForPlayReady()) {
