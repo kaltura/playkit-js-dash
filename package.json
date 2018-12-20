@@ -76,10 +76,6 @@
     "webpack": "latest",
     "webpack-dev-server": "latest"
   },
-  "peerDependencies": {
-    "@playkit-js/playkit-js": "canary",
-    "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-3"
-  },
   "keywords": [
     "kaltura",
     "dash",
