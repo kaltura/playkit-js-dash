@@ -24,6 +24,7 @@ module.exports = {
     filename: '[name].js',
     library: ['playkit', 'dash'],
     libraryTarget: 'umd',
+    umdNamedDefine: true,
     devtoolModuleFilenameTemplate: './dash/[resource-path]'
   },
   devtool: 'source-map',
