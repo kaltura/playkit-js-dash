@@ -457,6 +457,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._videoElement.addEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
     this._videoElement.addEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
+    // called when a resource is downloaded
+    this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
+      if (type != shaka.net.NetworkingEngine.RequestType.SEGMENT) return;
+      this.handleFragementLoaded(response.timeMs);
+    });
   }
 
   /**
