@@ -461,7 +461,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
       switch (type) {
         case shaka.net.NetworkingEngine.RequestType.SEGMENT:
-          this.handleFragementLoaded(response.timeMs);
+          this.handleFragementLoaded(response.timeMs, response.data.byteLength);
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
           this.handleManifestLoaded(response.timeMs);
