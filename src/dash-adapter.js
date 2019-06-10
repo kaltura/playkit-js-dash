@@ -455,7 +455,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.addEventListener(ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
     this._shaka.addEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
-    shaka.player.stat;
     this._videoElement.addEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
     this._videoElement.addEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
     // called when a resource is downloaded
@@ -886,5 +885,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     } else {
       return 0;
     }
+  }
+
+  get targetBuffer(): number {
+    let retval = NaN;
+    if (this._shaka && this._shaka.getConfiguration() && this._shaka.getConfiguration().streaming) {
+      retval = this._shaka.getConfiguration().streaming.bufferingGoal;
+    }
+    return retval;
   }
 }
