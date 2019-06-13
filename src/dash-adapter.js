@@ -887,11 +887,26 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 
+  /**
+   * gets the target buffer of the player
+   * @returns {number} - buffer length target in seconds
+   */
   get targetBuffer(): number {
-    let retval = NaN;
-    if (this._shaka && this._shaka.getConfiguration() && this._shaka.getConfiguration().streaming) {
-      retval = this._shaka.getConfiguration().streaming.bufferingGoal;
+    let targetBufferVal = NaN;
+    if (!this._shaka) return NaN;
+    if (this.isLive()) {
+      if (this._shaka.getManifest()) {
+        targetBufferVal =
+          this._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
+          this._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
+          (this._videoElement.currentTime - this._getLiveEdge());
+        targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal);
+      }
+    } else {
+      if (this._shaka.getConfiguration() && this._shaka.getConfiguration().streaming) {
+        targetBufferVal = this._shaka.getConfiguration().streaming.bufferingGoal;
+      }
     }
-    return retval;
+    return targetBufferVal;
   }
 }
