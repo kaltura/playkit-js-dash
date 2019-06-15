@@ -457,6 +457,17 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._videoElement.addEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
     this._videoElement.addEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
+    // called when a resource is downloaded
+    this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
+      switch (type) {
+        case shaka.net.NetworkingEngine.RequestType.SEGMENT:
+          this._trigger(EventType.FRAG_LOADED, {miliSeconds: response.timeMs, bytes: response.data.byteLength});
+          break;
+        case shaka.net.NetworkingEngine.RequestType.MANIFEST:
+          this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
+          break;
+      }
+    });
   }
 
   /**
@@ -874,5 +885,28 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     } else {
       return 0;
     }
+  }
+
+  /**
+   * gets the target buffer of the player
+   * @returns {number} - buffer length target in seconds
+   */
+  get targetBuffer(): number {
+    let targetBufferVal = NaN;
+    if (!this._shaka) return NaN;
+    if (this.isLive()) {
+      if (this._shaka.getManifest()) {
+        targetBufferVal =
+          this._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
+          this._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
+          (this._videoElement.currentTime - this._getLiveEdge());
+        targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal);
+      }
+    } else {
+      if (this._shaka.getConfiguration() && this._shaka.getConfiguration().streaming) {
+        targetBufferVal = this._shaka.getConfiguration().streaming.bufferingGoal;
+      }
+    }
+    return targetBufferVal;
   }
 }
