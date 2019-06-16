@@ -58,6 +58,7 @@
     "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-3",
     "sinon": "^5.0.3",
     "sinon-chai": "^3.0.0",
+    "source-map-loader": "^0.2.4",
     "standard-version": "^4.3.0",
     "uglifyjs-webpack-plugin": "^1.2.5",
     "webpack": "4.7.0",
