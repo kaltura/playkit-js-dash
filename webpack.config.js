@@ -11,10 +11,6 @@ let plugins = [
   })
 ];
 
-if (PROD) {
-  plugins.push(new webpack.optimize.UglifyJsPlugin({sourceMap: true}));
-}
-
 module.exports = {
   context: __dirname + '/src',
   entry: {'playkit-dash': 'index.js'},
@@ -24,7 +20,7 @@ module.exports = {
     library: ['playkit', 'adapters', 'dash'],
     libraryTarget: 'umd',
     umdNamedDefine: true,
-    devtoolModuleFilenameTemplate: './dash/[resource-path]'
+    devtoolModuleFilenameTemplate: './playkit/adapters/dash/[resource-path]'
   },
   devtool: 'source-map',
   plugins: plugins,
