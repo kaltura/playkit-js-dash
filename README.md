@@ -1,25 +1,29 @@
 # PlayKit JS DASH - [Shaka Player] Adapter for the [PlayKit JS Player]
 
 [![Build Status](https://travis-ci.org/kaltura/playkit-js-dash.svg?branch=master)](https://travis-ci.org/kaltura/playkit-js-dash)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![](https://img.shields.io/npm/v/@playkit-js/playkit-js-dash/latest.svg)](https://www.npmjs.com/package/@playkit-js/playkit-js-dash)
+[![](https://img.shields.io/npm/v/@playkit-js/playkit-js-dash/canary.svg)](https://www.npmjs.com/package/@playkit-js/playkit-js-dash/v/canary)
 
 PlayKit JS DASH adapter integrates [Shaka Player] with the [PlayKit JS Player].
- 
+
 PlayKit JS DASH is written in [ECMAScript6], statically analysed using [Flow] and transpiled in ECMAScript5 using [Babel].
 
-[Shaka Player]: https://github.com/google/shaka-player
-[Shaka Player API docs]: https://shaka-player-demo.appspot.com/docs/api/index.html
-[Flow]: https://flow.org/
-[ECMAScript6]: https://github.com/ericdouglas/ES6-Learning#articles--tutorials
-[Babel]: https://babeljs.io
+[shaka player]: https://github.com/google/shaka-player
+[shaka player api docs]: https://shaka-player-demo.appspot.com/docs/api/index.html
+[flow]: https://flow.org/
+[ecmascript6]: https://github.com/ericdouglas/ES6-Learning#articles--tutorials
+[babel]: https://babeljs.io
 
 ## Getting Started
 
 ### Prerequisites
+
 The adapter requires [PlayKit JS Player] to be loaded first.
 
 The adapter uses the [Shaka Player] javascript library.
 
-[Playkit JS Player]: https://github.com/kaltura/playkit-js
+[playkit js player]: https://github.com/kaltura/playkit-js
 
 ### Installing
 
@@ -49,13 +53,14 @@ Finally, add the bundle as a script tag in your page, and initialize the player
 <script type="text/javascript" src="/PATH/TO/FILE/playkit.js"></script>
 <script type="text/javascript" src="/PATH/TO/FILE/playkit-dash.js"></script>
 <div id="player-placeholder" style="height:360px; width:640px">
-<script type="text/javascript">
-var playerContainer = document.querySelector("#player-placeholder");
-var config = {...};
-var player = playkit.core.loadPlayer(config);
-playerContainer.appendChild(player.getView());
-player.play();
-</script>
+  <script type="text/javascript">
+    var playerContainer = document.querySelector("#player-placeholder");
+    var config = {...};
+    var player = playkit.core.loadPlayer(config);
+    playerContainer.appendChild(player.getView());
+    player.play();
+  </script>
+</div>
 ```
 
 ## Configuration
@@ -66,7 +71,7 @@ The configuration is exposed via the playback section:
 
 ```javascript
 {
-  playback:{
+  playback: {
     options: {
       html5: {
         dash: {
@@ -76,18 +81,20 @@ The configuration is exposed via the playback section:
     }
   }
 }
-``` 
+```
 
 ## Running the tests
 
 Tests can be run locally via [Karma], which will run on Chrome, Firefox and Safari
 
-[Karma]: https://karma-runner.github.io/1.0/index.html
+[karma]: https://karma-runner.github.io/1.0/index.html
+
 ```
 yarn run test
 ```
 
 You can test individual browsers:
+
 ```
 yarn run test:chrome
 yarn run test:firefox
@@ -102,7 +109,6 @@ See [ESLint config](.eslintrc.json) for full configuration.
 
 We also use [.editorconfig](.editorconfig) to maintain consistent coding styles and settings, please make sure you comply with the styling.
 
-
 ## Compatibility
 
 TBD
@@ -113,7 +119,7 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/kaltura/playkit-js-dash/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/kaltura/playkit-js-dash/tags).
 
 ## License
 

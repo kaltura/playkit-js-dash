@@ -2,6 +2,107 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.10.1"></a>
+## [1.10.1](https://github.com/kaltura/playkit-js-dash/compare/v1.10.0...v1.10.1) (2019-05-01)
+
+
+
+<a name="1.10.0"></a>
+# [1.10.0](https://github.com/kaltura/playkit-js-dash/compare/v1.9.0...v1.10.0) (2018-12-20)
+
+
+### Features
+
+* **FEC-8700:** add config option to specify DRM system ([#70](https://github.com/kaltura/playkit-js-dash/issues/70)) ([5a7e528](https://github.com/kaltura/playkit-js-dash/commit/5a7e528))
+
+
+
+<a name="1.9.0"></a>
+# [1.9.0](https://github.com/kaltura/playkit-js-dash/compare/v1.8.3...v1.9.0) (2018-12-12)
+
+
+### Features
+
+* **FEC-8147:** add ability to set ABR settings ([#69](https://github.com/kaltura/playkit-js-dash/issues/69)) ([8f5271b](https://github.com/kaltura/playkit-js-dash/commit/8f5271b))
+
+
+
+<a name="1.8.3"></a>
+## [1.8.3](https://github.com/kaltura/playkit-js-dash/compare/v1.8.2...v1.8.3) (2018-11-22)
+
+
+### Bug Fixes
+
+* **FEC-8711:** live in IE has a small jump in the stream after a second ([#67](https://github.com/kaltura/playkit-js-dash/issues/67)) ([ceb4063](https://github.com/kaltura/playkit-js-dash/commit/ceb4063))
+
+
+
+<a name="1.8.2"></a>
+## [1.8.2](https://github.com/kaltura/playkit-js-dash/compare/v1.8.1...v1.8.2) (2018-11-19)
+
+
+### Bug Fixes
+
+* **FEC-8684:** IE11 live dash playback is stuck ([#66](https://github.com/kaltura/playkit-js-dash/issues/66)) ([c543921](https://github.com/kaltura/playkit-js-dash/commit/c543921))
+
+
+
+<a name="1.8.1"></a>
+## [1.8.1](https://github.com/kaltura/playkit-js-dash/compare/v1.8.0...v1.8.1) (2018-11-08)
+
+
+### Bug Fixes
+
+* **FEC-8666:** cannot play dash drm ([#65](https://github.com/kaltura/playkit-js-dash/issues/65)) ([8d724ac](https://github.com/kaltura/playkit-js-dash/commit/8d724ac))
+
+
+
+<a name="1.8.0"></a>
+# [1.8.0](https://github.com/kaltura/playkit-js-dash/compare/v1.7.0...v1.8.0) (2018-11-07)
+
+
+### Features
+
+* **FEC-8553:** add ability to force redirect kaltura playManifest urls ([#64](https://github.com/kaltura/playkit-js-dash/issues/64)) ([5d9cc5c](https://github.com/kaltura/playkit-js-dash/commit/5d9cc5c))
+
+
+
+<a name="1.7.0"></a>
+# [1.7.0](https://github.com/kaltura/playkit-js-dash/compare/v1.6.3...v1.7.0) (2018-11-05)
+
+
+### Bug Fixes
+
+* **FEC-7590:** filter Shaka audio tracks by language and not bitrate ([#58](https://github.com/kaltura/playkit-js-dash/issues/58)) ([e88747c](https://github.com/kaltura/playkit-js-dash/commit/e88747c))
+
+
+### Features
+
+* **FEC-7808:** quality watcher for the player ([#63](https://github.com/kaltura/playkit-js-dash/issues/63)) ([4e808af](https://github.com/kaltura/playkit-js-dash/commit/4e808af))
+
+
+
+<a name="1.6.4"></a>
+## [1.6.4](https://github.com/kaltura/playkit-js-dash/compare/v1.6.3...v1.6.4) (2018-08-05)
+
+
+### Bug Fixes
+
+* **FEC-7590:** filter Shaka audio tracks by language and not bitrate ([#58](https://github.com/kaltura/playkit-js-dash/issues/58)) ([e88747c](https://github.com/kaltura/playkit-js-dash/commit/e88747c))
+
+
+
+<a name="1.6.3"></a>
+## [1.6.3](https://github.com/kaltura/playkit-js-dash/compare/v1.6.2...v1.6.3) (2018-07-12)
+
+
+### Bug Fixes
+
+* **FEC-7935:** fix text selection logic ([#55](https://github.com/kaltura/playkit-js-dash/issues/55)) ([cefc2ce](https://github.com/kaltura/playkit-js-dash/commit/cefc2ce))
+* **FEC-8396:** media source adapters default config overrides the player supplied config ([#56](https://github.com/kaltura/playkit-js-dash/issues/56)) ([a9d41ca](https://github.com/kaltura/playkit-js-dash/commit/a9d41ca))
+
+
+
 <a name="1.6.2"></a>
 ## [1.6.2](https://github.com/kaltura/playkit-js-dash/compare/v1.6.1...v1.6.2) (2018-05-10)
 

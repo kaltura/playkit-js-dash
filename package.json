@@ -1,6 +1,6 @@
 {
-  "name": "playkit-js-dash",
-  "version": "1.6.2",
+  "name": "@playkit-js/playkit-js-dash",
+  "version": "1.10.1",
   "description": "",
   "main": "dist/playkit-dash.js",
   "scripts": {
@@ -11,17 +11,26 @@
     "watch": "webpack --mode production --progress --colors --watch",
     "test": "NODE_ENV=test karma start --color",
     "release": "standard-version",
-    "publish": "git push --follow-tags --no-verify origin master",
+    "pushTaggedRelease": "git push --follow-tags --no-verify origin master",
     "eslint": "eslint . --color",
     "flow": "flow check",
-    "commit:dist": "git add --force --all dist && (git commit -m 'chore: update dist' || exit 0)"
+    "precommit": "lint-staged"
   },
-  "standard-version": {
-    "scripts": {
-      "postbump": "yarn run build && npm run commit:dist"
-    }
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{json,md,scss}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
+    "@playkit-js/playkit-js": "^0.44.0",
     "babel-cli": "^6.18.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
@@ -30,16 +39,18 @@
     "babel-plugin-transform-class-properties": "^6.22.0",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-env": "^1.6.1",
-    "babel-preset-es2015": "^6.18.0",
     "babel-register": "^6.23.0",
     "chai": "^4.1.2",
     "cross-env": "^5.1.4",
     "eslint": "^4.19.1",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-loader": "^2.0.0",
     "eslint-plugin-flowtype": "^2.46.3",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-mocha-no-only": "^0.0.6",
+    "eslint-plugin-prettier": "^2.6.2",
     "flow-bin": "latest",
+    "husky": "^0.14.3",
     "istanbul": "^0.4.5",
     "karma": "^2.0.2",
     "karma-chai": "^0.1.0",
@@ -49,12 +60,14 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-mocha": "^1.3.0",
+    "karma-mocha-reporter": "^2.2.5",
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.0",
+    "lint-staged": "^7.2.0",
     "mocha": "^5.1.1",
     "mocha-cli": "^1.0.1",
-    "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.27.1",
+    "prettier": "^1.13.7",
     "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-3",
     "sinon": "^5.0.3",
     "sinon-chai": "^3.0.0",
@@ -65,12 +78,21 @@
     "webpack-cli": "^2.1.2",
     "webpack-dev-server": "3.1.4"
   },
-  "keywords": [],
-  "license": "AGPL-3.0",
   "peerDependencies": {
-    "playkit-js": "https://github.com/kaltura/playkit-js.git#v0.27.1",
+    "@playkit-js/playkit-js": "^0.44.0",
     "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-3"
   },
+  "keywords": [
+    "kaltura",
+    "dash",
+    "shaka-player",
+    "mse",
+    "player",
+    "playkit-js",
+    "playkit-js-dash",
+    "html5 player"
+  ],
+  "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kaltura/playkit-js-dash.git"
