@@ -4,7 +4,7 @@ import {BaseDrmProtocol} from 'playkit-js'
 const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 
-export default class PlayReady extends BaseDrmProtocol {
+export class PlayReady extends BaseDrmProtocol {
   static _logger = BaseDrmProtocol.getLogger('PlayReady');
 
   /**

@@ -1,12 +1,12 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from 'playkit-js'
-import Widevine from './drm/widevine'
-import PlayReady from './drm/playready'
-import DefaultConfig from './default-config'
-import TextDisplayer from './text-displayer'
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
+import {Widevine} from './drm/widevine';
+import {PlayReady} from './drm/playready';
+import DefaultConfig from './default-config';
+import {TextDisplayer} from './text-displayer';
 
-type ShakaEventType = { [event: string]: string };
+type ShakaEventType = {[event: string]: string};
 
 /**
  * Shaka events enum
@@ -18,6 +18,13 @@ const ShakaEvent: ShakaEventType = {
   ADAPTATION: 'adaptation',
   BUFFERING: 'buffering'
 };
+
+/**
+ * the interval in which to sample player size changes
+ * @type {number}
+ * @const
+ */
+const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
 
 /**
  * Adapter of shaka lib for dash content
