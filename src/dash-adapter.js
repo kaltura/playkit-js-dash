@@ -289,6 +289,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
     this._setShakaConfig();
+    setInterval(() => {
+      DashAdapter._logger.debug('targetBuffer:' + this.targetBuffer);
+    }, 1000);
   }
 
   /**
