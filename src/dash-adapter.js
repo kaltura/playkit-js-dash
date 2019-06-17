@@ -900,13 +900,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
           this._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
           (this._videoElement.currentTime - this._getLiveEdge());
-        targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal);
       }
     } else {
-      if (this._shaka.getConfiguration() && this._shaka.getConfiguration().streaming) {
-        targetBufferVal = this._shaka.getConfiguration().streaming.bufferingGoal;
-      }
+      // consideration of the end of the playback in the target buffer calc
+      targetBufferVal = this._videoElement.duration - this._videoElement.currentTime;
     }
+
+    targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal);
     return targetBufferVal;
   }
 }
