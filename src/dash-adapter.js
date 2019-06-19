@@ -918,7 +918,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const activeTrack = this._getActiveTrack();
     const activeTrackId = activeTrack ? activeTrack.id : NaN;
     let segmentLength = 0;
-    if (activeTrackId) {
+    if (!isNaN(activeTrackId)) {
       for (let i = 0; i < this._shaka.getManifest().periods.length; i++) {
         for (let j = 0; j < this._shaka.getManifest().periods[i].variants.length; j++) {
           const variant = this._shaka.getManifest().periods[i].variants[j];
