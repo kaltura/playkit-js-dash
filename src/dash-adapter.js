@@ -461,7 +461,7 @@ export class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
       switch (type) {
         case shaka.net.NetworkingEngine.RequestType.SEGMENT:
-          this._trigger(EventType.FRAG_LOADED, {miliSeconds: response.timeMs, bytes: response.data.byteLength});
+          this._trigger(EventType.FRAG_LOADED, {miliSeconds: response.timeMs, bytes: response.data.byteLength, url: response.uri});
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
@@ -546,13 +546,17 @@ export class DashAdapter extends BaseMediaSourceAdapter {
    */
   _getVideoTracks(): Array<Object> {
     let variantTracks = this._shaka.getVariantTracks();
-    let activeVariantTrack = variantTracks.filter(variantTrack => {
-      return variantTrack.active;
-    })[0];
+    let activeVariantTrack = this._getActiveTrack();
     let videoTracks = variantTracks.filter(variantTrack => {
       return variantTrack.audioId === activeVariantTrack.audioId;
     });
     return videoTracks;
+  }
+
+  _getActiveTrack(): Object {
+    return this._shaka.getVariantTracks().filter(variantTrack => {
+      return variantTrack.active;
+    })[0];
   }
 
   /**
@@ -900,14 +904,34 @@ export class DashAdapter extends BaseMediaSourceAdapter {
           this._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
           this._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
           (this._videoElement.currentTime - this._getLiveEdge());
-        targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal);
       }
     } else {
-      if (this._shaka.getConfiguration() && this._shaka.getConfiguration().streaming) {
-        targetBufferVal = this._shaka.getConfiguration().streaming.bufferingGoal;
+      // consideration of the end of the playback in the target buffer calc
+      targetBufferVal = this._videoElement.duration - this._videoElement.currentTime;
+    }
+
+    targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal + this._getCurrentSegmentLength());
+    return targetBufferVal;
+  }
+
+  _getCurrentSegmentLength(): number {
+    const activeTrack = this._getActiveTrack();
+    const activeTrackId = activeTrack ? activeTrack.id : NaN;
+    let segmentLength = 0;
+    const periods = this._shaka.getManifest().periods;
+    if (!isNaN(activeTrackId)) {
+      for (let i = 0; i < periods.length; i++) {
+        for (let j = 0; j < periods[i].variants.length; j++) {
+          const variant = periods[i].variants[j];
+          if (variant.id === activeTrackId) {
+            const segmentPosition = variant.video.findSegmentPosition(this._videoElement.currentTime);
+            let seg = variant.video.getSegmentReference(segmentPosition);
+            segmentLength = seg.endTime - seg.startTime;
+          }
+        }
       }
     }
-    return targetBufferVal;
+    return segmentLength;
   }
 }
 

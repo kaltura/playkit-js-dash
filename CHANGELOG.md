@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.12.0"></a>
+# [1.12.0](https://github.com/kaltura/playkit-js-dash/compare/v1.11.0...v1.12.0) (2019-06-20)
+
+
+### Features
+
+* **FEC-8975:** adding segment size in target buffer when exceeding maxmax ([#75](https://github.com/kaltura/playkit-js-dash/issues/75)) ([ed04391](https://github.com/kaltura/playkit-js-dash/commit/ed04391))
+
+
+
+<a name="1.11.0"></a>
+# [1.11.0](https://github.com/kaltura/playkit-js-dash/compare/v1.10.1...v1.11.0) (2019-06-17)
+
+
+### Features
+
+* **FEC-8975:** adding QoS data enhancement ([#72](https://github.com/kaltura/playkit-js-dash/issues/72)) ([baeb140](https://github.com/kaltura/playkit-js-dash/commit/baeb140))
+* **FEC-8975:** QoS Data enhancment ([#74](https://github.com/kaltura/playkit-js-dash/issues/74)) ([6fa818b](https://github.com/kaltura/playkit-js-dash/commit/6fa818b))
+
+
+
 <a name="1.10.1"></a>
 ## [1.10.1](https://github.com/kaltura/playkit-js-dash/compare/v1.10.0...v1.10.1) (2019-05-01)
 
