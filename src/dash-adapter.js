@@ -143,6 +143,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'playback.useNativeTextTrack')) {
       adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
     }
+    if (Utils.Object.hasPropertyPath(config, 'playback.startTime')) {
+      const startTime = Utils.Object.getPropertyPath(config, 'playback.startTime');
+      if (startTime > -1) {
+        adapterConfig.playback.startTime = startTime;
+      }
+    }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
       adapterConfig.forceRedirectExternalStreams = options.forceRedirectExternalStreams;
@@ -318,7 +324,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka = new shaka.Player(this._videoElement);
     this._maybeSetDrmConfig();
     this._shaka.configure(this._config.shakaConfig);
+    this._maybeSetPlaybackStartTime();
     this._addBindings();
+  }
+
+  /**
+   * set start time to shaka player
+   * @returns {void}
+   * @private
+   */
+  _maybeSetPlaybackStartTime(): void {
+    if (Utils.Object.hasPropertyPath(this._config, 'playback.startTime')) {
+      this._shaka.setPlaybackStartTime(this._config.playback.startTime);
+    }
   }
 
   /**
