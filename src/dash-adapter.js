@@ -100,6 +100,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _buffering: boolean = false;
   /**
+   * The startTime from config
+   * @member {number} - _startTime
+   * @type {number}
+   * @private
+   */
+  _startTime: number = -1;
+  /**
    * Whether 'waiting' event has been sent by the HTMLVideoElement
    * @member {boolean} - _waitingSent
    * @type {boolean}
@@ -146,7 +153,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'playback.startTime')) {
       const startTime = Utils.Object.getPropertyPath(config, 'playback.startTime');
       if (startTime > -1) {
-        adapterConfig.playback.startTime = startTime;
+        Utils.Object.createPropertyPath(adapterConfig, 'playback.startTime', startTime);
       }
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
@@ -335,7 +342,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeSetPlaybackStartTime(): void {
     if (Utils.Object.hasPropertyPath(this._config, 'playback.startTime')) {
-      this._shaka.setPlaybackStartTime(this._config.playback.startTime);
+      this._startTime = this._config.playback.startTime;
+    } else {
+      this._startTime = -1;
     }
   }
 
@@ -514,7 +523,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
-          const shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
+          let shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
+          shakaStartTime = !shakaStartTime && this._startTime > -1 ? this._startTime : undefined;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(url => {
               return this._shaka.load(url, shakaStartTime);

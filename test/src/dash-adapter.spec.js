@@ -1125,6 +1125,29 @@ describe('DashAdapter: _onPlaying', () => {
     dashInstance._onPlaying();
   });
 
+  it('should startTime config load the video from this position', done => {
+    const startTime = 30;
+    config = {
+      playback: {
+        options: {html5: {dash: {}}},
+        startTime: startTime
+      }
+    };
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance
+      .load()
+      .then((/* data */) => {
+        video
+          .play()
+          .then(() => {
+            dashInstance.currentTime.should.equal(startTime);
+            done();
+          })
+          .catch(err => done(err));
+      })
+      .catch(err => done(err));
+  });
+
   it('should not dispatch waiting event when buffering is false', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     let t = setTimeout(done, 0);
