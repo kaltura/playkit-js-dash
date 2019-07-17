@@ -1,6 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, Html5EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
 import Widevine from './drm/widevine';
 import PlayReady from './drm/playready';
 import DefaultConfig from './default-config';
@@ -128,7 +128,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   VIDEO_ERROR_CODE: number = 3016;
-
+  /**
+   * The last time detach occurred
+   * @type {number}
+   * @private
+   */
+  _lastTimeDetach: number = 0;
   /**
    * Factory method to create media source adapter.
    * @function createAdapter
@@ -404,6 +409,42 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * attach media - return the media source to handle the video tag
+   * @public
+   * @param {boolean} playbackEnded don't seek to the last detach point
+   * @returns {void}
+   */
+  attachMediaSource(playbackEnded: ?boolean): void {
+    if (!this._shaka) {
+      if (this._videoElement && this._videoElement.src) {
+        Utils.Dom.setAttribute(this._videoElement, 'src', '');
+        Utils.Dom.removeAttribute(this._videoElement, 'src');
+      }
+      this._init();
+      if (!isNaN(this._lastTimeDetach) && !playbackEnded) {
+        const canPlayHandler = () => {
+          this._videoElement.removeEventListener(Html5EventType.CAN_PLAY, canPlayHandler);
+          this.currentTime = this._lastTimeDetach;
+          this._lastTimeDetach = NaN;
+        };
+        this._videoElement.addEventListener(Html5EventType.CAN_PLAY, canPlayHandler);
+      }
+    }
+  }
+  /**
+   * detach media - will remove the media source from handling the video
+   * @public
+   * @returns {void}
+   */
+  detachMediaSource(): void {
+    if (this._shaka) {
+      this._lastTimeDetach = this.currentTime;
+      this._reset();
+      this._shaka = null;
+      this._loadPromise = null;
+    }
+  }
+  /**
    * Clear the video update timer
    * @private
    * @returns {void}
@@ -525,19 +566,35 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   destroy(): Promise<*> {
     return super.destroy().then(() => {
       DashAdapter._logger.debug('destroy');
-      this._clearVideoUpdateTimer();
       this._loadPromise = null;
       this._buffering = false;
       this._waitingSent = false;
       this._playingSent = false;
+      this._clearVideoUpdateTimer();
       if (this._shaka) {
         this._removeBindings();
         this._adapterEventsBindings = {};
         return this._shaka.destroy();
       }
+      // this._reset();
     });
   }
-
+  /**
+   * reset shaka instance and its bindings
+   * @private
+   * @returns {void}
+   */
+  _reset(): void {
+    this._buffering = false;
+    this._waitingSent = false;
+    this._playingSent = false;
+    this._clearVideoUpdateTimer();
+    if (this._shaka) {
+      this._removeBindings();
+      this._adapterEventsBindings = {};
+      this._shaka.destroy();
+    }
+  }
   /**
    * Get the original video tracks
    * @function _getVideoTracks
