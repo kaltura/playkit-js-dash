@@ -439,9 +439,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   detachMediaSource(): void {
     if (this._shaka) {
       this._lastTimeDetach = this.currentTime;
-      this._reset();
-      this._shaka = null;
-      this._loadPromise = null;
+      this._reset().then(() => {
+        this._shaka = null;
+        this._loadPromise = null;
+      });
     }
   }
   /**
@@ -567,24 +568,17 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return super.destroy().then(() => {
       DashAdapter._logger.debug('destroy');
       this._loadPromise = null;
-      this._buffering = false;
-      this._waitingSent = false;
-      this._playingSent = false;
-      this._clearVideoUpdateTimer();
-      if (this._shaka) {
-        this._removeBindings();
-        this._adapterEventsBindings = {};
-        return this._shaka.destroy();
-      }
-      // this._reset();
+      this._reset();
     });
   }
+
   /**
    * reset shaka instance and its bindings
+   * @function _reset
    * @private
-   * @returns {void}
+   * @returns {Promise<*>} - The destroy promise.
    */
-  _reset(): void {
+  _reset(): Promise<*> {
     this._buffering = false;
     this._waitingSent = false;
     this._playingSent = false;
@@ -592,8 +586,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (this._shaka) {
       this._removeBindings();
       this._adapterEventsBindings = {};
-      this._shaka.destroy();
+      return this._shaka.destroy();
     }
+    return Promise.resolve();
   }
   /**
    * Get the original video tracks
