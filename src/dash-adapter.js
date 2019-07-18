@@ -555,7 +555,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       DashAdapter._logger.debug('destroy');
       this._loadPromise = null;
       this._eventManager.destroy();
-      this._reset();
+      return this._reset();
     });
   }
 
