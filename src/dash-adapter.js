@@ -1,6 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, Html5EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventManager, EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
 import Widevine from './drm/widevine';
 import PlayReady from './drm/playready';
 import DefaultConfig from './default-config';
@@ -294,6 +294,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
     this._setShakaConfig();
+    this._eventManager = new EventManager();
   }
 
   /**
@@ -411,7 +412,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * attach media - return the media source to handle the video tag
    * @public
-   * @param {boolean} playbackEnded don't seek to the last detach point
+   * @param {boolean} playbackEnded playback ended after ads and media
    * @returns {void}
    */
   attachMediaSource(playbackEnded: ?boolean): void {
@@ -423,11 +424,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._init();
       if (!isNaN(this._lastTimeDetach) && !playbackEnded) {
         const canPlayHandler = () => {
-          this._videoElement.removeEventListener(Html5EventType.CAN_PLAY, canPlayHandler);
           this.currentTime = this._lastTimeDetach;
           this._lastTimeDetach = NaN;
         };
-        this._videoElement.addEventListener(Html5EventType.CAN_PLAY, canPlayHandler);
+        this._eventManager.listenOnce(this._videoElement, EventType.CAN_PLAY, canPlayHandler);
       }
     }
   }
@@ -494,11 +494,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _addBindings(): void {
-    this._shaka.addEventListener(ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
-    this._shaka.addEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
-    this._shaka.addEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
-    this._videoElement.addEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
-    this._videoElement.addEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
+    this._eventManager.listen(this._shaka, ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
+    this._eventManager.listen(this._shaka, ShakaEvent.ERROR, this._adapterEventsBindings.error);
+    this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
+    this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
+    this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
     // called when a resource is downloaded
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
       switch (type) {
@@ -510,20 +510,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           break;
       }
     });
-  }
-
-  /**
-   * Remove the bindings to shaka.
-   * @function _removeBindings
-   * @private
-   * @returns {void}
-   */
-  _removeBindings(): void {
-    this._shaka.removeEventListener(ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
-    this._shaka.removeEventListener(ShakaEvent.ERROR, this._adapterEventsBindings.error);
-    this._shaka.removeEventListener(ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
-    this._videoElement.removeEventListener(EventType.WAITING, this._adapterEventsBindings.waiting);
-    this._videoElement.removeEventListener(EventType.PLAYING, this._adapterEventsBindings.playing);
   }
 
   /**
@@ -568,6 +554,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return super.destroy().then(() => {
       DashAdapter._logger.debug('destroy');
       this._loadPromise = null;
+      this._eventManager.destroy();
       this._reset();
     });
   }
@@ -583,8 +570,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._waitingSent = false;
     this._playingSent = false;
     this._clearVideoUpdateTimer();
+    if (this._eventManager) {
+      this._eventManager.removeAll();
+    }
     if (this._shaka) {
-      this._removeBindings();
       this._adapterEventsBindings = {};
       return this._shaka.destroy();
     }
