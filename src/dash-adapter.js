@@ -422,11 +422,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
       this._init();
       if (!isNaN(this._lastTimeDetach) && !playbackEnded) {
-        const canPlayHandler = () => {
+        const loadedDataHandler = () => {
           this.currentTime = this._lastTimeDetach;
           this._lastTimeDetach = NaN;
         };
-        this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, canPlayHandler);
+        this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, loadedDataHandler);
       } else {
         this._eventManager.listenOnce(this._videoElement, EventType.PLAY, () => (this.currentTime = 0));
         this._lastTimeDetach = NaN;
