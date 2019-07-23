@@ -426,7 +426,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this.currentTime = this._lastTimeDetach;
           this._lastTimeDetach = NaN;
         };
-        this._eventManager.listenOnce(this._videoElement, EventType.CAN_PLAY, canPlayHandler);
+        this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, canPlayHandler);
+      } else {
+        this._eventManager.listenOnce(this._videoElement, EventType.PLAY, () => (this.currentTime = 0));
+        this._lastTimeDetach = NaN;
       }
     }
   }
