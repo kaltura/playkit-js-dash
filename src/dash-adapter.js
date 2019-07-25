@@ -445,7 +445,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   detachMediaSource(): void {
     if (this._isMediaAttached) {
-      this._isMediaAttached = false;
       this._lastTimeDetach = this.currentTime;
       this._reset().then(() => {
         this._shaka = null;
@@ -576,6 +575,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._buffering = false;
     this._waitingSent = false;
     this._playingSent = false;
+    this._isMediaAttached = false;
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
       this._eventManager.removeAll();
