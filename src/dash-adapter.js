@@ -415,7 +415,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   attachMediaSource(playbackEnded: boolean): void {
-    if (!this._hls) {
+    if (!this._shaka) {
       if (this._videoElement && this._videoElement.src) {
         Utils.Dom.setAttribute(this._videoElement, 'src', '');
         Utils.Dom.removeAttribute(this._videoElement, 'src');
@@ -426,7 +426,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._lastTimeDetach = NaN;
       };
       if (!isNaN(this._lastTimeDetach)) {
-        this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, () => _seekAfterDetach(playbackEnded ? 0 : this._lastTimeDetach));
+        const seekTo = playbackEnded ? 0 : this._lastTimeDetach;
+        this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, () => _seekAfterDetach(seekTo));
       }
     }
   }
