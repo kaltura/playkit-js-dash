@@ -73,6 +73,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _shaka: any;
   /**
+   * attached the media events after attachMediaSource
+   * @member {boolean} _isMediaAttached
+   * @private
+   */
+  _isMediaAttached: boolean = false;
+  /**
    * an object containing all the events we bind and unbind to.
    * @member {Object} - _adapterEventsBindings
    * @type {Object}
@@ -323,6 +329,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka = new shaka.Player(this._videoElement);
     this._maybeSetDrmConfig();
     this._shaka.configure(this._config.shakaConfig);
+    this._isMediaAttached = true;
     this._addBindings();
   }
 
@@ -415,12 +422,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   attachMediaSource(playbackEnded: boolean): void {
-    if (!this._shaka) {
+    if (!this._isMediaAttached) {
       if (this._videoElement && this._videoElement.src) {
         Utils.Dom.setAttribute(this._videoElement, 'src', '');
         Utils.Dom.removeAttribute(this._videoElement, 'src');
       }
-      this._init();
       const _seekAfterDetach = seekTo => {
         this.currentTime = seekTo;
         this._lastTimeDetach = NaN;
@@ -429,6 +435,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         const seekTo = playbackEnded ? 0 : this._lastTimeDetach;
         this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, () => _seekAfterDetach(seekTo));
       }
+      this._isMediaAttached = true;
     }
   }
   /**
@@ -437,7 +444,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   detachMediaSource(): void {
-    if (this._shaka) {
+    if (this._isMediaAttached) {
+      this._isMediaAttached = false;
       this._lastTimeDetach = this.currentTime;
       this._reset().then(() => {
         this._shaka = null;
