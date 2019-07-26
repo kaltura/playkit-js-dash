@@ -418,22 +418,24 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * attach media - return the media source to handle the video tag
    * @public
-   * @param {boolean} playbackEnded playback ended after ads and media
    * @returns {void}
    */
-  attachMediaSource(playbackEnded: boolean): void {
+  attachMediaSource(): void {
     if (!this._isMediaAttached) {
       if (this._videoElement && this._videoElement.src) {
         Utils.Dom.setAttribute(this._videoElement, 'src', '');
         Utils.Dom.removeAttribute(this._videoElement, 'src');
       }
-      const _seekAfterDetach = seekTo => {
-        this.currentTime = seekTo;
+      const _seekAfterDetach = () => {
+        if (parseInt(this._lastTimeDetach) === parseInt(this.duration)) {
+          this.currentTime = 0;
+        } else {
+          this.currentTime = this._lastTimeDetach;
+        }
         this._lastTimeDetach = NaN;
       };
       if (!isNaN(this._lastTimeDetach)) {
-        const seekTo = playbackEnded ? 0 : this._lastTimeDetach;
-        this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, () => _seekAfterDetach(seekTo));
+        this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, () => _seekAfterDetach());
       }
       this._isMediaAttached = true;
     }
