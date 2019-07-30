@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.13.1"></a>
+## [1.13.1](https://github.com/kaltura/playkit-js-dash/compare/v1.13.0...v1.13.1) (2019-07-28)
+
+
+### Bug Fixes
+
+* **FEC-9262:** playback doesn't return to start after playback with ads in LG TV ([#79](https://github.com/kaltura/playkit-js-dash/issues/79)) ([5e359b9](https://github.com/kaltura/playkit-js-dash/commit/5e359b9))
+
+
+
+<a name="1.13.0"></a>
+# [1.13.0](https://github.com/kaltura/playkit-js-dash/compare/v1.12.0...v1.13.0) (2019-07-19)
+
+
+### Features
+
+* **FEC-9227:** support reInit of MSE ([#78](https://github.com/kaltura/playkit-js-dash/issues/78)) ([1fe4542](https://github.com/kaltura/playkit-js-dash/commit/1fe4542))
+
+
+
 <a name="1.12.0"></a>
 # [1.12.0](https://github.com/kaltura/playkit-js-dash/compare/v1.11.0...v1.12.0) (2019-06-20)
 
