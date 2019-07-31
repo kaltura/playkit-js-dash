@@ -2,16 +2,8 @@ import Widevine from '../../../src/drm/widevine';
 import {BaseDrmProtocol, Env} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
 
-const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 const BROWSER: string = Env.browser.name;
-
-function isValidEnvForWidevine() {
-  return (
-    (BROWSER === 'Chrome' || BROWSER === 'Firefox') &&
-    (DrmSupport._Browsers['Chrome']() === DrmScheme.WIDEVINE || DrmSupport._Browsers['Firefox']() === DrmScheme.WIDEVINE)
-  );
-}
 
 describe('Widevine', function() {
   describe('isConfigured', function() {
@@ -25,20 +17,6 @@ describe('Widevine', function() {
 
     it('should return false for non-widevine data even configured', function() {
       Widevine.isConfigured(prDrmData, {keySystem: DrmScheme.WIDEVINE}).should.be.false;
-    });
-  });
-
-  describe('canPlayDrm', function() {
-    it('should return true for widevine data on valid widevine env and false otherwise', function() {
-      if (isValidEnvForWidevine()) {
-        Widevine.canPlayDrm(wwDrmData).should.be.true;
-      } else {
-        Widevine.canPlayDrm(wwDrmData).should.be.false;
-      }
-    });
-
-    it('should return false for non-widevine data any case', function() {
-      Widevine.canPlayDrm(prDrmData).should.be.false;
     });
   });
 

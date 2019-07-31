@@ -242,26 +242,50 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {boolean} - Whether the dash adapter can play a specific drm data.
    * @static
    */
-  static canPlayDrm(drmData: Array<Object>, drmConfig: PKDrmConfigObject): boolean {
+  static canPlayDrm(drmData: Array<Object>, drmConfig: PKDrmConfigObject): Promise<*> {
+    let promises = [];
     let canPlayDrm = false;
     for (let drmProtocol of DashAdapter._drmProtocols) {
       if (drmProtocol.isConfigured(drmData, drmConfig)) {
-        DashAdapter._drmProtocol = drmProtocol;
+        promises.push(Promise.resolve(drmProtocol));
         canPlayDrm = true;
         break;
       }
     }
     if (!canPlayDrm) {
       for (let drmProtocol of DashAdapter._drmProtocols) {
-        if (drmProtocol.canPlayDrm(drmData)) {
-          DashAdapter._drmProtocol = drmProtocol;
-          canPlayDrm = true;
-          break;
-        }
+        promises.push(
+          new Promise((resolve, reject) => {
+            drmProtocol
+              .canPlayDrm(drmData)
+              .then(() => {
+                resolve(drmProtocol);
+              })
+              .catch(() => {
+                reject();
+              });
+          })
+        );
       }
     }
-    DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString(), drmData);
-    return canPlayDrm;
+    return Promise.all(
+      promises.map(p => {
+        // If a request fails, count that as a resolution so it will keep
+        // waiting for other possible successes. If a request succeeds,
+        // treat it as a rejection so Promise.all immediately bails out.
+        return p.then(drmProtocol => Promise.reject(drmProtocol), () => Promise.resolve());
+      })
+    ).then(
+      // If '.all' resolved, we've just got an array of errors.
+      () => Promise.reject(),
+      // If '.all' rejected, we've got the result we wanted.
+      drmProtocol => {
+        if (!DashAdapter._drmProtocol) {
+          DashAdapter._drmProtocol = drmProtocol;
+          Promise.resolve();
+        }
+      }
+    );
   }
 
   /**

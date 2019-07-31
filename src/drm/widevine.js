@@ -24,9 +24,20 @@ export default class Widevine extends BaseDrmProtocol {
    * @param {Array<Object>} drmData - The drm data to check.
    * @return {boolean} - Whether Widevine can be play on the current environment.
    */
-  static canPlayDrm(drmData: Array<Object>): boolean {
-    Widevine._logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
-    return DrmSupport.isProtocolSupported(DrmScheme.WIDEVINE, drmData);
+  static canPlayDrm(drmData: Array<PKDrmDataObject>): Promise<*> {
+    return new Promise((resolve, reject) => {
+      DrmSupport.isProtocolSupported(DrmScheme.WIDEVINE, drmData)
+        .then(() => {
+          Widevine._logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
+          Widevine._logger.debug('canPlayDrm result is true', drmData);
+          resolve();
+        })
+        .catch(() => {
+          Widevine._logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
+          Widevine._logger.debug('canPlayDrm result is false', drmData);
+          reject();
+        });
+    });
   }
 
   /**
