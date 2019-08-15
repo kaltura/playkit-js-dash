@@ -1,6 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack, RequestType} from '@playkit-js/playkit-js';
 import Widevine from './drm/widevine';
 import PlayReady from './drm/playready';
 import DefaultConfig from './default-config';
@@ -187,7 +187,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       Utils.Object.mergeDeep(adapterConfig.shakaConfig, config.playback.options.html5.dash);
     }
-
+    adapterConfig.network = config.network;
     return new this(videoElement, source, adapterConfig);
   }
 
@@ -327,6 +327,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player(this._videoElement);
+    this._maybeSetFilters();
     this._maybeSetDrmConfig();
     this._shaka.configure(this._config.shakaConfig);
     this._isMediaAttached = true;
@@ -355,6 +356,39 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         })
         .catch(() => resolve(url));
     });
+  }
+
+  _maybeSetFilters(): void {
+    if (typeof Utils.Object.getPropertyPath(this._config, 'network.requestFilter') === 'function') {
+      DashAdapter._logger.debug('Register request filter');
+      this._shaka.getNetworkingEngine().registerRequestFilter((shakaType, request) => {
+        let type;
+        switch (shakaType) {
+          case shaka.net.NetworkingEngine.RequestType.MANIFEST:
+            type = RequestType.MANIFEST_DASH;
+            break;
+          case shaka.net.NetworkingEngine.RequestType.SEGMENT:
+            type = RequestType.SEGMENT_DASH;
+            break;
+          case shaka.net.NetworkingEngine.RequestType.LICENSE:
+            type = DashAdapter._drmProtocol === Widevine ? RequestType.LICENSE_WIDEVINE : RequestType.LICENSE_PLAYREADY;
+            break;
+          default:
+            return;
+        }
+        const pkRequest: PKRequestObject = {url: request.uris[0], body: request.body, headers: request.headers};
+        try {
+          this._config.network.requestFilter(type, pkRequest);
+          request.uris = [pkRequest.url];
+          request.headers = pkRequest.headers;
+          if (request.method === 'POST') {
+            request.body = pkRequest.body;
+          }
+        } catch (error) {
+          this._trigger(EventType.ERROR, new Error(Error.Severity.RECOVERABLE, Error.Category.NETWORK, Error.Code.REQUEST_FILTER_ERROR, error));
+        }
+      });
+    }
   }
 
   /**
