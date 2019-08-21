@@ -1,7 +1,6 @@
 // @flow
 import {BaseDrmProtocol} from '@playkit-js/playkit-js';
 
-// const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 
 export default class PlayReady extends BaseDrmProtocol {
