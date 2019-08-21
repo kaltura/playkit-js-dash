@@ -1,7 +1,6 @@
 // @flow
 import {BaseDrmProtocol, Env} from '@playkit-js/playkit-js';
 
-// const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 
 export default class Widevine extends BaseDrmProtocol {
