@@ -1,7 +1,7 @@
 // @flow
 import {BaseDrmProtocol} from '@playkit-js/playkit-js';
 
-const DrmSupport = BaseDrmProtocol.DrmSupport;
+// const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 
 export default class PlayReady extends BaseDrmProtocol {
@@ -21,12 +21,10 @@ export default class PlayReady extends BaseDrmProtocol {
    * PlayReady playback supports in case 2 conditions are met:
    * 1. The environment supports PlayReady playback.
    * 2. The drm data of the source object contains entry with PlayReady scheme.
-   * @param {Array<Object>} drmData - The drm data to check.
    * @return {boolean} - Whether PlayReady can be play on the current environment.
    */
-  static canPlayDrm(drmData: Array<Object>): boolean {
-    PlayReady._logger.debug('Can play DRM scheme of: ' + DrmScheme.PLAYREADY);
-    return DrmSupport.isProtocolSupported(DrmScheme.PLAYREADY, drmData);
+  static canPlayDrm(): boolean {
+    return true;
   }
 
   /**

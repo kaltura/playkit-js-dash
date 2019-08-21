@@ -243,25 +243,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static canPlayDrm(drmData: Array<Object>, drmConfig: PKDrmConfigObject): boolean {
-    let canPlayDrm = false;
     for (let drmProtocol of DashAdapter._drmProtocols) {
       if (drmProtocol.isConfigured(drmData, drmConfig)) {
         DashAdapter._drmProtocol = drmProtocol;
-        canPlayDrm = true;
         break;
       }
     }
-    if (!canPlayDrm) {
-      for (let drmProtocol of DashAdapter._drmProtocols) {
-        if (drmProtocol.canPlayDrm(drmData)) {
-          DashAdapter._drmProtocol = drmProtocol;
-          canPlayDrm = true;
-          break;
-        }
-      }
-    }
-    DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString(), drmData);
-    return canPlayDrm;
+    return true;
   }
 
   /**
@@ -363,8 +351,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _maybeSetDrmConfig(): void {
-    if (DashAdapter._drmProtocol && this._sourceObj && this._sourceObj.drmData) {
-      DashAdapter._drmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
+    if (this._sourceObj && this._sourceObj.drmData) {
+      if (DashAdapter._drmProtocol) {
+        DashAdapter._drmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
+      } else {
+        let config = {};
+        for (let drmProtocol of DashAdapter._drmProtocols) {
+          drmProtocol.setDrmPlayback(config, this._sourceObj.drmData);
+          Utils.Object.mergeDeep(this._config.shakaConfig, config);
+        }
+      }
     }
   }
 

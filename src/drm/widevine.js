@@ -1,7 +1,7 @@
 // @flow
 import {BaseDrmProtocol, Env} from '@playkit-js/playkit-js';
 
-const DrmSupport = BaseDrmProtocol.DrmSupport;
+// const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 
 export default class Widevine extends BaseDrmProtocol {
@@ -21,12 +21,10 @@ export default class Widevine extends BaseDrmProtocol {
    * Widevine playback supports in case 2 conditions are met:
    * 1. The environment supports Widevine playback.
    * 2. The drm data of the source object contains entry with Widevine scheme.
-   * @param {Array<Object>} drmData - The drm data to check.
    * @return {boolean} - Whether Widevine can be play on the current environment.
    */
-  static canPlayDrm(drmData: Array<Object>): boolean {
-    Widevine._logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
-    return DrmSupport.isProtocolSupported(DrmScheme.WIDEVINE, drmData);
+  static canPlayDrm(): boolean {
+    return true;
   }
 
   /**
