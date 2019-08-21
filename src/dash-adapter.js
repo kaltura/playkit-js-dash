@@ -65,7 +65,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    * @static
    */
-  static _drmProtocol: ?Function = null;
+  static _configuredDrmProtocol: ?Function = null;
   /**
    * The shaka player instance
    * @member {any} _shaka
@@ -245,7 +245,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   static canPlayDrm(drmData: Array<Object>, drmConfig: PKDrmConfigObject): boolean {
     for (let drmProtocol of DashAdapter._drmProtocols) {
       if (drmProtocol.isConfigured(drmData, drmConfig)) {
-        DashAdapter._drmProtocol = drmProtocol;
+        DashAdapter._configuredDrmProtocol = drmProtocol;
         break;
       }
     }
@@ -352,8 +352,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeSetDrmConfig(): void {
     if (this._sourceObj && this._sourceObj.drmData) {
-      if (DashAdapter._drmProtocol) {
-        DashAdapter._drmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
+      if (DashAdapter._configuredDrmProtocol) {
+        DashAdapter._configuredDrmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
       } else {
         let config = {};
         for (let drmProtocol of DashAdapter._drmProtocols) {
