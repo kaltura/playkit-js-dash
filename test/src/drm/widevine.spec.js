@@ -20,6 +20,16 @@ describe('Widevine', function() {
     });
   });
 
+  describe('canPlayDrm', function() {
+    it('should return true for widevine data', function() {
+      Widevine.canPlayDrm(wwDrmData).should.be.true;
+    });
+
+    it('should return false for non-widevine data any case', function() {
+      Widevine.canPlayDrm(prDrmData).should.be.false;
+    });
+  });
+
   describe('setDrmPlayback', function() {
     let config = {};
     let expectedConfig = {

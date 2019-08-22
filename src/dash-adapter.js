@@ -60,7 +60,14 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   static _drmProtocols: Array<Function> = [Widevine, PlayReady];
   /**
-   * The DRM protocol for the current playback.
+   * The DRM protocols available for the current playback.
+   * @type {Array<Function>}
+   * @private
+   * @static
+   */
+  static _availableDrmProtocol: Array<Function> = [];
+  /**
+   * The DRM protocol if configured
    * @type {?Function}
    * @private
    * @static
@@ -249,7 +256,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         break;
       }
     }
-    return true;
+    if (!DashAdapter._configuredDrmProtocol) {
+      for (let drmProtocol of DashAdapter._drmProtocols) {
+        if (drmProtocol.canPlayDrm(drmData)) {
+          DashAdapter._availableDrmProtocol.push(drmProtocol);
+        }
+      }
+    }
+
+    return !!DashAdapter._availableDrmProtocol || !!DashAdapter._configuredDrmProtocol;
   }
 
   /**
@@ -356,7 +371,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         DashAdapter._configuredDrmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
       } else {
         let config = {};
-        for (let drmProtocol of DashAdapter._drmProtocols) {
+        for (let drmProtocol of DashAdapter._availableDrmProtocol) {
           drmProtocol.setDrmPlayback(config, this._sourceObj.drmData);
           Utils.Object.mergeDeep(this._config.shakaConfig, config);
         }

@@ -20,10 +20,11 @@ export default class Widevine extends BaseDrmProtocol {
    * Widevine playback supports in case 2 conditions are met:
    * 1. The environment supports Widevine playback.
    * 2. The drm data of the source object contains entry with Widevine scheme.
+   * @param {Array<Object>} drmData - The drm data to check.
    * @return {boolean} - Whether Widevine can be play on the current environment.
    */
-  static canPlayDrm(): boolean {
-    return true;
+  static canPlayDrm(drmData: Array<Object>): boolean {
+    return !!drmData.find(drmEntry => drmEntry.scheme === BaseDrmProtocol.DrmScheme.WIDEVINE);
   }
 
   /**

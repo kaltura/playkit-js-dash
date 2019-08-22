@@ -19,6 +19,15 @@ describe('PlayReady', function() {
     });
   });
 
+  describe('canPlayDrm', function() {
+    it('should return true for playready data', function() {
+      PlayReady.canPlayDrm(prDrmData).should.be.true;
+    });
+    it('should return false for non-playready data any case', function() {
+      PlayReady.canPlayDrm(wwDrmData).should.be.false;
+    });
+  });
+
   describe('setDrmPlayback', function() {
     let config = {};
     let expectedConfig = {
