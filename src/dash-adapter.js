@@ -141,6 +141,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _lastTimeDetach: number = 0;
   /**
+   * Whether the request filter threw an error
+   * @type {boolean}
+   * @private
+   */
+  _requestFilterError: boolean = false;
+  /**
    * Factory method to create media source adapter.
    * @function createAdapter
    * @param {HTMLVideoElement} videoElement - The video element that the media source adapter work with.
@@ -385,7 +391,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             request.body = pkRequest.body;
           }
         } catch (error) {
-          this._trigger(EventType.ERROR, new Error(Error.Severity.RECOVERABLE, Error.Category.NETWORK, Error.Code.REQUEST_FILTER_ERROR, error));
+          this._requestFilterError = true;
+          throw error;
         }
       });
     }
@@ -611,6 +618,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._buffering = false;
     this._waitingSent = false;
     this._playingSent = false;
+    this._requestFilterError = false;
     this._isMediaAttached = false;
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
@@ -903,10 +911,17 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _onError(event: any): void {
     if (event && event.detail) {
-      const error = event.detail;
+      let error = event.detail;
       //don't handle video element errors, they are already handled by the player
       if (error.code === this.VIDEO_ERROR_CODE) {
         return;
+      }
+      if (this._requestFilterError && error.data[0] instanceof shaka.util.Error) {
+        // When the request filter of the license request throws an error,
+        // shaka wraps the request filter error (code 1006) with a license request error (code 6007)
+        // so extract the inner error
+        error = error.data[0];
+        this._requestFilterError = false;
       }
       this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
       DashAdapter._logger.error(error);
