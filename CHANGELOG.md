@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.14.0"></a>
+# [1.14.0](https://github.com/kaltura/playkit-js-dash/compare/v1.13.1...v1.14.0) (2019-08-26)
+
+
+### Features
+
+* **FEC-9137:** DRM protocol detection ([#82](https://github.com/kaltura/playkit-js-dash/issues/82)) ([efb1c1e](https://github.com/kaltura/playkit-js-dash/commit/efb1c1e))
+* **FEC-9271:** expose interface and methods to enable customising DRM request/response ([#81](https://github.com/kaltura/playkit-js-dash/issues/81)) ([7c90a3e](https://github.com/kaltura/playkit-js-dash/commit/7c90a3e))
+
+
+
 <a name="1.13.1"></a>
 ## [1.13.1](https://github.com/kaltura/playkit-js-dash/compare/v1.13.0...v1.13.1) (2019-07-28)
 

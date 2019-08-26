@@ -1,7 +1,6 @@
 // @flow
 import {BaseDrmProtocol} from '@playkit-js/playkit-js';
 
-const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
 
 export class PlayReady extends BaseDrmProtocol {
@@ -26,7 +25,7 @@ export class PlayReady extends BaseDrmProtocol {
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
     PlayReady._logger.debug('Can play DRM scheme of: ' + DrmScheme.PLAYREADY);
-    return DrmSupport.isProtocolSupported(DrmScheme.PLAYREADY, drmData);
+    return !!drmData.find(drmEntry => drmEntry.scheme === BaseDrmProtocol.DrmScheme.PLAYREADY);
   }
 
   /**

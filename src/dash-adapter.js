@@ -1,6 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack} from '@playkit-js/playkit-js';
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack, RequestType} from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
@@ -60,12 +60,12 @@ export class DashAdapter extends BaseMediaSourceAdapter {
    */
   static _drmProtocols: Array<Function> = [Widevine, PlayReady];
   /**
-   * The DRM protocol for the current playback.
-   * @type {?Function}
+   * The DRM protocols available for the current playback.
+   * @type {Array<Function>}
    * @private
    * @static
    */
-  static _drmProtocol: ?Function = null;
+  static _availableDrmProtocol: Array<Function> = [];
   /**
    * The shaka player instance
    * @member {any} _shaka
@@ -141,6 +141,12 @@ export class DashAdapter extends BaseMediaSourceAdapter {
    */
   _lastTimeDetach: number = 0;
   /**
+   * Whether the request filter threw an error
+   * @type {boolean}
+   * @private
+   */
+  _requestFilterError: boolean = false;
+  /**
    * Factory method to create media source adapter.
    * @function createAdapter
    * @param {HTMLVideoElement} videoElement - The video element that the media source adapter work with.
@@ -187,7 +193,7 @@ export class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       Utils.Object.mergeDeep(adapterConfig.shakaConfig, config.playback.options.html5.dash);
     }
-
+    adapterConfig.network = config.network;
     return new this(videoElement, source, adapterConfig);
   }
 
@@ -243,25 +249,21 @@ export class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static canPlayDrm(drmData: Array<Object>, drmConfig: PKDrmConfigObject): boolean {
-    let canPlayDrm = false;
     for (let drmProtocol of DashAdapter._drmProtocols) {
       if (drmProtocol.isConfigured(drmData, drmConfig)) {
-        DashAdapter._drmProtocol = drmProtocol;
-        canPlayDrm = true;
+        DashAdapter._availableDrmProtocol.push(drmProtocol);
         break;
       }
     }
-    if (!canPlayDrm) {
+    if (!DashAdapter._availableDrmProtocol.length) {
       for (let drmProtocol of DashAdapter._drmProtocols) {
         if (drmProtocol.canPlayDrm(drmData)) {
-          DashAdapter._drmProtocol = drmProtocol;
-          canPlayDrm = true;
-          break;
+          DashAdapter._availableDrmProtocol.push(drmProtocol);
         }
       }
     }
-    DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString(), drmData);
-    return canPlayDrm;
+
+    return !!DashAdapter._availableDrmProtocol.length;
   }
 
   /**
@@ -327,6 +329,7 @@ export class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player(this._videoElement);
+    this._maybeSetFilters();
     this._maybeSetDrmConfig();
     this._shaka.configure(this._config.shakaConfig);
     this._isMediaAttached = true;
@@ -357,14 +360,42 @@ export class DashAdapter extends BaseMediaSourceAdapter {
     });
   }
 
+  _maybeSetFilters(): void {
+    if (typeof Utils.Object.getPropertyPath(this._config, 'network.requestFilter') === 'function') {
+      DashAdapter._logger.debug('Register request filter');
+      this._shaka.getNetworkingEngine().registerRequestFilter((type, request) => {
+        if (Object.values(RequestType).includes(type)) {
+          const pkRequest: PKRequestObject = {url: request.uris[0], body: request.body, headers: request.headers};
+          try {
+            this._config.network.requestFilter(type, pkRequest);
+            request.uris = [pkRequest.url];
+            request.headers = pkRequest.headers;
+            if (request.method === 'POST') {
+              request.body = pkRequest.body;
+            } else if (pkRequest.body) {
+              DashAdapter._logger.warn(`Request with ${request.method} method cannot have body`);
+            }
+          } catch (error) {
+            this._requestFilterError = true;
+            throw error;
+          }
+        }
+      });
+    }
+  }
+
   /**
    * Configure drm for shaka player.
    * @private
    * @returns {void}
    */
   _maybeSetDrmConfig(): void {
-    if (DashAdapter._drmProtocol && this._sourceObj && this._sourceObj.drmData) {
-      DashAdapter._drmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
+    if (this._sourceObj && this._sourceObj.drmData) {
+      let config = {};
+      for (let drmProtocol of DashAdapter._availableDrmProtocol) {
+        drmProtocol.setDrmPlayback(config, this._sourceObj.drmData);
+        Utils.Object.mergeDeep(this._config.shakaConfig, config);
+      }
     }
   }
 
@@ -577,6 +608,7 @@ export class DashAdapter extends BaseMediaSourceAdapter {
     this._buffering = false;
     this._waitingSent = false;
     this._playingSent = false;
+    this._requestFilterError = false;
     this._isMediaAttached = false;
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
@@ -869,10 +901,17 @@ export class DashAdapter extends BaseMediaSourceAdapter {
    */
   _onError(event: any): void {
     if (event && event.detail) {
-      const error = event.detail;
+      let error = event.detail;
       //don't handle video element errors, they are already handled by the player
       if (error.code === this.VIDEO_ERROR_CODE) {
         return;
+      }
+      if (this._requestFilterError && error.data[0] instanceof shaka.util.Error) {
+        // When the request filter of the license request throws an error,
+        // shaka wraps the request filter error (code 1006) with a license request error (code 6007)
+        // so extract the inner error
+        error = error.data[0];
+        this._requestFilterError = false;
       }
       this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
       DashAdapter._logger.error(error);
