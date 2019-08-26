@@ -30,7 +30,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@playkit-js/playkit-js": "^0.51.0",
+    "@playkit-js/playkit-js": "0.52.0-canary.0d0908",
     "babel-cli": "^6.18.0",
     "babel-core": "^6.18.2",
     "babel-eslint": "^7.1.1",
@@ -77,7 +77,7 @@
     "webpack-dev-server": "latest"
   },
   "peerDependencies": {
-    "@playkit-js/playkit-js": "^0.51.0",
+    "@playkit-js/playkit-js": "0.52.0-canary.0d0908",
     "shaka-player": "https://github.com/kaltura/shaka-player.git#v2.3.3-k-3"
   },
   "keywords": [
