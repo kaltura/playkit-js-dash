@@ -1,17 +1,8 @@
 import PlayReady from '../../../src/drm/playready';
-import {BaseDrmProtocol, Env} from '@playkit-js/playkit-js';
+import {BaseDrmProtocol} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
 
-const DrmSupport = BaseDrmProtocol.DrmSupport;
 const DrmScheme = BaseDrmProtocol.DrmScheme;
-const BROWSER: string = Env.browser.name;
-
-function isValidEnvForPlayReady() {
-  return (
-    (BROWSER === 'Edge' || BROWSER === 'IE') &&
-    (DrmSupport._Browsers['Edge']() === DrmScheme.PLAYREADY || DrmSupport._Browsers['IE']() === DrmScheme.PLAYREADY)
-  );
-}
 
 describe('PlayReady', function() {
   describe('isConfigured', function() {
@@ -29,14 +20,9 @@ describe('PlayReady', function() {
   });
 
   describe('canPlayDrm', function() {
-    it('should return true for playready data on valid playready env and false otherwise', function() {
-      if (isValidEnvForPlayReady()) {
-        PlayReady.canPlayDrm(prDrmData).should.be.true;
-      } else {
-        PlayReady.canPlayDrm(prDrmData).should.be.false;
-      }
+    it('should return true for playready data', function() {
+      PlayReady.canPlayDrm(prDrmData).should.be.true;
     });
-
     it('should return false for non-playready data any case', function() {
       PlayReady.canPlayDrm(wwDrmData).should.be.false;
     });

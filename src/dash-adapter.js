@@ -60,12 +60,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   static _drmProtocols: Array<Function> = [Widevine, PlayReady];
   /**
-   * The DRM protocol for the current playback.
-   * @type {?Function}
+   * The DRM protocols available for the current playback.
+   * @type {Array<Function>}
    * @private
    * @static
    */
-  static _drmProtocol: ?Function = null;
+  static _availableDrmProtocol: Array<Function> = [];
   /**
    * The shaka player instance
    * @member {any} _shaka
@@ -243,25 +243,21 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static canPlayDrm(drmData: Array<Object>, drmConfig: PKDrmConfigObject): boolean {
-    let canPlayDrm = false;
     for (let drmProtocol of DashAdapter._drmProtocols) {
       if (drmProtocol.isConfigured(drmData, drmConfig)) {
-        DashAdapter._drmProtocol = drmProtocol;
-        canPlayDrm = true;
+        DashAdapter._availableDrmProtocol.push(drmProtocol);
         break;
       }
     }
-    if (!canPlayDrm) {
+    if (!DashAdapter._availableDrmProtocol.length) {
       for (let drmProtocol of DashAdapter._drmProtocols) {
         if (drmProtocol.canPlayDrm(drmData)) {
-          DashAdapter._drmProtocol = drmProtocol;
-          canPlayDrm = true;
-          break;
+          DashAdapter._availableDrmProtocol.push(drmProtocol);
         }
       }
     }
-    DashAdapter._logger.debug('canPlayDrm result is ' + canPlayDrm.toString(), drmData);
-    return canPlayDrm;
+
+    return !!DashAdapter._availableDrmProtocol.length;
   }
 
   /**
@@ -363,8 +359,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _maybeSetDrmConfig(): void {
-    if (DashAdapter._drmProtocol && this._sourceObj && this._sourceObj.drmData) {
-      DashAdapter._drmProtocol.setDrmPlayback(this._config.shakaConfig, this._sourceObj.drmData);
+    if (this._sourceObj && this._sourceObj.drmData) {
+      let config = {};
+      for (let drmProtocol of DashAdapter._availableDrmProtocol) {
+        drmProtocol.setDrmPlayback(config, this._sourceObj.drmData);
+        Utils.Object.mergeDeep(this._config.shakaConfig, config);
+      }
     }
   }
 

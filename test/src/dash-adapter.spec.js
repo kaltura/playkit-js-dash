@@ -5,6 +5,7 @@ import {VideoTrack, AudioTrack, TextTrack} from '@playkit-js/playkit-js';
 import Widevine from '../../src/drm/widevine';
 import PlayReady from '../../src/drm/playready';
 import {EventType} from '@playkit-js/playkit-js';
+import {wwDrmData, prDrmData} from './drm/fake-drm-data';
 
 const targetId = 'player-placeholder_dash-adapter.spec';
 
@@ -77,52 +78,48 @@ describe('DashAdapter: canPlayDrm', () => {
 
   afterEach(() => {
     sandbox.restore();
-    DashAdapter._drmProtocol = null;
+    DashAdapter._availableDrmProtocol = [];
   });
 
-  it('should return true since widevine can play drm', function() {
+  it('should return true since widevine configured', function() {
     sandbox.stub(Widevine, 'canPlayDrm').value(() => true);
-    sandbox.stub(Widevine, 'isConfigured').value(() => false);
-    sandbox.stub(PlayReady, 'canPlayDrm').value(() => false);
-    sandbox.stub(PlayReady, 'isConfigured').value(() => false);
-    DashAdapter.canPlayDrm().should.be.true;
-    DashAdapter._drmProtocol.should.equal(Widevine);
-  });
-
-  it('should return true since playready can play drm', function() {
-    sandbox.stub(Widevine, 'canPlayDrm').value(() => false);
-    sandbox.stub(Widevine, 'isConfigured').value(() => false);
-    sandbox.stub(PlayReady, 'canPlayDrm').value(() => true);
-    sandbox.stub(PlayReady, 'isConfigured').value(() => false);
-    DashAdapter.canPlayDrm().should.be.true;
-    DashAdapter._drmProtocol.should.equal(PlayReady);
-  });
-
-  it('should return false since no drm can be played', function() {
-    sandbox.stub(Widevine, 'canPlayDrm').value(() => false);
-    sandbox.stub(Widevine, 'isConfigured').value(() => false);
-    sandbox.stub(PlayReady, 'canPlayDrm').value(() => false);
-    sandbox.stub(PlayReady, 'isConfigured').value(() => false);
-    DashAdapter.canPlayDrm().should.be.false;
-    (DashAdapter._drmProtocol === null).should.be.true;
-  });
-
-  it('should return true even playready can be played since widevine configured', function() {
     sandbox.stub(Widevine, 'isConfigured').value(() => true);
-    sandbox.stub(Widevine, 'canPlayDrm').value(() => false);
+    sandbox.stub(PlayReady, 'canPlayDrm').value(() => false);
     sandbox.stub(PlayReady, 'isConfigured').value(() => false);
-    sandbox.stub(PlayReady, 'canPlayDrm').value(() => true);
     DashAdapter.canPlayDrm().should.be.true;
-    DashAdapter._drmProtocol.should.equal(Widevine);
+    DashAdapter._availableDrmProtocol.length.should.equal(1);
+    (DashAdapter._availableDrmProtocol.find(entry => entry === Widevine) !== null).should.be.true;
   });
 
-  it('should return true even widevine can be played since playready configured', function() {
+  it('should return true since playready configured', function() {
+    sandbox.stub(Widevine, 'canPlayDrm').value(() => false);
     sandbox.stub(Widevine, 'isConfigured').value(() => false);
-    sandbox.stub(Widevine, 'canPlayDrm').value(() => true);
+    sandbox.stub(PlayReady, 'canPlayDrm').value(() => true);
     sandbox.stub(PlayReady, 'isConfigured').value(() => true);
-    sandbox.stub(PlayReady, 'canPlayDrm').value(() => false);
     DashAdapter.canPlayDrm().should.be.true;
-    DashAdapter._drmProtocol.should.equal(PlayReady);
+    DashAdapter._availableDrmProtocol.length.should.equal(1);
+    (DashAdapter._availableDrmProtocol.find(entry => entry === PlayReady) !== null).should.be.true;
+  });
+
+  it('should return true for widevine and playready sources without config', function() {
+    sandbox.stub(Widevine, 'isConfigured').value(() => false);
+    sandbox.stub(PlayReady, 'isConfigured').value(() => false);
+    DashAdapter.canPlayDrm(wwDrmData.concat(prDrmData)).should.be.true;
+    DashAdapter._availableDrmProtocol.length.should.equal(2);
+  });
+
+  it('should return true for widevine source only', function() {
+    sandbox.stub(Widevine, 'isConfigured').value(() => false);
+    sandbox.stub(PlayReady, 'isConfigured').value(() => false);
+    DashAdapter.canPlayDrm(wwDrmData).should.be.true;
+    DashAdapter._availableDrmProtocol.length.should.equal(1);
+  });
+
+  it('should return true for playready source only', function() {
+    sandbox.stub(Widevine, 'isConfigured').value(() => false);
+    sandbox.stub(PlayReady, 'isConfigured').value(() => false);
+    DashAdapter.canPlayDrm(prDrmData).should.be.true;
+    DashAdapter._availableDrmProtocol.length.should.equal(1);
   });
 });
 
