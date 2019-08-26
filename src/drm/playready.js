@@ -24,6 +24,7 @@ export default class PlayReady extends BaseDrmProtocol {
    * @return {boolean} - Whether PlayReady can be play on the current environment.
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
+    PlayReady._logger.debug('Can play DRM scheme of: ' + DrmScheme.PLAYREADY);
     return !!drmData.find(drmEntry => drmEntry.scheme === BaseDrmProtocol.DrmScheme.PLAYREADY);
   }
 
