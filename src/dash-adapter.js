@@ -367,32 +367,22 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _maybeSetFilters(): void {
     if (typeof Utils.Object.getPropertyPath(this._config, 'network.requestFilter') === 'function') {
       DashAdapter._logger.debug('Register request filter');
-      this._shaka.getNetworkingEngine().registerRequestFilter((shakaType, request) => {
-        let type;
-        switch (shakaType) {
-          case shaka.net.NetworkingEngine.RequestType.MANIFEST:
-            type = RequestType.MANIFEST_DASH;
-            break;
-          case shaka.net.NetworkingEngine.RequestType.SEGMENT:
-            type = RequestType.SEGMENT_DASH;
-            break;
-          case shaka.net.NetworkingEngine.RequestType.LICENSE:
-            type = DashAdapter._drmProtocol === Widevine ? RequestType.LICENSE_WIDEVINE : RequestType.LICENSE_PLAYREADY;
-            break;
-          default:
-            return;
-        }
-        const pkRequest: PKRequestObject = {url: request.uris[0], body: request.body, headers: request.headers};
-        try {
-          this._config.network.requestFilter(type, pkRequest);
-          request.uris = [pkRequest.url];
-          request.headers = pkRequest.headers;
-          if (request.method === 'POST') {
-            request.body = pkRequest.body;
+      this._shaka.getNetworkingEngine().registerRequestFilter((type, request) => {
+        if (Object.values(RequestType).includes(type)) {
+          const pkRequest: PKRequestObject = {url: request.uris[0], body: request.body, headers: request.headers};
+          try {
+            this._config.network.requestFilter(type, pkRequest);
+            request.uris = [pkRequest.url];
+            request.headers = pkRequest.headers;
+            if (request.method === 'POST') {
+              request.body = pkRequest.body;
+            } else if (pkRequest.body) {
+              DashAdapter._logger.warn(`Request with ${request.method} method cannot have body`);
+            }
+          } catch (error) {
+            this._requestFilterError = true;
+            throw error;
           }
-        } catch (error) {
-          this._requestFilterError = true;
-          throw error;
         }
       });
     }
