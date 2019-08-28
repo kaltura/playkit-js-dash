@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.14.1"></a>
+## [1.14.1](https://github.com/kaltura/playkit-js-dash/compare/v1.14.0...v1.14.1) (2019-08-28)
+
+
+### Bug Fixes
+
+* logs for DRM checks ([#83](https://github.com/kaltura/playkit-js-dash/issues/83)) ([985943c](https://github.com/kaltura/playkit-js-dash/commit/985943c))
+
+
+
 <a name="1.14.0"></a>
 # [1.14.0](https://github.com/kaltura/playkit-js-dash/compare/v1.13.1...v1.14.0) (2019-08-26)
 
