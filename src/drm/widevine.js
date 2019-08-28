@@ -13,7 +13,6 @@ export default class Widevine extends BaseDrmProtocol {
    * @return {boolean} - Whether Widevine is the configure key system.
    */
   static isConfigured(drmData: Array<Object>, drmConfig: PKDrmConfigObject): boolean {
-    Widevine._logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
     return DrmScheme.WIDEVINE === drmConfig.keySystem && !!drmData.find(drmEntry => drmEntry.scheme === drmConfig.keySystem);
   }
 
@@ -25,6 +24,7 @@ export default class Widevine extends BaseDrmProtocol {
    * @return {boolean} - Whether Widevine can be play on the current environment.
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
+    Widevine._logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
     return !!drmData.find(drmEntry => drmEntry.scheme === BaseDrmProtocol.DrmScheme.WIDEVINE);
   }
 
