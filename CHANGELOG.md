@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.15.0"></a>
+# [1.15.0](https://github.com/kaltura/playkit-js-dash/compare/v1.14.1...v1.15.0) (2019-09-12)
+
+
+### Features
+
+* **FEC-9314:** update Shaka version ([04aa3e4](https://github.com/kaltura/playkit-js-dash/commit/04aa3e4))
+
+
+
 <a name="1.14.1"></a>
 ## [1.14.1](https://github.com/kaltura/playkit-js-dash/compare/v1.14.0...v1.14.1) (2019-08-28)
 
