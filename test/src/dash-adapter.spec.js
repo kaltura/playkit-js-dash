@@ -22,7 +22,7 @@ let liveSource = {
 
 let dvrSource = {
   mimetype: 'application/dash+xml',
-  url: 'http://klive-a.akamaihd.net/dc-1/live/dash/p/1897241/e/1_gffgxm38/t/e83cor13pmTGTQ7kPZiopg/manifest.mpd'
+  url: 'https://klive.kaltura.com/dc-1/live/dash/p/1740481/e/1_fdv46dba/sd/6000/t/COYHFWwT0PpKExPkv3R-gg/manifest-s32-s36-s37.mpd'
 };
 
 describe.skip('DashAdapter [debugging and testing manually]', () => {
