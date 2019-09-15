@@ -12,7 +12,7 @@ const targetId = 'player-placeholder_dash-adapter.spec';
 let vodSource = {
   mimetype: 'application/dash+xml',
   url:
-    'https://qa-apache-php7.dev.kaltura.com/p/1091/sp/1091/playManifest/entryId/0_wifqaipd/flavorIds/0_m131krws,0_5407xm9j,0_xcrwyk2n/deliveryProfileId/911/protocol/https/format/mpegdash/manifest.mpd'
+    'https://cfvod.kaltura.com/dasha/p/1740481/sp/174048100/serveFlavor/entryId/1_kbyh1guy/v/1/flavorId/1_,71znmnbh,hq6oztva,/forceproxy/true/name/a.mp4.urlset/manifest.mpd'
 };
 
 let liveSource = {
