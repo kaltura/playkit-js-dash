@@ -12,7 +12,7 @@ const targetId = 'player-placeholder_dash-adapter.spec';
 let vodSource = {
   mimetype: 'application/dash+xml',
   url:
-    'https://cfvod.kaltura.com/dasha/p/1740481/sp/174048100/serveFlavor/entryId/1_kbyh1guy/v/1/flavorId/1_,71znmnbh,hq6oztva,/forceproxy/true/name/a.mp4.urlset/manifest.mpd'
+    'https://cfvod.kaltura.com/dasha/p/1740481/sp/174048100/serveFlavor/entryId/1_ez6mf1n8/v/,1/ev/3/flavorId/1_fwvuvqym,1/ev/3/flavorId/1_5zyuykzo,1/ev/3/flavorId/1_4xul4cg0,1/ev/3/flavorId/1_5jovgwnt,1/ev/3/flavorId/1_dt7bjb0q,2/ev/3/flavorId/0_og64h1z3,2/ev/3/flavorId/0_mgociiko,2/ev/3/flavorId/0_dxxbalt0,/forceproxy/true/name/a.mp4.urlset/manifest.mpd'
 };
 
 let liveSource = {
@@ -22,7 +22,7 @@ let liveSource = {
 
 let dvrSource = {
   mimetype: 'application/dash+xml',
-  url: 'https://klive.kaltura.com/dc-1/live/dash/p/1740481/e/1_fdv46dba/sd/6000/t/COYHFWwT0PpKExPkv3R-gg/manifest-s32-s36-s37.mpd'
+  url: 'http://klive-a.akamaihd.net/dc-1/live/dash/p/1897241/e/1_gffgxm38/t/e83cor13pmTGTQ7kPZiopg/manifest.mpd'
 };
 
 describe.skip('DashAdapter [debugging and testing manually]', () => {
