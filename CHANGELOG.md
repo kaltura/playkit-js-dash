@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.15.1"></a>
+## [1.15.1](https://github.com/kaltura/playkit-js-dash/compare/v1.15.0...v1.15.1) (2019-09-18)
+
+
+### Bug Fixes
+
+* **FEC-9342:** Disable shaka on iOS ([#86](https://github.com/kaltura/playkit-js-dash/issues/86)) ([84761fd](https://github.com/kaltura/playkit-js-dash/commit/84761fd))
+
+
+
 <a name="1.15.0"></a>
 # [1.15.0](https://github.com/kaltura/playkit-js-dash/compare/v1.14.1...v1.15.0) (2019-09-12)
 
