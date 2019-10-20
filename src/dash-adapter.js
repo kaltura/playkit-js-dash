@@ -1,6 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack, RequestType} from '@playkit-js/playkit-js';
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack, RequestType, Env} from '@playkit-js/playkit-js';
 import Widevine from './drm/widevine';
 import PlayReady from './drm/playready';
 import DefaultConfig from './default-config';
@@ -58,7 +58,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    * @static
    */
-  static _drmProtocols: Array<Function> = [Widevine, PlayReady];
+  static _drmProtocols: Array<Function> = Env.browser.name === 'Edge' ? [PlayReady, Widevine] : [Widevine, PlayReady];
   /**
    * The DRM protocols available for the current playback.
    * @type {Array<Function>}
