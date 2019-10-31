@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.15.2"></a>
+## [1.15.2](https://github.com/kaltura/playkit-js-dash/compare/v1.15.1...v1.15.2) (2019-10-31)
+
+
+### Bug Fixes
+
+* **FEC-9316:** seek doesn't work before video finished loading ([#87](https://github.com/kaltura/playkit-js-dash/issues/87)) ([c498d4d](https://github.com/kaltura/playkit-js-dash/commit/c498d4d))
+
+
+
 <a name="1.15.1"></a>
 ## [1.15.1](https://github.com/kaltura/playkit-js-dash/compare/v1.15.0...v1.15.1) (2019-09-18)
 
