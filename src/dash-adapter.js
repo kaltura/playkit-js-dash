@@ -67,6 +67,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   static _availableDrmProtocol: Array<Function> = [];
   /**
+   * The shaka Lib
+   * @member {any} _shakaLib
+   * @private
+   */
+  _shakaLib: any = shaka;
+  /**
    * The shaka player instance
    * @member {any} _shaka
    * @private
