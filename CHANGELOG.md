@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.15.4"></a>
+## [1.15.4](https://github.com/kaltura/playkit-js-dash/compare/v1.15.3...v1.15.4) (2019-12-05)
+
+
+### Bug Fixes
+
+* **FEC-9512:** save shaka lib on mediaSource adapter ([#95](https://github.com/kaltura/playkit-js-dash/issues/95)) ([cbf15be](https://github.com/kaltura/playkit-js-dash/commit/cbf15be))
+
+
+
 <a name="1.15.3"></a>
 ## [1.15.3](https://github.com/kaltura/playkit-js-dash/compare/v1.15.2...v1.15.3) (2019-11-12)
 
