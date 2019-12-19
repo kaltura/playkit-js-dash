@@ -366,12 +366,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._shaka.getNetworkingEngine().registerRequestFilter((type, request) => {
         if (Object.values(RequestType).includes(type)) {
           const pkRequest: PKRequestObject = {url: request.uris[0], body: request.body, headers: request.headers};
-          let requestFilterPromise = Promise.resolve(pkRequest);
+          let requestFilterPromise;
           try {
-            requestFilterPromise = this._config.network.requestFilter(type, pkRequest) || Promise.resolve(pkRequest);
+            requestFilterPromise = this._config.network.requestFilter(type, pkRequest);
           } catch (error) {
             requestFilterPromise = Promise.reject(error);
           }
+          requestFilterPromise = requestFilterPromise || Promise.resolve(pkRequest);
           return requestFilterPromise
             .then(updatedRequest => {
               request.uris = [updatedRequest.url];
