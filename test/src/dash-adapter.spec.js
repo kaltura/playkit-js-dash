@@ -1185,7 +1185,7 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
   });
 });
 
-describe('NativeAdapter: request filter', () => {
+describe('DashAdapter: request filter', () => {
   let video, dashInstance, config, sandbox;
 
   beforeEach(() => {
@@ -1228,6 +1228,7 @@ describe('NativeAdapter: request filter', () => {
       })
     );
     sandbox.stub(dashInstance._shakaLib.net.HttpFetchPlugin, 'g').callsFake(value => {
+      // stub HttpFetchPlugin.fetch_ method complied to g
       try {
         value.indexOf('?test').should.be.gt(-1);
         done();
@@ -1256,6 +1257,7 @@ describe('NativeAdapter: request filter', () => {
       })
     );
     sandbox.stub(dashInstance._shakaLib.net.HttpFetchPlugin, 'g').callsFake(value => {
+      // stub HttpFetchPlugin.fetch_ method complied to g
       try {
         value.indexOf('?test').should.be.gt(-1);
         done();
