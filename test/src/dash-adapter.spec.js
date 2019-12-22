@@ -1,10 +1,8 @@
-import loadPlayer from '@playkit-js/playkit-js';
 import DashAdapter from '../../src';
 import * as TestUtils from './utils/test-utils';
-import {VideoTrack, AudioTrack, TextTrack} from '@playkit-js/playkit-js';
+import {loadPlayer, VideoTrack, AudioTrack, TextTrack, Utils, RequestType, EventType, Error} from '@playkit-js/playkit-js';
 import Widevine from '../../src/drm/widevine';
 import PlayReady from '../../src/drm/playready';
-import {EventType} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './drm/fake-drm-data';
 
 const targetId = 'player-placeholder_dash-adapter.spec';
@@ -1184,5 +1182,184 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
       .catch(e => {
         done(e);
       });
+  });
+});
+
+describe('NativeAdapter: request filter', () => {
+  let video, dashInstance, config, sandbox;
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+    sandbox = sinon.sandbox.create();
+  });
+
+  afterEach(done => {
+    sandbox.restore();
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  const validateFilterError = e => {
+    e.severity.should.equal(Error.Severity.CRITICAL);
+    e.category.should.equal(Error.Category.NETWORK);
+    e.code.should.equal(Error.Code.REQUEST_FILTER_ERROR);
+    e.data[0].should.equal('error');
+  };
+
+  it('should apply void filter for manifest', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          requestFilter: function(type, request) {
+            if (type === RequestType.MANIFEST) {
+              request.url += '?test';
+            }
+          }
+        }
+      })
+    );
+    sandbox.stub(dashInstance._shakaLib.net.HttpFetchPlugin, 'g').callsFake(value => {
+      try {
+        value.indexOf('?test').should.be.gt(-1);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    dashInstance.load();
+  });
+
+  it('should apply promise filter for manifest', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          requestFilter: function(type, request) {
+            if (type === RequestType.MANIFEST) {
+              return new Promise(resolve => {
+                request.url += '?test';
+                resolve(request);
+              });
+            }
+          }
+        }
+      })
+    );
+    sandbox.stub(dashInstance._shakaLib.net.HttpFetchPlugin, 'g').callsFake(value => {
+      try {
+        value.indexOf('?test').should.be.gt(-1);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    dashInstance.load();
+  });
+
+  it('should handle error thrown from void filter', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          requestFilter: function() {
+            throw 'error';
+          }
+        }
+      })
+    );
+    dashInstance.load().catch(e => {
+      try {
+        validateFilterError(e);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should handle error thrown from promise filter', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          requestFilter: function() {
+            return new Promise(() => {
+              throw 'error';
+            });
+          }
+        }
+      })
+    );
+    dashInstance.load().catch(e => {
+      try {
+        validateFilterError(e);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should handle error rejected from promise filter', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          requestFilter: function() {
+            return new Promise((resolve, reject) => {
+              reject('error');
+            });
+          }
+        }
+      })
+    );
+    dashInstance.load().catch(e => {
+      try {
+        validateFilterError(e);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should handle error rejected from promise filter - segment', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          requestFilter: function(type) {
+            if (type === RequestType.SEGMENT) {
+              return new Promise((resolve, reject) => {
+                reject('error');
+              });
+            }
+          }
+        }
+      })
+    );
+    dashInstance.addEventListener(EventType.ERROR, event => {
+      try {
+        validateFilterError(event.payload);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    dashInstance.load();
   });
 });
