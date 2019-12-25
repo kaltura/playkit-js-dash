@@ -366,19 +366,27 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._shaka.getNetworkingEngine().registerRequestFilter((type, request) => {
         if (Object.values(RequestType).includes(type)) {
           const pkRequest: PKRequestObject = {url: request.uris[0], body: request.body, headers: request.headers};
+          let requestFilterPromise;
           try {
-            this._config.network.requestFilter(type, pkRequest);
-            request.uris = [pkRequest.url];
-            request.headers = pkRequest.headers;
-            if (request.method === 'POST') {
-              request.body = pkRequest.body;
-            } else if (pkRequest.body) {
-              DashAdapter._logger.warn(`Request with ${request.method} method cannot have body`);
-            }
+            requestFilterPromise = this._config.network.requestFilter(type, pkRequest);
           } catch (error) {
-            this._requestFilterError = true;
-            throw error;
+            requestFilterPromise = Promise.reject(error);
           }
+          requestFilterPromise = requestFilterPromise || Promise.resolve(pkRequest);
+          return requestFilterPromise
+            .then(updatedRequest => {
+              request.uris = [updatedRequest.url];
+              request.headers = updatedRequest.headers;
+              if (request.method === 'POST') {
+                request.body = updatedRequest.body;
+              } else if (updatedRequest.body) {
+                DashAdapter._logger.warn(`Request with ${request.method} method cannot have body`);
+              }
+            })
+            .catch(error => {
+              this._requestFilterError = true;
+              throw error;
+            });
         }
       });
     }
