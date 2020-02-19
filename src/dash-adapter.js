@@ -1,6 +1,17 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack, RequestType} from '@playkit-js/playkit-js';
+import {
+  AudioTrack,
+  BaseMediaSourceAdapter,
+  Error,
+  EventType,
+  CustomEventType,
+  TextTrack,
+  Track,
+  Utils,
+  VideoTrack,
+  RequestType
+} from '@playkit-js/playkit-js';
 import Widevine from './drm/widevine';
 import PlayReady from './drm/playready';
 import DefaultConfig from './default-config';
@@ -16,7 +27,8 @@ type ShakaEventType = {[event: string]: string};
 const ShakaEvent: ShakaEventType = {
   ERROR: 'error',
   ADAPTATION: 'adaptation',
-  BUFFERING: 'buffering'
+  BUFFERING: 'buffering',
+  DRM_SESSION_UPDATE: 'drmsessionupdate'
 };
 
 /**
@@ -88,6 +100,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     [ShakaEvent.ERROR]: event => this._onError(event),
     [ShakaEvent.ADAPTATION]: () => this._onAdaptation(),
     [ShakaEvent.BUFFERING]: event => this._onBuffering(event),
+    [ShakaEvent.DRM_SESSION_UPDATE]: () => this._onDrmSessionUpdate(),
     [EventType.WAITING]: () => this._onWaiting(),
     [EventType.PLAYING]: () => this._onPlaying()
   };
@@ -949,6 +962,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._videoElement.dispatchEvent(new window.Event(EventType.PLAYING));
       }
     }
+  }
+
+  /**
+   * An handler to shaka drm session update event
+   * @function _onDrmSessionUpdate
+   * @returns {void}
+   * @private
+   */
+  _onDrmSessionUpdate(): void {
+    this._videoElement.dispatchEvent(new window.Event(CustomEventType.WAITING));
   }
 
   /**
