@@ -68,7 +68,7 @@
     "mocha": "^3.2.0",
     "mocha-cli": "^1.0.1",
     "prettier": "^1.13.7",
-    "shaka-player": "^2.5.5",
+    "shaka-player": "^2.5.9",
     "sinon": "^2.0.0",
     "sinon-chai": "^2.8.0",
     "standard-version": "^4.0.0",

@@ -1,17 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
-import {
-  AudioTrack,
-  BaseMediaSourceAdapter,
-  Error,
-  EventType,
-  CustomEventType,
-  TextTrack,
-  Track,
-  Utils,
-  VideoTrack,
-  RequestType
-} from '@playkit-js/playkit-js';
+import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack, RequestType} from '@playkit-js/playkit-js';
 import Widevine from './drm/widevine';
 import PlayReady from './drm/playready';
 import DefaultConfig from './default-config';
@@ -561,6 +550,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._shaka, ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
     this._eventManager.listen(this._shaka, ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
+    this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
     // called when a resource is downloaded
@@ -971,7 +961,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onDrmSessionUpdate(): void {
-    this._videoElement.dispatchEvent(new window.Event(CustomEventType.WAITING));
+    this._trigger(EventType.DRM_LICENSE_RESPONSE, {licenseTime: this._shaka.getStats().licenseTime});
   }
 
   /**
