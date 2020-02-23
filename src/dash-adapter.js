@@ -1,11 +1,21 @@
 // @flow
 import shaka from 'shaka-player';
-import {AudioTrack, BaseMediaSourceAdapter, Error, EventType, TextTrack, Track, Utils, VideoTrack, RequestType} from '@playkit-js/playkit-js';
+import {
+  DrmScheme,
+  AudioTrack,
+  BaseMediaSourceAdapter,
+  Error,
+  EventType,
+  TextTrack,
+  Track,
+  Utils,
+  VideoTrack,
+  RequestType
+} from '@playkit-js/playkit-js';
 import Widevine from './drm/widevine';
 import PlayReady from './drm/playready';
 import DefaultConfig from './default-config';
 import TextDisplayer from './text-displayer';
-
 type ShakaEventType = {[event: string]: string};
 
 /**
@@ -961,9 +971,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onDrmSessionUpdate(): void {
-    if (this._shaka.getStats() && typeof this._shaka.getStats().licenseTime === 'number') {
-      this._trigger(EventType.DRM_LICENSE_RESPONSE, {licenseTime: this._shaka.getStats().licenseTime});
-    }
+    this._trigger(EventType.DRM_LICENSE_LOADED, {licenseTime: this._shaka.getStats().licenseTime, scheme: DrmScheme.WIDEVINE});
   }
 
   /**
