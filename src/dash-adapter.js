@@ -961,7 +961,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onDrmSessionUpdate(): void {
-    this._trigger(EventType.DRM_LICENSE_RESPONSE, {licenseTime: this._shaka.getStats().licenseTime});
+    if (this._shaka.getStats() && typeof this._shaka.getStats().licenseTime === 'number') {
+      this._trigger(EventType.DRM_LICENSE_RESPONSE, {licenseTime: this._shaka.getStats().licenseTime});
+    }
   }
 
   /**
