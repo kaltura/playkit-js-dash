@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.17.0"></a>
+# [1.17.0](https://github.com/kaltura/playkit-js-dash/compare/v1.14.0...v1.17.0) (2020-02-24)
+
+
+### Bug Fixes
+
+* logs for DRM checks ([#83](https://github.com/kaltura/playkit-js-dash/issues/83)) ([985943c](https://github.com/kaltura/playkit-js-dash/commit/985943c))
+* **FEC-9316:** seek doesn't work before video finished loading ([#87](https://github.com/kaltura/playkit-js-dash/issues/87)) ([c498d4d](https://github.com/kaltura/playkit-js-dash/commit/c498d4d))
+* **FEC-9342:** Disable shaka on iOS ([#86](https://github.com/kaltura/playkit-js-dash/issues/86)) ([84761fd](https://github.com/kaltura/playkit-js-dash/commit/84761fd))
+* seek doesn't work before video finished loading ([#94](https://github.com/kaltura/playkit-js-dash/issues/94)) ([c25663e](https://github.com/kaltura/playkit-js-dash/commit/c25663e))
+* **FEC-9512:** save shaka lib on mediaSource adapter ([#95](https://github.com/kaltura/playkit-js-dash/issues/95)) ([cbf15be](https://github.com/kaltura/playkit-js-dash/commit/cbf15be))
+
+
+### Features
+
+* **FEC-9109:** add DRM Load time metric ([#98](https://github.com/kaltura/playkit-js-dash/issues/98)) ([efb30c0](https://github.com/kaltura/playkit-js-dash/commit/efb30c0))
+* **FEC-9314:** update Shaka version ([04aa3e4](https://github.com/kaltura/playkit-js-dash/commit/04aa3e4))
+* **FEC-9452:** async request filter handlers ([#96](https://github.com/kaltura/playkit-js-dash/issues/96)) ([565a680](https://github.com/kaltura/playkit-js-dash/commit/565a680))
+
+
+
 <a name="1.16.0"></a>
 # [1.16.0](https://github.com/kaltura/playkit-js-dash/compare/v1.15.4...v1.16.0) (2019-12-29)
 
