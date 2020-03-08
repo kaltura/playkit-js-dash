@@ -214,20 +214,134 @@ describe('DashAdapter: load', () => {
       });
   });
 
+  it('should fire MANIFEST_LOADED', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+      dashInstance.addEventListener(EventType.MANIFEST_LOADED, event => {
+        event.payload.miliSeconds.should.exist;
+        done();
+      });
+    } catch (e) {
+      done(e);
+    }
+    dashInstance.load();
+  });
+
+  it('should fire FRAG_LOADED', done => {
+    try {
+      const fragLoadedFunc = event => {
+        event.payload.miliSeconds.should.exist;
+        event.payload.bytes.should.exist;
+        event.payload.url.should.not.be.empty;
+        dashInstance.removeEventListener(EventType.FRAG_LOADED, fragLoadedFunc);
+        done();
+      };
+      dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+      dashInstance.addEventListener(EventType.FRAG_LOADED, fragLoadedFunc);
+      dashInstance.load();
+    } catch (e) {
+      done(e);
+    }
+  });
+
   it('should fail load if URL is corrupted/return 403', done => {
-    dashInstance = DashAdapter.createAdapter(
-      video,
-      {
-        mimetype: 'application/dash+xml',
-        url: 'some/corrupted/url'
-      },
-      config
-    );
+    dashInstance = DashAdapter.createAdapter(video, {mimetype: 'application/dash+xml', url: 'some/corrupted/url'}, config);
 
     dashInstance.load().catch(error => {
       error.should.be.exist;
       done();
     });
+  });
+});
+
+describe('DashAdapter: targetBuffer', () => {
+  let video, dashInstance, config;
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach(done => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+  it('should check targetBuffer in VOD far from end of stream', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+      video.addEventListener(EventType.PLAYING, () => {
+        dashInstance.targetBuffer.should.equal(
+          dashInstance._shaka.getConfiguration().streaming.bufferingGoal + dashInstance._getCurrentSegmentLength()
+        );
+        done();
+      });
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should check targetBuffer in VOD close to end of stream (time left to end of stream is less than targetBuffer)', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+      video.addEventListener(EventType.PLAYING, () => {
+        video.currentTime = video.duration - 1;
+        video.addEventListener(EventType.SEEKED, () => {
+          dashInstance.targetBuffer.should.equal(video.duration - video.currentTime);
+          done();
+        });
+      });
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should check targetBuffer in LIVE', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+      video.addEventListener(EventType.PLAYING, () => {
+        dashInstance._shaka.configure({streaming: {bufferingGoal: 120}});
+        let targetBufferVal =
+          dashInstance._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
+          dashInstance._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
+          (video.currentTime - dashInstance._getLiveEdge());
+
+        dashInstance.targetBuffer.should.equal(targetBufferVal);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should check targetBuffer in LIVE and restricted by bufferingGoal', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+      video.addEventListener(EventType.PLAYING, () => {
+        dashInstance._shaka.getConfiguration().streaming.bufferingGoal = 10;
+        let targetBufferVal = dashInstance._shaka.getConfiguration().streaming.bufferingGoal + dashInstance._getCurrentSegmentLength();
+
+        dashInstance.targetBuffer.should.equal(targetBufferVal);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
   });
 });
 
