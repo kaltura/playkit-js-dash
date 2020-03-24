@@ -159,6 +159,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _requestFilterError: boolean = false;
   /**
+   * Whether the response filter threw an error
+   * @type {boolean}
+   * @private
+   */
+  _responseFilterError: boolean = false;
+  /**
    * Factory method to create media source adapter.
    * @function createAdapter
    * @param {HTMLVideoElement} videoElement - The video element that the media source adapter work with.
@@ -402,6 +408,29 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         }
       });
     }
+    if (typeof Utils.Object.getPropertyPath(this._config, 'network.responseFilter') === 'function') {
+      DashAdapter._logger.debug('Register response filter');
+      this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
+        if (Object.values(RequestType).includes(type)) {
+          const pkResponse: PKResponseObject = {data: response.data};
+          let responseFilterPromise;
+          try {
+            responseFilterPromise = this._config.network.responseFilter(type, pkResponse);
+          } catch (error) {
+            responseFilterPromise = Promise.reject(error);
+          }
+          responseFilterPromise = responseFilterPromise || Promise.resolve(pkResponse);
+          return responseFilterPromise
+            .then(updatedResponse => {
+              response.data = updatedResponse.data;
+            })
+            .catch(error => {
+              this._responseFilterError = true;
+              throw error;
+            });
+        }
+      });
+    }
   }
 
   /**
@@ -633,6 +662,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._waitingSent = false;
     this._playingSent = false;
     this._requestFilterError = false;
+    this._responseFilterError = false;
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
       this._eventManager.removeAll();
@@ -929,12 +959,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (error.code === this.VIDEO_ERROR_CODE) {
         return;
       }
-      if (this._requestFilterError && error.data[0] instanceof shaka.util.Error) {
-        // When the request filter of the license request throws an error,
-        // shaka wraps the request filter error (code 1006) with a license request error (code 6007)
+      if ((this._requestFilterError || this._responseFilterError) && error.data[0] instanceof shaka.util.Error) {
+        // When the request/response filter of the license request throws an error,
+        // shaka wraps the request/response filter error (code 1006/1007) with a license request error (code 6007)
         // so extract the inner error
         error = error.data[0];
-        this._requestFilterError = false;
+        this._requestFilterError ? (this._requestFilterError = false) : (this._responseFilterError = false);
       }
       this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
       DashAdapter._logger.error(error);

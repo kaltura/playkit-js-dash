@@ -1365,3 +1365,159 @@ describe('DashAdapter: request filter', () => {
     dashInstance.load();
   });
 });
+
+describe('DashAdapter: response filter', () => {
+  let video, dashInstance, config, sandbox;
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+    sandbox = sinon.sandbox.create();
+  });
+
+  afterEach(done => {
+    sandbox.restore();
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  const validateFilterError = e => {
+    e.severity.should.equal(Error.Severity.CRITICAL);
+    e.category.should.equal(Error.Category.NETWORK);
+    e.code.should.equal(Error.Code.RESPONSE_FILTER_ERROR);
+    e.data[0].should.equal('error');
+  };
+
+  it('should apply void filter for manifest', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          responseFilter: function(type, response) {
+            if (type === RequestType.MANIFEST) {
+              response.data['test'] = 'test';
+            }
+          }
+        }
+      })
+    );
+    sandbox.stub(window, 'Uint8Array').callsFake(value => {
+      try {
+        if (value instanceof ArrayBuffer) {
+          value['test'].should.equal('test');
+          done();
+        }
+      } catch (e) {
+        done(e);
+      }
+    });
+    dashInstance.load();
+  });
+
+  it('should apply promise filter for manifest', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          responseFilter: function(type, response) {
+            if (type === RequestType.MANIFEST) {
+              return new Promise(resolve => {
+                response.data['test'] = 'test';
+                resolve(response);
+              });
+            }
+          }
+        }
+      })
+    );
+    sandbox.stub(window, 'Uint8Array').callsFake(value => {
+      try {
+        if (value instanceof ArrayBuffer) {
+          value['test'].should.equal('test');
+          done();
+        }
+      } catch (e) {
+        done(e);
+      }
+    });
+    dashInstance.load();
+  });
+
+  it('should handle error thrown from void filter', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          responseFilter: function() {
+            throw 'error';
+          }
+        }
+      })
+    );
+    dashInstance.load().catch(e => {
+      try {
+        validateFilterError(e);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should handle error thrown from promise filter', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          responseFilter: function() {
+            return new Promise(() => {
+              throw 'error';
+            });
+          }
+        }
+      })
+    );
+    dashInstance.load().catch(e => {
+      try {
+        validateFilterError(e);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should handle error rejected from promise filter', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          responseFilter: function() {
+            return new Promise((resolve, reject) => {
+              reject('error');
+            });
+          }
+        }
+      })
+    );
+    dashInstance.load().catch(e => {
+      try {
+        validateFilterError(e);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+});
