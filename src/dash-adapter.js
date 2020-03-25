@@ -412,7 +412,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       DashAdapter._logger.debug('Register response filter');
       this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
         if (Object.values(RequestType).includes(type)) {
-          const pkResponse: PKResponseObject = {data: response.data};
+          const {uri: url, ed: originalUrl, data, headers}: PKResponseObject = response;
+          const pkResponse: PKResponseObject = {url, originalUrl, data, headers};
           let responseFilterPromise;
           try {
             responseFilterPromise = this._config.network.responseFilter(type, pkResponse);
