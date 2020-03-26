@@ -1213,6 +1213,29 @@ describe('DashAdapter: request filter', () => {
     e.data[0].should.equal('error');
   };
 
+  it('should pass the params to the request filter', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          requestFilter: function(type, request) {
+            try {
+              type.should.equal(RequestType.MANIFEST);
+              request.url.should.equal(vodSource.url);
+              request.hasOwnProperty('body').should.be.true;
+              request.headers.should.be.exist;
+              done();
+            } catch (e) {
+              done(e);
+            }
+          }
+        }
+      })
+    );
+    dashInstance.load();
+  });
+
   it('should apply void filter for manifest', done => {
     dashInstance = DashAdapter.createAdapter(
       video,
@@ -1393,6 +1416,30 @@ describe('DashAdapter: response filter', () => {
     e.code.should.equal(Error.Code.RESPONSE_FILTER_ERROR);
     e.data[0].should.equal('error');
   };
+
+  it('should pass the params to the response filter', done => {
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      vodSource,
+      Utils.Object.mergeDeep(config, {
+        network: {
+          responseFilter: function(type, response) {
+            try {
+              type.should.equal(RequestType.MANIFEST);
+              response.url.should.equal(vodSource.url);
+              response.originalUrl.should.equal(vodSource.url);
+              response.data.byteLength.should.be.exist;
+              response.headers['content-type'].should.equal('application/dash+xml');
+              done();
+            } catch (e) {
+              done(e);
+            }
+          }
+        }
+      })
+    );
+    dashInstance.load();
+  });
 
   it('should apply void filter for manifest', done => {
     dashInstance = DashAdapter.createAdapter(
