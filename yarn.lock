@@ -2,10 +2,9 @@
 # yarn lockfile v1
 
 
-"@playkit-js/playkit-js@0.54.0":
-  version "0.54.0"
-  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.54.0.tgz#ee41651650504439047a685b80295f63046a8fb2"
-  integrity sha512-nmKAW4OxkyUQfce2sXMfst/UQbeG/9jm3q6JmyizVdWoc62tjC4hnkOGeIfHZmgp0utI8DsjH3H/bOqIbVNnIQ==
+"@playkit-js/playkit-js@0.61.0-canary.a9862b1":
+  version "0.61.0-canary.a9862b1"
+  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.61.0-canary.a9862b1.tgz#3542c6e6269d1211074a8435ef2633646a99836d"
   dependencies:
     js-logger "^1.3.0"
     ua-parser-js "^0.7.13"
@@ -1843,7 +1842,6 @@ elliptic@^6.0.0:
 eme-encryption-scheme-polyfill@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-2.0.0.tgz#b44a8fb7d5c7c0be869897be9d77a8cb9c0ba795"
-  integrity sha512-/zoXuACHLGQ8w5nkJrVr3YI0IGe05ZS8HR1x5uTqiAoHuj5hPzdnoyW9Zom8iPv93arPzwpde93GrKCFKLFK4g==
 
 emojis-list@^2.0.0:
   version "2.1.0"
@@ -5065,7 +5063,6 @@ sha.js@^2.4.0, sha.js@^2.4.8:
 shaka-player@^2.5.9:
   version "2.5.9"
   resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-2.5.9.tgz#007dc19df2bb5d3d959d278b2d894af05adffe38"
-  integrity sha512-XavLBqxvIbvLOPfk7VKZu5fbMJyVko9bBfzxmMWdX5bvQwUSjU7ZhV8v2tHqXQYafpHml1hlGHzKkLs7idouNQ==
   dependencies:
     eme-encryption-scheme-polyfill "^2.0.0"
 
