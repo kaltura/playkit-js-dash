@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.18.1"></a>
+## [1.18.1](https://github.com/kaltura/playkit-js-dash/compare/v1.18.0...v1.18.1) (2020-04-13)
+
+
+
+<a name="1.18.0"></a>
+# [1.18.0](https://github.com/kaltura/playkit-js-dash/compare/v1.17.0...v1.18.0) (2020-04-13)
+
+
+### Features
+
+* **FEC-9678:** add response filter implementation to dash adapter ([#100](https://github.com/kaltura/playkit-js-dash/issues/100)) ([5454526](https://github.com/kaltura/playkit-js-dash/commit/5454526))
+
+
+
 <a name="1.17.0"></a>
 # [1.17.0](https://github.com/kaltura/playkit-js-dash/compare/v1.14.0...v1.17.0) (2020-02-24)
 
