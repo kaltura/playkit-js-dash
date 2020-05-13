@@ -264,6 +264,7 @@ describe('DashAdapter: targetBuffer', () => {
 
   afterEach(done => {
     dashInstance.destroy().then(() => {
+      video = null;
       dashInstance = null;
       done();
     });
@@ -290,11 +291,12 @@ describe('DashAdapter: targetBuffer', () => {
       dashInstance = DashAdapter.createAdapter(video, vodSource, config);
       video.addEventListener(EventType.PLAYING, () => {
         video.currentTime = video.duration - 1;
-        video.addEventListener(EventType.SEEKED, () => {
+        dashInstance._eventManager.listenOnce(video, EventType.SEEKED, () => {
           dashInstance.targetBuffer.should.equal(video.duration - video.currentTime);
           done();
         });
       });
+
       dashInstance.load().then(() => {
         video.play();
       });
@@ -305,9 +307,12 @@ describe('DashAdapter: targetBuffer', () => {
 
   it('should check targetBuffer in LIVE', done => {
     try {
-      dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+      dashInstance = DashAdapter.createAdapter(
+        video,
+        liveSource,
+        Utils.Object.mergeDeep(config, {playback: {options: {html5: {dash: {streaming: {bufferingGoal: 120}}}}}})
+      );
       video.addEventListener(EventType.PLAYING, () => {
-        dashInstance._shaka.configure({streaming: {bufferingGoal: 120}});
         let targetBufferVal =
           dashInstance._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
           dashInstance._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
@@ -327,9 +332,12 @@ describe('DashAdapter: targetBuffer', () => {
 
   it('should check targetBuffer in LIVE and restricted by bufferingGoal', done => {
     try {
-      dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+      dashInstance = DashAdapter.createAdapter(
+        video,
+        liveSource,
+        Utils.Object.mergeDeep(config, {playback: {options: {html5: {dash: {streaming: {bufferingGoal: 10}}}}}})
+      );
       video.addEventListener(EventType.PLAYING, () => {
-        dashInstance._shaka.getConfiguration().streaming.bufferingGoal = 10;
         let targetBufferVal = dashInstance._shaka.getConfiguration().streaming.bufferingGoal + dashInstance._getCurrentSegmentLength();
 
         dashInstance.targetBuffer.should.equal(targetBufferVal);
