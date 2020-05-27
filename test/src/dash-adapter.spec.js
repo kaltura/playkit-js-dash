@@ -76,7 +76,6 @@ describe('DashAdapter: canPlayDrm', () => {
 
   afterEach(() => {
     sandbox.restore();
-    DashAdapter._availableDrmProtocol = [];
   });
 
   it('should return true since widevine configured', function() {
