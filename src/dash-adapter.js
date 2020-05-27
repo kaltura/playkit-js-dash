@@ -267,6 +267,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   static canPlayDrm(drmData: Array<Object>, drmConfig: PKDrmConfigObject): boolean {
+    DashAdapter._availableDrmProtocol = [];
     for (let drmProtocol of DashAdapter._drmProtocols) {
       if (drmProtocol.isConfigured(drmData, drmConfig)) {
         DashAdapter._availableDrmProtocol.push(drmProtocol);
