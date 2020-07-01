@@ -445,6 +445,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       let config = {};
       for (let drmProtocol of DashAdapter._availableDrmProtocol) {
         drmProtocol.setDrmPlayback(config, this._sourceObj.drmData);
+        // If shaka config already has some drm configuration override the config defaults with it
+        if (this._config.shakaConfig.drm) {
+          Utils.Object.mergeDeep(config.drm, this._config.shakaConfig.drm);
+        }
         Utils.Object.mergeDeep(this._config.shakaConfig, config);
       }
     }
