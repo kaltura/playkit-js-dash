@@ -13,7 +13,9 @@
     "should": true,
     "sinon": true,
     "__VERSION__": true,
-    "__NAME__": true
+    "__NAME__": true,
+    "process": true,
+    "__dirname": true
   },
   "rules": {
     "prettier/prettier": "error",
