@@ -289,7 +289,7 @@ describe('DashAdapter: targetBuffer', () => {
   it('should check targetBuffer in VOD close to end of stream (time left to end of stream is less than targetBuffer)', done => {
     try {
       dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-      video.addEventListener(EventType.PLAYING, () => {
+      dashInstance._eventManager.listenOnce(video, EventType.PLAYING, () => {
         video.currentTime = video.duration - 1;
         dashInstance._eventManager.listenOnce(video, EventType.SEEKED, () => {
           dashInstance.targetBuffer.should.equal(video.duration - video.currentTime);
@@ -475,6 +475,36 @@ describe('DashAdapter: _getParsedTracks', () => {
   it('should return empty array before loading', () => {
     let tracks = dashInstance._getParsedTracks();
     tracks.length.should.be.equal(0);
+  });
+});
+
+describe('DashAdapter: check config overriding', () => {
+  let video, dashInstance, config;
+  const source = {
+    drmData: wwDrmData
+  };
+
+  beforeEach(() => {
+    video = document.createElement('video');
+  });
+
+  afterEach(done => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should set drm security level to HW', done => {
+    config = {playback: {options: {html5: {dash: {drm: {advanced: {'com.widevine.alpha': {videoRobustness: 'HW_SECURE_ALL'}}}}}}}};
+    DashAdapter._availableDrmProtocol.push(Widevine);
+    dashInstance = DashAdapter.createAdapter(video, source, config);
+    dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].videoRobustness.should.equal('HW_SECURE_ALL');
+    done();
   });
 });
 

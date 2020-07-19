@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.18.3"></a>
+## [1.18.3](https://github.com/kaltura/playkit-js-dash/compare/v1.18.2...v1.18.3) (2020-07-07)
+
+
+### Bug Fixes
+
+* **FEC-10269:** dash adapter overrides shaka DRM settings ([#105](https://github.com/kaltura/playkit-js-dash/issues/105)) ([466f688](https://github.com/kaltura/playkit-js-dash/commit/466f688))
+
+
+
+<a name="1.18.2"></a>
+## [1.18.2](https://github.com/kaltura/playkit-js-dash/compare/v1.18.1...v1.18.2) (2020-06-10)
+
+
+### Bug Fixes
+
+* **FEC-10122:** static _availableDrmProtocol doesn't get clear on reloading ([#103](https://github.com/kaltura/playkit-js-dash/issues/103)) ([e5695b3](https://github.com/kaltura/playkit-js-dash/commit/e5695b3))
+
+
+
 <a name="1.18.1"></a>
 ## [1.18.1](https://github.com/kaltura/playkit-js-dash/compare/v1.18.0...v1.18.1) (2020-04-13)
 
