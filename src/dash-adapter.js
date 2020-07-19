@@ -332,7 +332,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _setShakaConfig(): void {
     const textDisplayerConfig = {
       shakaConfig: {
-        textDisplayFactory: function(videoEl) {
+        textDisplayFactory: function (videoEl) {
           return new TextDisplayer(videoEl);
         }.bind(null, this._videoElement)
       }
@@ -462,7 +462,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _maybeApplyAbrRestrictions(): void {
     if (this._config.capLevelToPlayerSize) {
       const videoTracks = this._getVideoTracks();
-      const getMinDimensions = (dim): number => Math.min.apply(null, videoTracks.map(variant => variant[dim]));
+      const getMinDimensions = (dim): number =>
+        Math.min.apply(
+          null,
+          videoTracks.map(variant => variant[dim])
+        );
       //Get minimal allowed dimensions
       const minWidth = getMinDimensions('width');
       const minHeight = getMinDimensions('height');
@@ -944,7 +948,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onAdaptation(): void {
-    let selectedVideoTrack = this._getParsedVideoTracks().filter(function(videoTrack) {
+    let selectedVideoTrack = this._getParsedVideoTracks().filter(function (videoTrack) {
       return videoTrack.active;
     })[0];
     DashAdapter._logger.debug('Video track changed', selectedVideoTrack);
