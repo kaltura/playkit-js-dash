@@ -1547,7 +1547,6 @@ describe('DashAdapter: response filter', () => {
         network: {
           responseFilter: function (type, response) {
             try {
-              debugger;
               type.should.equal(RequestType.MANIFEST);
               response.url.should.equal(vodSource.url);
               response.originalUrl.should.equal(vodSource.url);
