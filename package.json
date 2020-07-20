@@ -42,7 +42,7 @@
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-flow": "^7.10.4",
     "@babel/register": "^7.10.5",
-    "@playkit-js/playkit-js": "0.61.0-canary.a9862b1",
+    "@playkit-js/playkit-js": "0.62.1-canary.724715e",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "babel-plugin-istanbul": "^6.0.0",
@@ -74,7 +74,7 @@
     "mocha": "^8.0.1",
     "mocha-cli": "^1.0.1",
     "prettier": "^2.0.5",
-    "shaka-player": "^2.5.9",
+    "shaka-player": "2.5.9",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0",
     "standard-version": "^8.0.2",
@@ -84,7 +84,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "peerDependencies": {
-    "@playkit-js/playkit-js": "0.61.0-canary.a9862b1",
+    "@playkit-js/playkit-js": "0.62.1-canary.724715e",
     "shaka-player": "^2.5.5"
   },
   "keywords": [
