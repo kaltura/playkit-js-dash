@@ -1,15 +1,15 @@
-import {BaseDrmProtocol} from '@playkit-js/playkit-js';
+import {DrmScheme} from '@playkit-js/playkit-js';
 
 export const wwDrmData = [
   {
     licenseUrl: 'LICENSE_URL',
-    scheme: BaseDrmProtocol.DrmScheme.WIDEVINE
+    scheme: DrmScheme.WIDEVINE
   }
 ];
 
 export const prDrmData = [
   {
     licenseUrl: 'LICENSE_URL',
-    scheme: BaseDrmProtocol.DrmScheme.PLAYREADY
+    scheme: DrmScheme.PLAYREADY
   }
 ];
