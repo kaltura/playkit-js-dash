@@ -1,9 +1,9 @@
 // @flow
-import {IDrmProtocol, Env, getLogger, DrmScheme} from '@playkit-js/playkit-js';
+import {IDrmProtocol, Env, DrmScheme, getLogger} from '@playkit-js/playkit-js';
 
-const _logger = getLogger('Widevine');
+const Widevine: IDrmProtocol = class Widevine {
+  static _logger = getLogger('Widevine');
 
-const Widevine: IDrmProtocol = class _Widevine {
   /**
    * Widevine is the configure key system.
    * @param {Array<Object>} drmData - The drm data.
@@ -22,7 +22,7 @@ const Widevine: IDrmProtocol = class _Widevine {
    * @return {boolean} - Whether Widevine can be play on the current environment.
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
-    _logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
+    Widevine._logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
     return !!drmData.find(drmEntry => drmEntry.scheme === DrmScheme.WIDEVINE);
   }
 
@@ -33,7 +33,7 @@ const Widevine: IDrmProtocol = class _Widevine {
    * @returns {void}
    */
   static setDrmPlayback(config: Object, drmData: Array<Object>): void {
-    _logger.debug('Sets drm playback');
+    Widevine._logger.debug('Sets drm playback');
     let browser = Env.browser.name;
     let wwDrmEntry = drmData.find(drmEntry => drmEntry.scheme === DrmScheme.WIDEVINE);
     if (wwDrmEntry) {

@@ -14,7 +14,7 @@ const customLaunchers = {
   }
 };
 
-module.exports = function(config) {
+module.exports = function (config) {
   let karmaConf = {
     logLevel: config.LOG_INFO,
     browsers: ['Chrome', 'Firefox'],
@@ -27,10 +27,7 @@ module.exports = function(config) {
       'src/**/*.js': ['webpack', 'sourcemap'],
       'test/setup/karma.js': ['webpack', 'sourcemap']
     },
-    reporters: [
-      'mocha',
-      'coverage'
-    ],
+    reporters: ['mocha', 'coverage'],
     webpack: webpackConfig,
     webpackServer: {
       noInfo: true

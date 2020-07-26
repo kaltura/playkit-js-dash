@@ -1,9 +1,9 @@
 // @flow
-import {IDrmProtocol, getLogger, DrmScheme} from '@playkit-js/playkit-js';
+import {IDrmProtocol, DrmScheme, getLogger} from '@playkit-js/playkit-js';
 
-const _logger = getLogger('PlayReady');
+const PlayReady: IDrmProtocol = class PlayReady {
+  static _logger = getLogger('PlayReady');
 
-const PlayReady: IDrmProtocol = class _PlayReady {
   /**
    * PLAYREADY is the configure key system.
    * @param {Array<Object>} drmData - The drm data.
@@ -22,7 +22,7 @@ const PlayReady: IDrmProtocol = class _PlayReady {
    * @return {boolean} - Whether PlayReady can be play on the current environment.
    */
   static canPlayDrm(drmData: Array<Object>): boolean {
-    _logger.debug('Can play DRM scheme of: ' + DrmScheme.PLAYREADY);
+    PlayReady._logger.debug('Can play DRM scheme of: ' + DrmScheme.PLAYREADY);
     return !!drmData.find(drmEntry => drmEntry.scheme === DrmScheme.PLAYREADY);
   }
 
@@ -33,7 +33,7 @@ const PlayReady: IDrmProtocol = class _PlayReady {
    * @returns {void}
    */
   static setDrmPlayback(config: Object, drmData: Array<Object>): void {
-    _logger.debug('Sets drm playback');
+    PlayReady._logger.debug('Sets drm playback');
     let prDrmEntry = drmData.find(drmEntry => drmEntry.scheme === DrmScheme.PLAYREADY);
     if (prDrmEntry) {
       config.drm = {
