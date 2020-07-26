@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@playkit-js/playkit-js@^0.62.0":
-  version "0.62.0"
-  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.62.0.tgz#af68874b1182e5ae436ab1ca4e7a49cd0f7d3cee"
-  integrity sha512-96IP8Sb3qQ7her5kdAfxD9ly3gO435CEuHrvY+mC2pqV/ELvHtezFg1jVl/jrlXlvwsHqf5VQJU+70NaO/Vliw==
+"@playkit-js/playkit-js@^0.62.1-canary.28e7dd3":
+  version "0.62.1-canary.c752a64"
+  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.62.1-canary.c752a64.tgz#4875e92cafd49c5e6ef26568607778198280383c"
+  integrity sha512-BYu6tgIh5FWvO4XXkgXxrDb0s+QqQWsAMq42rD6CK0t072zz1KskHGOCz8eFaQGliB1MJntl8pq9Mt2UL3Om/g==
   dependencies:
-    js-logger "^1.3.0"
-    ua-parser-js "^0.7.13"
+    js-logger "^1.6.0"
+    ua-parser-js "^0.7.21"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
@@ -3318,9 +3318,10 @@ jest-validate@^23.0.0:
     leven "^2.1.0"
     pretty-format "^23.2.0"
 
-js-logger@^1.3.0:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/js-logger/-/js-logger-1.4.1.tgz#f0230dc5e84e120f213d6e5a6b767a913d290335"
+js-logger@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/js-logger/-/js-logger-1.6.0.tgz#7abae5cfaf208c965f3ef20754533bb9e79c7aef"
+  integrity sha512-K4kt2AdD0jUYINbe00BPPpsL65u/rdYOgfaBBVWm/mid+ANk7qxDnoXgKI5ilm49Sjmach2Dzlc+5VxKdRA3tw==
 
 js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
@@ -5677,9 +5678,10 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-ua-parser-js@^0.7.13:
-  version "0.7.14"
-  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.14.tgz#110d53fa4c3f326c121292bbeac904d2e03387ca"
+ua-parser-js@^0.7.21:
+  version "0.7.21"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.21.tgz#853cf9ce93f642f67174273cc34565ae6f308777"
+  integrity sha512-+O8/qh/Qj8CgC6eYBVBykMrNtp5Gebn4dlGD/kKXVkJNDwyrAwSIqwz8CDf+tsAIWVycKcku6gIXJ0qwx/ZXaQ==
 
 uglify-js@^2.6, uglify-js@^2.8.29:
   version "2.8.29"
