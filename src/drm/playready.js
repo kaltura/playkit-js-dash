@@ -3,7 +3,7 @@ import {IDrmProtocol, getLogger, DrmScheme} from '@playkit-js/playkit-js';
 
 const _logger = getLogger('PlayReady');
 
-const PlayReady: IDrmProtocol = class PlayReady {
+const PlayReady: IDrmProtocol = class _PlayReady {
   /**
    * PLAYREADY is the configure key system.
    * @param {Array<Object>} drmData - The drm data.
@@ -45,4 +45,4 @@ const PlayReady: IDrmProtocol = class PlayReady {
   }
 };
 
-export default PlayReady;
+export {PlayReady};

@@ -3,7 +3,7 @@ import {IDrmProtocol, Env, getLogger, DrmScheme} from '@playkit-js/playkit-js';
 
 const _logger = getLogger('Widevine');
 
-const Widevine: IDrmProtocol = class Widevine {
+const Widevine: IDrmProtocol = class _Widevine {
   /**
    * Widevine is the configure key system.
    * @param {Array<Object>} drmData - The drm data.
@@ -55,4 +55,4 @@ const Widevine: IDrmProtocol = class Widevine {
   }
 };
 
-export default Widevine;
+export {Widevine};
