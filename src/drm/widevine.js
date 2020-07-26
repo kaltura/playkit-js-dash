@@ -55,4 +55,4 @@ const Widevine: IDrmProtocol = class Widevine {
   }
 };
 
-export {Widevine};
+export default Widevine;

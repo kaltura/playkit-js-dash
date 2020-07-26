@@ -45,4 +45,4 @@ const PlayReady: IDrmProtocol = class PlayReady {
   }
 };
 
-export {PlayReady};
+export default PlayReady;
