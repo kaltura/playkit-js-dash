@@ -1,4 +1,4 @@
-import PlayReady from '../../../src/drm/playready';
+import {PlayReady} from '../../../src/drm/playready';
 import {DrmScheme} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
 
