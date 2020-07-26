@@ -1,8 +1,6 @@
-import PlayReady from '../../../src/drm/playready';
-import {BaseDrmProtocol} from '@playkit-js/playkit-js';
+import {PlayReady} from '../../../src/drm/playready';
+import {DrmScheme} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
-
-const DrmScheme = BaseDrmProtocol.DrmScheme;
 
 describe('PlayReady', function() {
   describe('isConfigured', function() {

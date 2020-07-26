@@ -12,8 +12,8 @@ import {
   VideoTrack,
   RequestType
 } from '@playkit-js/playkit-js';
-import Widevine from './drm/widevine';
-import PlayReady from './drm/playready';
+import {Widevine} from './drm/widevine';
+import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
 import TextDisplayer from './text-displayer';
 type ShakaEventType = {[event: string]: string};
