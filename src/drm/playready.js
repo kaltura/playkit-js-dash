@@ -1,5 +1,5 @@
 // @flow
-import {DrmScheme, getLogger} from '@playkit-js/playkit-js';
+import {IDrmProtocol, DrmScheme, getLogger} from '@playkit-js/playkit-js';
 
 const PlayReady: IDrmProtocol = class PlayReady {
   static _logger = getLogger('PlayReady');
@@ -45,4 +45,4 @@ const PlayReady: IDrmProtocol = class PlayReady {
   }
 };
 
-export default PlayReady;
+export {PlayReady};

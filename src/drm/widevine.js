@@ -1,5 +1,5 @@
 // @flow
-import {Env, DrmScheme, getLogger} from '@playkit-js/playkit-js';
+import {IDrmProtocol, Env, DrmScheme, getLogger} from '@playkit-js/playkit-js';
 
 const Widevine: IDrmProtocol = class Widevine {
   static _logger = getLogger('Widevine');
@@ -55,4 +55,4 @@ const Widevine: IDrmProtocol = class Widevine {
   }
 };
 
-export default Widevine;
+export {Widevine};

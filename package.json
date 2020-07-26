@@ -84,7 +84,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "peerDependencies": {
-    "@playkit-js/playkit-js": "0.62.1-canary.724715e",
+    "@playkit-js/playkit-js": "0.62.1-canary.2264c8f",
     "shaka-player": "^2.5.5"
   },
   "keywords": [
