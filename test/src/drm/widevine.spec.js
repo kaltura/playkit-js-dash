@@ -1,8 +1,7 @@
 import Widevine from '../../../src/drm/widevine';
-import {BaseDrmProtocol, Env} from '@playkit-js/playkit-js';
+import {DrmScheme, Env} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
 
-const DrmScheme = BaseDrmProtocol.DrmScheme;
 const BROWSER: string = Env.browser.name;
 
 describe('Widevine', function() {
