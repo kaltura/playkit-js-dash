@@ -2825,7 +2825,7 @@ elliptic@^6.0.0, elliptic@^6.5.2:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
 
-eme-encryption-scheme-polyfill@^2.0.0:
+eme-encryption-scheme-polyfill@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-2.0.1.tgz#b080b01bffd74c75c9cf8044c1cabedf3b83954f"
   integrity sha512-Wz+Ro1c0/2Wsx2RLFvTOO0m4LvYn+7cSnq3XOvRvLLBq8jbvUACH/zpU9s0/5+mQa5oaelkU69x+q0z/iWYrFA==
@@ -6837,12 +6837,12 @@ sha.js@^2.4.0, sha.js@^2.4.8:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-shaka-player@2.5.9:
-  version "2.5.9"
-  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-2.5.9.tgz#007dc19df2bb5d3d959d278b2d894af05adffe38"
-  integrity sha512-XavLBqxvIbvLOPfk7VKZu5fbMJyVko9bBfzxmMWdX5bvQwUSjU7ZhV8v2tHqXQYafpHml1hlGHzKkLs7idouNQ==
+shaka-player@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-3.0.2.tgz#f8d21e8af11a654bc26dcb5d34e2e674912ea947"
+  integrity sha512-GOVSnktrsRFS7dGPULDuk3fYwvht7MrNGaAD51XYQ2NhEE6x/cdO4P0x6aIp/9+83EJgSDdo/uvvaLUtOxSe7g==
   dependencies:
-    eme-encryption-scheme-polyfill "^2.0.0"
+    eme-encryption-scheme-polyfill "^2.0.1"
 
 shallow-clone@^3.0.0:
   version "3.0.1"
