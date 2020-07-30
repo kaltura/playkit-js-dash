@@ -1388,7 +1388,7 @@ describe('DashAdapter: request filter', () => {
     dashInstance.load();
   });
 
-  it('should apply void filter for manifest', done => {
+  it.skip('should apply void filter for manifest', done => {
     dashInstance = DashAdapter.createAdapter(
       video,
       vodSource,
@@ -1414,7 +1414,7 @@ describe('DashAdapter: request filter', () => {
     dashInstance.load();
   });
 
-  it('should apply promise filter for manifest', done => {
+  it.skip('should apply promise filter for manifest', done => {
     dashInstance = DashAdapter.createAdapter(
       video,
       vodSource,
