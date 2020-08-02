@@ -26,7 +26,7 @@ let dvrSource = {
 describe.skip('DashAdapter [debugging and testing manually]', () => {
   let player, tracks, videoTracks, textTracks, audioTracks;
 
-  before(function() {
+  before(function () {
     TestUtils.createElement('DIV', targetId);
   });
 
@@ -78,7 +78,7 @@ describe('DashAdapter: canPlayDrm', () => {
     sandbox.restore();
   });
 
-  it('should return true since widevine configured', function() {
+  it('should return true since widevine configured', function () {
     sandbox.stub(Widevine, 'canPlayDrm').value(() => true);
     sandbox.stub(Widevine, 'isConfigured').value(() => true);
     sandbox.stub(PlayReady, 'canPlayDrm').value(() => false);
@@ -88,7 +88,7 @@ describe('DashAdapter: canPlayDrm', () => {
     (DashAdapter._availableDrmProtocol.find(entry => entry === Widevine) !== null).should.be.true;
   });
 
-  it('should return true since playready configured', function() {
+  it('should return true since playready configured', function () {
     sandbox.stub(Widevine, 'canPlayDrm').value(() => false);
     sandbox.stub(Widevine, 'isConfigured').value(() => false);
     sandbox.stub(PlayReady, 'canPlayDrm').value(() => true);
@@ -98,21 +98,21 @@ describe('DashAdapter: canPlayDrm', () => {
     (DashAdapter._availableDrmProtocol.find(entry => entry === PlayReady) !== null).should.be.true;
   });
 
-  it('should return true for widevine and playready sources without config', function() {
+  it('should return true for widevine and playready sources without config', function () {
     sandbox.stub(Widevine, 'isConfigured').value(() => false);
     sandbox.stub(PlayReady, 'isConfigured').value(() => false);
     DashAdapter.canPlayDrm(wwDrmData.concat(prDrmData)).should.be.true;
     DashAdapter._availableDrmProtocol.length.should.equal(2);
   });
 
-  it('should return true for widevine source only', function() {
+  it('should return true for widevine source only', function () {
     sandbox.stub(Widevine, 'isConfigured').value(() => false);
     sandbox.stub(PlayReady, 'isConfigured').value(() => false);
     DashAdapter.canPlayDrm(wwDrmData).should.be.true;
     DashAdapter._availableDrmProtocol.length.should.equal(1);
   });
 
-  it('should return true for playready source only', function() {
+  it('should return true for playready source only', function () {
     sandbox.stub(Widevine, 'isConfigured').value(() => false);
     sandbox.stub(PlayReady, 'isConfigured').value(() => false);
     DashAdapter.canPlayDrm(prDrmData).should.be.true;
@@ -129,35 +129,35 @@ describe('DashAdapter: canPlayType', () => {
     DashAdapter.canPlayType('APPLICATION/DASH+XML').should.be.true;
   });
 
-  it('should return false to video/mp4', function() {
+  it('should return false to video/mp4', function () {
     DashAdapter.canPlayType('video/mp4').should.be.false;
   });
 
-  it('should return false to invalid mimetype', function() {
+  it('should return false to invalid mimetype', function () {
     DashAdapter.canPlayType('dummy').should.be.false;
   });
 
-  it('should return false to null mimetype', function() {
+  it('should return false to null mimetype', function () {
     DashAdapter.canPlayType(null).should.be.false;
   });
 
-  it('should return false to empty mimetype', function() {
+  it('should return false to empty mimetype', function () {
     DashAdapter.canPlayType('').should.be.false;
   });
 
-  it('should return false to no mimetype', function() {
+  it('should return false to no mimetype', function () {
     DashAdapter.canPlayType().should.be.false;
   });
 });
 
 describe('DashAdapter: isSupported', () => {
-  it('should return true', function() {
+  it('should return true', function () {
     DashAdapter.isSupported().should.be.true;
   });
 });
 
 describe('DashAdapter: id', () => {
-  it('should be named DashAdapter', function() {
+  it('should be named DashAdapter', function () {
     DashAdapter.id.should.equal('DashAdapter');
   });
 });
@@ -366,7 +366,7 @@ describe('DashAdapter: destroy', () => {
     dashInstance = null;
   });
 
-  after(function() {
+  after(function () {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
@@ -1371,7 +1371,7 @@ describe('DashAdapter: request filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          requestFilter: function(type, request) {
+          requestFilter: function (type, request) {
             try {
               type.should.equal(RequestType.MANIFEST);
               request.url.should.equal(vodSource.url);
@@ -1394,7 +1394,7 @@ describe('DashAdapter: request filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          requestFilter: function() {
+          requestFilter: function () {
             throw 'error';
           }
         }
@@ -1416,7 +1416,7 @@ describe('DashAdapter: request filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          requestFilter: function() {
+          requestFilter: function () {
             return new Promise(() => {
               throw 'error';
             });
@@ -1440,7 +1440,7 @@ describe('DashAdapter: request filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          requestFilter: function() {
+          requestFilter: function () {
             return new Promise((resolve, reject) => {
               reject('error');
             });
@@ -1464,7 +1464,7 @@ describe('DashAdapter: request filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          requestFilter: function(type) {
+          requestFilter: function (type) {
             if (type === RequestType.SEGMENT) {
               return new Promise((resolve, reject) => {
                 reject('error');
@@ -1497,7 +1497,7 @@ describe('DashAdapter: request filter', () => {
         vodSource,
         Utils.Object.mergeDeep(config, {
           network: {
-            requestFilter: function(type, request) {
+            requestFilter: function (type, request) {
               if (type === RequestType.MANIFEST) {
                 request.url += '?test';
               }
@@ -1505,7 +1505,7 @@ describe('DashAdapter: request filter', () => {
           }
         })
       );
-      const httpFetchRequest = (url) => {
+      const httpFetchRequest = url => {
         try {
           url.indexOf('?test').should.be.gt(-1);
           done();
@@ -1524,7 +1524,7 @@ describe('DashAdapter: request filter', () => {
         vodSource,
         Utils.Object.mergeDeep(config, {
           network: {
-            requestFilter: function(type, request) {
+            requestFilter: function (type, request) {
               if (type === RequestType.MANIFEST) {
                 return new Promise(resolve => {
                   request.url += '?test';
@@ -1535,7 +1535,7 @@ describe('DashAdapter: request filter', () => {
           }
         })
       );
-      const httpFetchRequest = (url) => {
+      const httpFetchRequest = url => {
         try {
           url.indexOf('?test').should.be.gt(-1);
           done();
@@ -1584,7 +1584,7 @@ describe('DashAdapter: response filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          responseFilter: function(type, response) {
+          responseFilter: function (type, response) {
             try {
               type.should.equal(RequestType.MANIFEST);
               response.url.should.equal(vodSource.url);
@@ -1608,7 +1608,7 @@ describe('DashAdapter: response filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          responseFilter: function(type, response) {
+          responseFilter: function (type, response) {
             if (type === RequestType.MANIFEST) {
               response.data['test'] = 'test';
             }
@@ -1635,7 +1635,7 @@ describe('DashAdapter: response filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          responseFilter: function(type, response) {
+          responseFilter: function (type, response) {
             if (type === RequestType.MANIFEST) {
               return new Promise(resolve => {
                 response.data['test'] = 'test';
@@ -1665,7 +1665,7 @@ describe('DashAdapter: response filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          responseFilter: function() {
+          responseFilter: function () {
             throw 'error';
           }
         }
@@ -1687,7 +1687,7 @@ describe('DashAdapter: response filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          responseFilter: function() {
+          responseFilter: function () {
             return new Promise(() => {
               throw 'error';
             });
@@ -1711,7 +1711,7 @@ describe('DashAdapter: response filter', () => {
       vodSource,
       Utils.Object.mergeDeep(config, {
         network: {
-          responseFilter: function() {
+          responseFilter: function () {
             return new Promise((resolve, reject) => {
               reject('error');
             });
