@@ -318,7 +318,7 @@ describe('DashAdapter: targetBuffer', () => {
           dashInstance._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
           (video.currentTime - dashInstance._getLiveEdge());
 
-        dashInstance.targetBuffer.should.equal(targetBufferVal);
+        (dashInstance.targetBuffer.toFixed(2) === targetBufferVal.toFixed(2)).should.be.true;
         done();
       });
 
@@ -340,7 +340,7 @@ describe('DashAdapter: targetBuffer', () => {
       video.addEventListener(EventType.PLAYING, () => {
         let targetBufferVal = dashInstance._shaka.getConfiguration().streaming.bufferingGoal + dashInstance._getCurrentSegmentLength();
 
-        dashInstance.targetBuffer.should.equal(targetBufferVal);
+        (dashInstance.targetBuffer.toFixed(2) === targetBufferVal.toFixed(2)).should.be.true;
         done();
       });
 
