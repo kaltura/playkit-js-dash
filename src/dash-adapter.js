@@ -413,8 +413,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       DashAdapter._logger.debug('Register response filter');
       this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
         if (Object.values(RequestType).includes(type)) {
-          const {uri: url, ed: originalUrl, data, headers} = response;
-          const pkResponse: PKResponseObject = {url, originalUrl, data, headers};
+          const {uri: url, data, headers} = response;
+          const pkResponse: PKResponseObject = {url, originalUrl: this._sourceObj.url, data, headers};
           let responseFilterPromise;
           try {
             responseFilterPromise = this._config.network.responseFilter(type, pkResponse);
@@ -1080,15 +1080,17 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const activeTrack = this._getActiveTrack();
     const activeTrackId = activeTrack ? activeTrack.id : NaN;
     let segmentLength = 0;
-    const periods = this._shaka.getManifest().periods;
-    if (!isNaN(activeTrackId)) {
-      for (let i = 0; i < periods.length; i++) {
-        for (let j = 0; j < periods[i].variants.length; j++) {
-          const variant = periods[i].variants[j];
-          if (variant.id === activeTrackId) {
-            const segmentPosition = variant.video.findSegmentPosition(this._videoElement.currentTime);
-            let seg = variant.video.getSegmentReference(segmentPosition);
-            segmentLength = seg.endTime - seg.startTime;
+    if (this._shaka.getManifest()) {
+      const periods = this._shaka.getManifest().periods;
+      if (!isNaN(activeTrackId) && periods) {
+        for (let i = 0; i < periods.length; i++) {
+          for (let j = 0; j < periods[i].variants.length; j++) {
+            const variant = periods[i].variants[j];
+            if (variant.id === activeTrackId) {
+              const segmentPosition = variant.video.findSegmentPosition(this._videoElement.currentTime);
+              let seg = variant.video.getSegmentReference(segmentPosition);
+              segmentLength = seg.endTime - seg.startTime;
+            }
           }
         }
       }

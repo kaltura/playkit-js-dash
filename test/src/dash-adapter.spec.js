@@ -4,7 +4,7 @@ import {loadPlayer, VideoTrack, AudioTrack, TextTrack, Utils, RequestType, Event
 import {Widevine} from '../../src/drm/widevine';
 import {PlayReady} from '../../src/drm/playready';
 import {wwDrmData, prDrmData} from './drm/fake-drm-data';
-
+import shaka from 'shaka-player';
 const targetId = 'player-placeholder_dash-adapter.spec';
 
 let vodSource = {
@@ -318,7 +318,7 @@ describe('DashAdapter: targetBuffer', () => {
           dashInstance._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
           (video.currentTime - dashInstance._getLiveEdge());
 
-        dashInstance.targetBuffer.should.equal(targetBufferVal);
+        (dashInstance.targetBuffer.toFixed(2) === targetBufferVal.toFixed(2)).should.be.true;
         done();
       });
 
@@ -340,7 +340,7 @@ describe('DashAdapter: targetBuffer', () => {
       video.addEventListener(EventType.PLAYING, () => {
         let targetBufferVal = dashInstance._shaka.getConfiguration().streaming.bufferingGoal + dashInstance._getCurrentSegmentLength();
 
-        dashInstance.targetBuffer.should.equal(targetBufferVal);
+        (dashInstance.targetBuffer.toFixed(2) === targetBufferVal.toFixed(2)).should.be.true;
         done();
       });
 
@@ -1388,61 +1388,6 @@ describe('DashAdapter: request filter', () => {
     dashInstance.load();
   });
 
-  it('should apply void filter for manifest', done => {
-    dashInstance = DashAdapter.createAdapter(
-      video,
-      vodSource,
-      Utils.Object.mergeDeep(config, {
-        network: {
-          requestFilter: function (type, request) {
-            if (type === RequestType.MANIFEST) {
-              request.url += '?test';
-            }
-          }
-        }
-      })
-    );
-    sandbox.stub(dashInstance._shakaLib.net.HttpFetchPlugin, 'g').callsFake(value => {
-      // stub HttpFetchPlugin.fetch_ method complied to g
-      try {
-        value.indexOf('?test').should.be.gt(-1);
-        done();
-      } catch (e) {
-        done(e);
-      }
-    });
-    dashInstance.load();
-  });
-
-  it('should apply promise filter for manifest', done => {
-    dashInstance = DashAdapter.createAdapter(
-      video,
-      vodSource,
-      Utils.Object.mergeDeep(config, {
-        network: {
-          requestFilter: function (type, request) {
-            if (type === RequestType.MANIFEST) {
-              return new Promise(resolve => {
-                request.url += '?test';
-                resolve(request);
-              });
-            }
-          }
-        }
-      })
-    );
-    sandbox.stub(dashInstance._shakaLib.net.HttpFetchPlugin, 'g').callsFake(value => {
-      // stub HttpFetchPlugin.fetch_ method complied to g
-      try {
-        value.indexOf('?test').should.be.gt(-1);
-        done();
-      } catch (e) {
-        done(e);
-      }
-    });
-    dashInstance.load();
-  });
-
   it('should handle error thrown from void filter', done => {
     dashInstance = DashAdapter.createAdapter(
       video,
@@ -1538,6 +1483,70 @@ describe('DashAdapter: request filter', () => {
       }
     });
     dashInstance.load();
+  });
+
+  describe('http request', () => {
+    after(() => {
+      shaka.net.NetworkingEngine.registerScheme('http', shaka.net.HttpFetchPlugin.parse, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      shaka.net.NetworkingEngine.registerScheme('https', shaka.net.HttpFetchPlugin.parse, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+    });
+
+    it('should apply void filter for manifest', done => {
+      dashInstance = DashAdapter.createAdapter(
+        video,
+        vodSource,
+        Utils.Object.mergeDeep(config, {
+          network: {
+            requestFilter: function (type, request) {
+              if (type === RequestType.MANIFEST) {
+                request.url += '?test';
+              }
+            }
+          }
+        })
+      );
+      const httpFetchRequest = url => {
+        try {
+          url.indexOf('?test').should.be.gt(-1);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      };
+      shaka.net.NetworkingEngine.registerScheme('http', httpFetchRequest, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      shaka.net.NetworkingEngine.registerScheme('https', httpFetchRequest, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      dashInstance.load();
+    });
+
+    it('should apply promise filter for manifest', done => {
+      dashInstance = DashAdapter.createAdapter(
+        video,
+        vodSource,
+        Utils.Object.mergeDeep(config, {
+          network: {
+            requestFilter: function (type, request) {
+              if (type === RequestType.MANIFEST) {
+                return new Promise(resolve => {
+                  request.url += '?test';
+                  resolve(request);
+                });
+              }
+            }
+          }
+        })
+      );
+      const httpFetchRequest = url => {
+        try {
+          url.indexOf('?test').should.be.gt(-1);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      };
+      shaka.net.NetworkingEngine.registerScheme('http', httpFetchRequest, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      shaka.net.NetworkingEngine.registerScheme('https', httpFetchRequest, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      dashInstance.load();
+    });
   });
 });
 
