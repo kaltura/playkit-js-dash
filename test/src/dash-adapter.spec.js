@@ -1487,8 +1487,8 @@ describe('DashAdapter: request filter', () => {
 
   describe('http request', () => {
     after(() => {
-      shaka.net.NetworkingEngine.registerScheme('http', shaka.net.HttpFetchPlugin.parse, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
-      shaka.net.NetworkingEngine.registerScheme('https', shaka.net.HttpFetchPlugin.parse, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      shaka.net.NetworkingEngine.registerScheme('http', shaka.net.HttpFetchPlugin, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      shaka.net.NetworkingEngine.registerScheme('https', shaka.net.HttpFetchPlugin, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
     });
 
     it('should apply void filter for manifest', done => {
