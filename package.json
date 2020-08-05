@@ -74,7 +74,7 @@
     "mocha": "^8.0.1",
     "mocha-cli": "^1.0.1",
     "prettier": "^2.0.5",
-    "shaka-player": "3.0.2",
+    "shaka-player": "2.5.13",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0",
     "standard-version": "^6.0.1",
@@ -85,7 +85,7 @@
   },
   "peerDependencies": {
     "@playkit-js/playkit-js": "0.62.1-canary.2264c8f",
-    "shaka-player": "^3.0.2"
+    "shaka-player": "2.5.13"
   },
   "keywords": [
     "kaltura",
