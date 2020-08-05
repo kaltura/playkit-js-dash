@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.19.1](https://github.com/kaltura/playkit-js-dash/compare/v1.19.0...v1.19.1) (2020-08-05)
+
+
+### Bug Fixes
+
+* downgrade shaka dependencies ([#113](https://github.com/kaltura/playkit-js-dash/issues/113)) ([af69a03](https://github.com/kaltura/playkit-js-dash/commit/af69a03))
+
+
+
 ## [1.19.0](https://github.com/kaltura/playkit-js-dash/compare/v1.17.0...v1.19.0) (2020-08-05)
 
 
