@@ -1,6 +1,28 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [1.19.0](https://github.com/kaltura/playkit-js-dash/compare/v1.17.0...v1.19.0) (2020-08-05)
+
+
+### Bug Fixes
+
+* **FEC-10122:** static _availableDrmProtocol doesn't get clear on reloading ([#103](https://github.com/kaltura/playkit-js-dash/issues/103)) ([e5695b3](https://github.com/kaltura/playkit-js-dash/commit/e5695b3))
+* **FEC-10269:** dash adapter overrides shaka DRM settings ([#105](https://github.com/kaltura/playkit-js-dash/issues/105)) ([466f688](https://github.com/kaltura/playkit-js-dash/commit/466f688))
+
+
+### Build System
+
+* github bad certificate ([#101](https://github.com/kaltura/playkit-js-dash/issues/101)) ([0b1bcb7](https://github.com/kaltura/playkit-js-dash/commit/0b1bcb7))
+
+
+### Features
+
+* **FEC-10290:** upgrade NPM packages  ([#109](https://github.com/kaltura/playkit-js-dash/issues/109)) ([136926f](https://github.com/kaltura/playkit-js-dash/commit/136926f))
+* **FEC-10356:** upgrade Shaka ([#112](https://github.com/kaltura/playkit-js-dash/issues/112)) ([3c3b05b](https://github.com/kaltura/playkit-js-dash/commit/3c3b05b))
+* **FEC-9678:** add response filter implementation to dash adapter ([#100](https://github.com/kaltura/playkit-js-dash/issues/100)) ([5454526](https://github.com/kaltura/playkit-js-dash/commit/5454526))
+
+
 
 <a name="1.18.3"></a>
 ## [1.18.3](https://github.com/kaltura/playkit-js-dash/compare/v1.18.2...v1.18.3) (2020-07-07)
