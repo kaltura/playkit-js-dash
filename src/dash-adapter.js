@@ -1061,7 +1061,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let targetBufferVal = NaN;
     if (!this._shaka) return NaN;
     if (this.isLive()) {
-      if (this._shaka.getManifest()) {
+      if (this._shaka.getManifest() && this._shaka.getManifest().presentationTimeline) {
         targetBufferVal =
           this._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
           this._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
@@ -1072,29 +1072,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       targetBufferVal = this._videoElement.duration - this._videoElement.currentTime;
     }
 
-    targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal + this._getCurrentSegmentLength());
-    return targetBufferVal;
-  }
-
-  _getCurrentSegmentLength(): number {
-    const activeTrack = this._getActiveTrack();
-    const activeTrackId = activeTrack ? activeTrack.id : NaN;
-    let segmentLength = 0;
-    if (this._shaka.getManifest()) {
-      const periods = this._shaka.getManifest().periods;
-      if (!isNaN(activeTrackId) && periods) {
-        for (let i = 0; i < periods.length; i++) {
-          for (let j = 0; j < periods[i].variants.length; j++) {
-            const variant = periods[i].variants[j];
-            if (variant.id === activeTrackId) {
-              const segmentPosition = variant.video.findSegmentPosition(this._videoElement.currentTime);
-              let seg = variant.video.getSegmentReference(segmentPosition);
-              segmentLength = seg.endTime - seg.startTime;
-            }
-          }
-        }
-      }
+    if (this._shaka.getManifest() && this._shaka.getManifest().presentationTimeline) {
+      targetBufferVal = Math.min(
+        targetBufferVal,
+        this._shaka.getConfiguration().streaming.bufferingGoal + this._shaka.getManifest().presentationTimeline.getMaxSegmentDuration()
+      );
     }
-    return segmentLength;
+    return targetBufferVal;
   }
 }
