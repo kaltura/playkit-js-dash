@@ -273,9 +273,10 @@ describe('DashAdapter: targetBuffer', () => {
     try {
       dashInstance = DashAdapter.createAdapter(video, vodSource, config);
       video.addEventListener(EventType.PLAYING, () => {
-        dashInstance.targetBuffer.should.equal(
-          dashInstance._shaka.getConfiguration().streaming.bufferingGoal + dashInstance._getCurrentSegmentLength()
-        );
+        const targetBufferVal =
+          dashInstance._shaka.getConfiguration().streaming.bufferingGoal + dashInstance._getCurrentSegmentLength();
+        Math.round(dashInstance.targetBuffer - targetBufferVal).should.equal(0);
+
         done();
       });
       dashInstance.load().then(() => {
@@ -292,7 +293,7 @@ describe('DashAdapter: targetBuffer', () => {
       dashInstance._eventManager.listenOnce(video, EventType.PLAYING, () => {
         video.currentTime = video.duration - 1;
         dashInstance._eventManager.listenOnce(video, EventType.SEEKED, () => {
-          dashInstance.targetBuffer.should.equal(video.duration - video.currentTime);
+          Math.round(dashInstance.targetBuffer - video.duration + video.currentTime).should.equal(0);
           done();
         });
       });
@@ -318,7 +319,7 @@ describe('DashAdapter: targetBuffer', () => {
           dashInstance._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
           (video.currentTime - dashInstance._getLiveEdge());
 
-        (dashInstance.targetBuffer.toFixed(2) === targetBufferVal.toFixed(2)).should.be.true;
+        Math.round(dashInstance.targetBuffer - targetBufferVal).should.equal(0);
         done();
       });
 
@@ -340,7 +341,7 @@ describe('DashAdapter: targetBuffer', () => {
       video.addEventListener(EventType.PLAYING, () => {
         let targetBufferVal = dashInstance._shaka.getConfiguration().streaming.bufferingGoal + dashInstance._getCurrentSegmentLength();
 
-        (dashInstance.targetBuffer.toFixed(2) === targetBufferVal.toFixed(2)).should.be.true;
+        Math.round(dashInstance.targetBuffer - targetBufferVal).should.equal(0);
         done();
       });
 
@@ -1487,8 +1488,8 @@ describe('DashAdapter: request filter', () => {
 
   describe('http request', () => {
     after(() => {
-      shaka.net.NetworkingEngine.registerScheme('http', shaka.net.HttpFetchPlugin, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
-      shaka.net.NetworkingEngine.registerScheme('https', shaka.net.HttpFetchPlugin, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      shaka.net.NetworkingEngine.registerScheme('http', shaka.net.HttpFetchPlugin.parse, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
+      shaka.net.NetworkingEngine.registerScheme('https', shaka.net.HttpFetchPlugin.parse, shaka.net.NetworkingEngine.PluginPriority.PREFERRED);
     });
 
     it('should apply void filter for manifest', done => {

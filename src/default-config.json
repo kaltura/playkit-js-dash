@@ -1,7 +1,8 @@
 {
   "shakaConfig": {
     "streaming": {
-      "ignoreTextStreamFailures": true
+      "ignoreTextStreamFailures": true,
+      "bufferingGoal": 60
     },
     "abr": {
       "enabled": true,
