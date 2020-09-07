@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.20.0](https://github.com/kaltura/playkit-js-dash/compare/v1.19.1...v1.20.0) (2020-09-07)
+
+
+### Build System
+
+* **FEC-10064:** add automatic release notes ([#116](https://github.com/kaltura/playkit-js-dash/issues/116)) ([81a210f](https://github.com/kaltura/playkit-js-dash/commit/81a210f))
+
+
+### Features
+
+* **FEC-10435:** upgrade shaka for fixing live issue and optimizations for smartTV ([#115](https://github.com/kaltura/playkit-js-dash/issues/115)) ([40af1c8](https://github.com/kaltura/playkit-js-dash/commit/40af1c8))
+
+
+### Tests
+
+* faster unit tests ([#114](https://github.com/kaltura/playkit-js-dash/issues/114)) ([0e58d25](https://github.com/kaltura/playkit-js-dash/commit/0e58d25))
+
+
+
 ### [1.19.1](https://github.com/kaltura/playkit-js-dash/compare/v1.19.0...v1.19.1) (2020-08-05)
 
 
