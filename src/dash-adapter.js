@@ -672,7 +672,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return super.destroy().then(() => {
       DashAdapter._logger.debug('destroy');
       this._loadPromise = null;
-      return this._reset().finally(() => (this._isDestroyInProgress = false));
+      return this._reset()
+        .then(resetResult => {
+          this._isDestroyInProgress = false;
+          return resetResult;
+        })
+        .catch(error => {
+          this._isDestroyInProgress = false;
+          return Promise.reject(error);
+        });
     });
   }
 
