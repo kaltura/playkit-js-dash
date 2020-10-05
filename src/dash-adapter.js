@@ -16,6 +16,7 @@ import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
 import TextDisplayer from './text-displayer';
+
 type ShakaEventType = {[event: string]: string};
 
 /**
@@ -164,6 +165,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _responseFilterError: boolean = false;
+  /**
+   * Whether async destroy is in progress
+   * @type {boolean}
+   * @private
+   */
+  _isDestroyInProgress: boolean = false;
+
   /**
    * Factory method to create media source adapter.
    * @function createAdapter
@@ -533,6 +541,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
     }
   }
+
   /**
    * detach media - will remove the media source from handling the video
    * @public
@@ -547,6 +556,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       });
     }
   }
+
   /**
    * Clear the video update timer
    * @private
@@ -606,7 +616,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
       switch (type) {
         case shaka.net.NetworkingEngine.RequestType.SEGMENT:
-          this._trigger(EventType.FRAG_LOADED, {miliSeconds: response.timeMs, bytes: response.data.byteLength, url: response.uri});
+          this._trigger(EventType.FRAG_LOADED, {
+            miliSeconds: response.timeMs,
+            bytes: response.data.byteLength,
+            url: response.uri
+          });
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
@@ -639,7 +653,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
               resolve(data);
             })
             .catch(error => {
-              reject(new Error(error.severity, error.category, error.code, error.data));
+              reject(new Error(this._isDestroyInProgress ? Error.Severity.RECOVERABLE : error.severity, error.category, error.code, error.data));
             });
         }
       });
@@ -654,10 +668,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {Promise<*>} - The destroy promise.
    */
   destroy(): Promise<*> {
+    this._isDestroyInProgress = true;
     return super.destroy().then(() => {
       DashAdapter._logger.debug('destroy');
       this._loadPromise = null;
-      return this._reset();
+      return this._reset().finally(() => (this._isDestroyInProgress = false));
     });
   }
 
@@ -683,6 +698,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
     return Promise.resolve();
   }
+
   /**
    * Get the original video tracks
    * @function _getVideoTracks
@@ -1011,7 +1027,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onDrmSessionUpdate(): void {
-    this._trigger(EventType.DRM_LICENSE_LOADED, {licenseTime: this._shaka.getStats().licenseTime, scheme: DrmScheme.WIDEVINE});
+    this._trigger(EventType.DRM_LICENSE_LOADED, {
+      licenseTime: this._shaka.getStats().licenseTime,
+      scheme: DrmScheme.WIDEVINE
+    });
   }
 
   /**
