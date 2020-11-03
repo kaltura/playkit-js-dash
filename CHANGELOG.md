@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.3](https://github.com/kaltura/playkit-js-dash/compare/v1.20.2...v1.20.3) (2020-11-03)
+
+
+### Build System
+
+* change modules to default value ([#121](https://github.com/kaltura/playkit-js-dash/issues/121)) ([5ce252f](https://github.com/kaltura/playkit-js-dash/commit/5ce252f))
+* remove plugins that already exist on preset-env ([#119](https://github.com/kaltura/playkit-js-dash/issues/119)) ([ba51981](https://github.com/kaltura/playkit-js-dash/commit/ba51981))
+
+
+### Tests
+
+* update shaka version ([#120](https://github.com/kaltura/playkit-js-dash/issues/120)) ([ba3431c](https://github.com/kaltura/playkit-js-dash/commit/ba3431c))
+
+
+
 ### [1.20.2](https://github.com/kaltura/playkit-js-dash/compare/v1.20.1...v1.20.2) (2020-10-06)
 
 
