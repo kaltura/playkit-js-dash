@@ -370,11 +370,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _maybeFixStallForSmartTV(): void {
-    const stallSkip = this._shaka.getConfiguration().streaming.stallSkip;
+    const defaultStallSkip = this._shaka.getConfiguration().streaming.stallSkip;
     Utils.Object.mergeDeep(this._config.shakaConfig, {streaming: {stallSkip: 0.1}});
     this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
-      if (stallSkip !== this._shaka.getConfiguration().streaming.stallSkip) {
-        this._shaka.configure({streaming: {stallSkip: stallSkip}});
+      if (defaultStallSkip !== this._shaka.getConfiguration().streaming.stallSkip) {
+        this._shaka.configure({streaming: {stallSkip: defaultStallSkip}});
       }
     });
   }
