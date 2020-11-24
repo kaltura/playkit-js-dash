@@ -357,12 +357,28 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
+    this._maybeFixStallForSmartTV();
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
     this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
   }
 
+  /**
+   * fix stall play promise rejected by seeking on the beginning instead of play pause
+   * @returns {void}
+   * @private
+   */
+  _maybeFixStallForSmartTV(): void {
+    const defaultStallSkip = 0.1;
+    const currentStallSkip = this._shaka.getConfiguration().streaming.stallSkip;
+    Utils.Object.mergeDeep(this._config.shakaConfig, {streaming: {stallSkip: defaultStallSkip}});
+    this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
+      if (currentStallSkip !== this._shaka.getConfiguration().streaming.stallSkip) {
+        this._shaka.configure({streaming: {stallSkip: currentStallSkip}});
+      }
+    });
+  }
   /**
    * get the redirected URL
    * @param {string} url - The url to check for redirection
