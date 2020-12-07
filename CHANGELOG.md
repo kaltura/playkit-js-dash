@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.4](https://github.com/kaltura/playkit-js-dash/compare/v1.20.3...v1.20.4) (2020-12-07)
+
+
+### Bug Fixes
+
+* destroy promise doesn't fullfiled correctly ([#122](https://github.com/kaltura/playkit-js-dash/issues/122)) ([ba82b06](https://github.com/kaltura/playkit-js-dash/commit/ba82b06))
+* **FEC-10590:** DOM play error on SmartTV on when stall happen on the beginning ([#123](https://github.com/kaltura/playkit-js-dash/issues/123)) ([84d10f2](https://github.com/kaltura/playkit-js-dash/commit/84d10f2))
+
+
+
 ### [1.20.3](https://github.com/kaltura/playkit-js-dash/compare/v1.20.2...v1.20.3) (2020-11-03)
 
 
