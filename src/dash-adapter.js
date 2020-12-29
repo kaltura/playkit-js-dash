@@ -183,8 +183,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   static createAdapter(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object): IMediaSourceAdapter {
     let adapterConfig: Object = Utils.Object.copyDeep(DefaultConfig);
-    if (Utils.Object.hasPropertyPath(config, 'playback.useNativeTextTrack')) {
-      adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'playback.useNativeTextTrack');
+    if (Utils.Object.hasPropertyPath(config, 'text.useNativeTextTrack')) {
+      adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'text.useNativeTextTrack');
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
