@@ -342,7 +342,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
     //render text tracks to our own container
-    if (this._config.useShakaTextTrackDisplay) {
+    if (this._config.shakaConfig.useShakaTextTrackDisplay) {
       this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
     }
     this._maybeFixStallForSmartTV();
@@ -892,7 +892,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   selectTextTrack(textTrack: TextTrack): void {
     if (this._shaka && textTrack instanceof TextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
-      this._shaka.setTextTrackVisibility(this._config.useShakaTextTrackDisplay || this._config.textTrackVisibile);
+      this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
       this._shaka.selectTextLanguage(textTrack.language);
       this._onTrackChanged(textTrack);
     }
