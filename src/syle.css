@@ -1,0 +1,29 @@
+.shaka-text-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  min-width: 48px;
+  transition: bottom cubic-bezier(0.4, 0, 0.6, 1) 0.1s;
+  transition-delay: 0.5s;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.shaka-text-container * {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.shaka-text-container span {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  display: inline-block;
+}
+
+.shaka-text-container .shaka-nested-cue:not(:last-of-type):after {
+  content: ' ';
+  white-space: pre;
+}
