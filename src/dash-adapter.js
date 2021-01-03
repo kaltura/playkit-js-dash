@@ -16,6 +16,7 @@ import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
 import TextDisplayer from './text-displayer';
+import 'shaka-player/dist/controls.css';
 
 type ShakaEventType = {[event: string]: string};
 
@@ -186,6 +187,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'text.useNativeTextTrack')) {
       adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'text.useNativeTextTrack');
     }
+    if (Utils.Object.hasPropertyPath(config, 'text.useShakaTextTrackDisplay')) {
+      adapterConfig.useShakaTextTrackDisplay = Utils.Object.getPropertyPath(config, 'text.useShakaTextTrackDisplay');
+    }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
       adapterConfig.forceRedirectExternalStreams = options.forceRedirectExternalStreams;
@@ -338,13 +342,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _setShakaConfig(): void {
-    const textDisplayerConfig = {
-      shakaConfig: {
-        textDisplayFactory: function (videoEl) {
-          return new TextDisplayer(videoEl);
-        }.bind(null, this._videoElement)
-      }
-    };
+    let textDisplayerConfig = {};
+    if (!this._config.useShakaTextTrackDisplay) {
+      textDisplayerConfig = {
+        shakaConfig: {
+          textDisplayFactory: function (videoEl) {
+            return new TextDisplayer(videoEl);
+          }.bind(null, this._videoElement)
+        }
+      };
+    }
     this._config = Utils.Object.mergeDeep(textDisplayerConfig, DefaultConfig, this._config);
   }
 
@@ -357,6 +364,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
+    //render text tracks to our own container
+    if (this._config.useShakaTextTrackDisplay) {
+      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
+    }
     this._maybeFixStallForSmartTV();
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
@@ -904,7 +915,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   selectTextTrack(textTrack: TextTrack): void {
     if (this._shaka && textTrack instanceof TextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
-      this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
+      this._shaka.setTextTrackVisibility(this._config.useShakaTextTrackDisplay || this._config.textTrackVisibile);
       this._shaka.selectTextLanguage(textTrack.language);
       this._onTrackChanged(textTrack);
     }
