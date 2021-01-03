@@ -15,7 +15,7 @@ import {
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
-import './syle.css';
+import './assets/syle.css';
 
 type ShakaEventType = {[event: string]: string};
 
