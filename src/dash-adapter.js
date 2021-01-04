@@ -15,7 +15,7 @@ import {
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
-import TextDisplayer from './text-displayer';
+import './assets/syle.css';
 
 type ShakaEventType = {[event: string]: string};
 
@@ -328,24 +328,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   constructor(videoElement: HTMLVideoElement, source: PKMediaSourceObject, config: Object = {}) {
     DashAdapter._logger.debug('Creating adapter. Shaka version: ' + shaka.Player.version);
     super(videoElement, source, config);
-    this._setShakaConfig();
+    this._config = Utils.Object.mergeDeep({}, DefaultConfig, this._config);
     this._init();
-  }
-
-  /**
-   * Sets the shaka config.
-   * @private
-   * @returns {void}
-   */
-  _setShakaConfig(): void {
-    const textDisplayerConfig = {
-      shakaConfig: {
-        textDisplayFactory: function (videoEl) {
-          return new TextDisplayer(videoEl);
-        }.bind(null, this._videoElement)
-      }
-    };
-    this._config = Utils.Object.mergeDeep(textDisplayerConfig, DefaultConfig, this._config);
   }
 
   /**
@@ -357,6 +341,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
+    //render text tracks to our own container
+    if (this._config.shakaConfig.useShakaTextTrackDisplay) {
+      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
+    }
     this._maybeFixStallForSmartTV();
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
