@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.21.0](https://github.com/kaltura/playkit-js-dash/compare/v1.20.4...v1.21.0) (2021-01-07)
+
+
+### Bug Fixes
+
+* **FEC-10767:** SMPTE-TT Subtitles Support ([#126](https://github.com/kaltura/playkit-js-dash/issues/126)) ([1ad0c7f](https://github.com/kaltura/playkit-js-dash/commit/1ad0c7f))
+
+
+### Features
+
+* **FEC-10766:** create text config section and option for styling ([#124](https://github.com/kaltura/playkit-js-dash/issues/124)) ([f4a56cf](https://github.com/kaltura/playkit-js-dash/commit/f4a56cf))
+
+
+
 ### [1.20.4](https://github.com/kaltura/playkit-js-dash/compare/v1.20.3...v1.20.4) (2020-12-07)
 
 
