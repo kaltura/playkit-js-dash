@@ -38,7 +38,7 @@
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-flow": "^7.10.4",
     "@babel/register": "^7.10.5",
-    "@playkit-js/playkit-js": "0.62.1-canary.724715e",
+    "@playkit-js/playkit-js": "0.65.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "babel-plugin-istanbul": "^6.0.0",
@@ -72,7 +72,7 @@
     "mocha": "^8.0.1",
     "mocha-cli": "^1.0.1",
     "prettier": "^2.0.5",
-    "shaka-player": "3.0.5",
+    "shaka-player": "3.0.7",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0",
     "standard-version": "^6.0.1",
@@ -83,8 +83,8 @@
     "webpack-dev-server": "^3.11.0"
   },
   "peerDependencies": {
-    "@playkit-js/playkit-js": "0.63.0",
-    "shaka-player": "3.0.5"
+    "@playkit-js/playkit-js": "0.65.0",
+    "shaka-player": "3.0.7"
   },
   "keywords": [
     "kaltura",
