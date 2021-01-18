@@ -1204,7 +1204,7 @@ describe('DashAdapter: _onBuffering', () => {
     dashInstance._onBuffering({buffering: true});
   });
 
-  it('should dispatch playing event when buffering is false and video is playing', done => {
+  it('should dispatch playing event when buffering is false and video is playing after waiting event', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     let hasPlaying = false;
     let onPlaying = () => {
@@ -1213,10 +1213,15 @@ describe('DashAdapter: _onBuffering', () => {
         done();
       } else {
         hasPlaying = true;
-        dashInstance._onBuffering({buffering: false});
+        dashInstance._onBuffering({buffering: true});
       }
     };
+    const onWaiting = () => {
+      dashInstance._videoElement.removeEventListener(EventType.WAITING, onWaiting);
+      dashInstance._onBuffering({buffering: false});
+    };
     dashInstance._videoElement.addEventListener(EventType.PLAYING, onPlaying);
+    dashInstance._videoElement.addEventListener(EventType.WAITING, onWaiting);
     dashInstance
       .load()
       .then(() => {
