@@ -612,10 +612,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _addBindings(): void {
     this._eventManager.listen(this._shaka, ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
     this._eventManager.listen(this._shaka, ShakaEvent.ERROR, this._adapterEventsBindings.error);
-    this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
+    this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () =>
+      this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering)
+    );
     // called when a resource is downloaded
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
       switch (type) {
