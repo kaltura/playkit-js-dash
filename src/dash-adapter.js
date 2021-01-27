@@ -152,7 +152,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @type {number}
    * @private
    */
-  _lastTimeDetach: number = 0;
+  _lastTimeDetach: number = NaN;
   /**
    * Whether the request filter threw an error
    * @type {boolean}
@@ -539,7 +539,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   detachMediaSource(): void {
     if (this._shaka) {
-      this._lastTimeDetach = this.currentTime;
+      if (parseInt(this.currentTime) === parseInt(this.duration)) {
+        this._lastTimeDetach = 0;
+      } else {
+        this._lastTimeDetach = this.currentTime;
+      }
       this._reset().then(() => {
         this._shaka = null;
         this._loadPromise = null;
@@ -635,6 +639,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
           let shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
           shakaStartTime = this._lastTimeDetach || shakaStartTime;
+          this._lastTimeDetach = NaN;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(url => {
               return this._shaka.load(url, shakaStartTime);
