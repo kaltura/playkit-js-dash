@@ -638,7 +638,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
           let shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
-          shakaStartTime = this._lastTimeDetach || shakaStartTime;
+          shakaStartTime = isNaN(this._lastTimeDetach) ? shakaStartTime : this._lastTimeDetach;
           this._lastTimeDetach = NaN;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(url => {
