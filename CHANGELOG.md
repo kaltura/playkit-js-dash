@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.21.1](https://github.com/kaltura/playkit-js-dash/compare/v1.21.0...v1.21.1) (2021-01-28)
+
+
+### Bug Fixes
+
+* **FEC-10840:** incorrect waiting and playing event comes from dash adapter ([#128](https://github.com/kaltura/playkit-js-dash/issues/128)) ([fb7ecba](https://github.com/kaltura/playkit-js-dash/commit/fb7ecba))
+* update shaka to fix the memory leak ([#127](https://github.com/kaltura/playkit-js-dash/issues/127)) ([7e58f67](https://github.com/kaltura/playkit-js-dash/commit/7e58f67))
+
+
+
 ## [1.21.0](https://github.com/kaltura/playkit-js-dash/compare/v1.20.4...v1.21.0) (2021-01-07)
 
 
