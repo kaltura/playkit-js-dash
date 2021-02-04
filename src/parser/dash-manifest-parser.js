@@ -1,5 +1,5 @@
 // @flow
-import {ParserUtils, XmlUtils, MpdUtils} from './parser-utils';
+import {MpdUtils, ParserUtils, XmlUtils} from './parser-utils';
 import {AdaptationSet} from './adaptation-set';
 import {getLogger} from '@playkit-js/playkit-js';
 

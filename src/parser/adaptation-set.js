@@ -1,7 +1,7 @@
 // @flow
 import {SegmentTemplate} from './segment-template';
 import {Representation} from './representation';
-import {XmlUtils, MpdUtils} from './parser-utils';
+import {MpdUtils, XmlUtils} from './parser-utils';
 
 class AdaptationSet {
   static ContentType: {[type: string]: string} = {

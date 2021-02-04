@@ -1,6 +1,6 @@
 // @flow
 import {EssentialProperty} from './essential-property';
-import {XmlUtils, MpdUtils} from './parser-utils';
+import {MpdUtils, XmlUtils} from './parser-utils';
 
 class Representation {
   _id: string;
