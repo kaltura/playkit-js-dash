@@ -1,21 +1,22 @@
 // @flow
 import shaka from 'shaka-player';
 import {
-  DrmScheme,
   AudioTrack,
   BaseMediaSourceAdapter,
+  DrmScheme,
   Error,
   EventType,
+  RequestType,
   TextTrack,
   Track,
   Utils,
-  VideoTrack,
-  RequestType
+  VideoTrack
 } from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
 import './assets/syle.css';
+import {DashManifestParser} from './parser/dash-manifest-parser';
 
 type ShakaEventType = {[event: string]: string};
 
@@ -367,6 +368,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
     });
   }
+
   /**
    * get the redirected URL
    * @param {string} url - The url to check for redirection
@@ -629,10 +631,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           });
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
+          this._parseManifest(response.data);
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
-          break;
       }
     });
+  }
+
+  _parseManifest(manifestBuffer: ArrayBuffer): void {
+    this._manifestParser = new DashManifestParser(manifestBuffer);
+    this._manifestParser.parseManifest();
   }
 
   /**
