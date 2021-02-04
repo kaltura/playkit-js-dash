@@ -539,7 +539,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   detachMediaSource(): void {
     if (this._shaka) {
-      if (parseInt(this.currentTime) === parseInt(this.duration)) {
+      // 1 second from will signal as end
+      if ((Math.floor(this.duration) - Math.floor(this.currentTime)) <= 1) {
         this._lastTimeDetach = 0;
       } else {
         this._lastTimeDetach = this.currentTime;
