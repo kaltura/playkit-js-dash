@@ -11,12 +11,12 @@ class SegmentTemplate {
   _endNumber: number;
 
   constructor(elem: HTMLElement) {
-    this._media = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.MEDIA);
-    this._startNumber = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.START_NUMBER, XmlUtils.parsePositiveInt);
-    this._duration = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.DURATION, XmlUtils.parseFloat);
-    this._timescale = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.TIMESCALE, XmlUtils.parsePositiveInt);
-    this._presentationTimeOffset = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.PRESENTATION_TIME_OFFSET, XmlUtils.parsePositiveInt);
-    this._endNumber = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.END_NUMBER, XmlUtils.parsePositiveInt);
+    this._media = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.MEDIA);
+    this._startNumber = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.START_NUMBER, XmlUtils.parsePositiveInt);
+    this._duration = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.DURATION, XmlUtils.parseFloat);
+    this._timescale = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.TIMESCALE, XmlUtils.parsePositiveInt);
+    this._presentationTimeOffset = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.PRESENTATION_TIME_OFFSET, XmlUtils.parsePositiveInt);
+    this._endNumber = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.END_NUMBER, XmlUtils.parsePositiveInt);
   }
 
   get media(): string {

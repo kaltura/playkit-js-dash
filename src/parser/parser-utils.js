@@ -11,13 +11,13 @@ const ParserUtils = {
 };
 
 const MpdUtils = {
-  TagsTypes: {
+  TagTypes: {
     SEGMENT_TEMPLATE: 'SegmentTemplate',
     REPRESENTATION: 'Representation',
     ESSENTIAL_PROPERTY: 'EssentialProperty',
     ADAPTATION_SET: 'AdaptationSet'
   },
-  AttributesTypes: {
+  AttributeTypes: {
     ID: 'id',
     CONTENT_TYPE: 'contentType',
     MIME_TYPE: 'mimeType',

@@ -36,7 +36,7 @@ class DashManifestParser {
   }
 
   _parseAdaptionSets = () => {
-    const adaptationNodes = XmlUtils.findElement(this._xmlDoc, MpdUtils.TagsTypes.ADAPTATION_SET);
+    const adaptationNodes = XmlUtils.findElement(this._xmlDoc, MpdUtils.TagTypes.ADAPTATION_SET);
     // For now parse only image adaptation sets
     const imageAdaptationsNodes = Array.from(adaptationNodes).filter(
       adaptation => XmlUtils.parseAttr(adaptation, 'contentType') === AdaptationSet.ContentType.IMAGE

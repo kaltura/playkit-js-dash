@@ -18,11 +18,11 @@ class AdaptationSet {
   _representations: Array<Representation>;
 
   constructor(elem: HTMLElement) {
-    this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.ID);
-    this._mimeType = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.MIME_TYPE);
-    this._contentType = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.CONTENT_TYPE);
-    this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagsTypes.REPRESENTATION)).map(repElem => new Representation(repElem));
-    const segTempElem = XmlUtils.findChild(elem, MpdUtils.TagsTypes.SEGMENT_TEMPLATE);
+    this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.ID);
+    this._mimeType = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.MIME_TYPE);
+    this._contentType = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.CONTENT_TYPE);
+    this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagTypes.REPRESENTATION)).map(repElem => new Representation(repElem));
+    const segTempElem = XmlUtils.findChild(elem, MpdUtils.TagTypes.SEGMENT_TEMPLATE);
     if (segTempElem) {
       this._segmentTemplate = new SegmentTemplate(segTempElem);
     }

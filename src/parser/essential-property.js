@@ -6,8 +6,8 @@ class EssentialProperty {
   _value: string;
 
   constructor(elem: HTMLElement) {
-    this._schemeIdUri = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.SCHEME_ID_URI);
-    this._value = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.VALUE);
+    this._schemeIdUri = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.SCHEME_ID_URI);
+    this._value = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.VALUE);
   }
 
   get schemeIdUri(): string {
