@@ -16,6 +16,22 @@ const MpdUtils = {
     REPRESENTATION: 'Representation',
     ESSENTIAL_PROPERTY: 'EssentialProperty',
     ADAPTATION_SET: 'AdaptationSet'
+  },
+  AttributesTypes: {
+    ID: 'id',
+    CONTENT_TYPE: 'contentType',
+    MIME_TYPE: 'mimeType',
+    MEDIA: 'media',
+    DURATION: 'duration',
+    START_NUMBER: 'startNumber',
+    TIMESCALE: 'timescale',
+    PRESENTATION_TIME_OFFSET: 'presentationTimeOffset',
+    END_NUMBER: 'endNumber',
+    BANDWIDTH: 'bandwidth',
+    WIDTH: 'width',
+    HEIGHT: 'height',
+    SCHEME_ID_URI: 'schemeIdUri',
+    VALUE: 'value'
   }
 };
 

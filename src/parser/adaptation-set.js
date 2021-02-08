@@ -18,9 +18,9 @@ class AdaptationSet {
   _representations: Array<Representation>;
 
   constructor(elem: HTMLElement) {
-    this._id = XmlUtils.parseAttr(elem, 'id');
-    this._mimeType = XmlUtils.parseAttr(elem, 'mimeType');
-    this._contentType = XmlUtils.parseAttr(elem, 'contentType');
+    this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.ID);
+    this._mimeType = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.MIME_TYPE);
+    this._contentType = XmlUtils.parseAttr(elem, MpdUtils.AttributesTypes.CONTENT_TYPE);
     this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagsTypes.REPRESENTATION)).map(repElem => new Representation(repElem));
     const segTempElem = XmlUtils.findChild(elem, MpdUtils.TagsTypes.SEGMENT_TEMPLATE);
     if (segTempElem) {
