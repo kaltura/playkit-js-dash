@@ -3,6 +3,10 @@ const ParserUtils = {
   BufferToStr: (buffer: ArrayBuffer): string => {
     const textDecoder = new TextDecoder();
     return textDecoder.decode(buffer);
+  },
+  StrToBuffer: (str: string): Uint8Array => {
+    const textEncoder = new TextEncoder();
+    return textEncoder.encode(str);
   }
 };
 

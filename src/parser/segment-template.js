@@ -5,7 +5,7 @@ class SegmentTemplate {
   _media: string;
   _duration: number;
   _startNumber: number;
-  // live related
+  // Live related
   _timescale: number;
   _presentationTimeOffset: number;
   _endNumber: number;

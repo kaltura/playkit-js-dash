@@ -9,6 +9,7 @@ class DashManifestParser {
   _adaptationSets: Array<AdaptationSet>;
 
   constructor(manifest: ArrayBuffer) {
+    this._logger.debug('Initialize manifest parser', manifest);
     const xmlStr = ParserUtils.BufferToStr(manifest);
     this._xmlDoc = XmlUtils.parseXml(xmlStr);
     this._adaptationSets = [];
@@ -16,21 +17,11 @@ class DashManifestParser {
 
   parseManifest() {
     try {
-      // for now parse only adaptation sets
+      this._logger.debug('Start parsing dash manifest');
+      // For now parse only adaptation sets
       this._parseAdaptionSets();
     } catch (e) {
       this._logger.error('Manifest parsing failed.', e);
-    }
-  }
-
-  _parseAdaptionSets() {
-    const adaptationNodes = XmlUtils.findElement(this._xmlDoc, MpdUtils.TagsTypes.ADAPTATION_SET);
-    // for now parse only image adaptation sets
-    const imageAdaptationsNodes = Array.from(adaptationNodes).filter(
-      adaptation => XmlUtils.parseAttr(adaptation, 'contentType') === AdaptationSet.ContentType.IMAGE
-    );
-    if (imageAdaptationsNodes.length > 0) {
-      this._adaptationSets = imageAdaptationsNodes.map(adaptation => new AdaptationSet(adaptation));
     }
   }
 
@@ -43,6 +34,18 @@ class DashManifestParser {
     }
     return null;
   }
+
+  _parseAdaptionSets = () => {
+    const adaptationNodes = XmlUtils.findElement(this._xmlDoc, MpdUtils.TagsTypes.ADAPTATION_SET);
+    // For now parse only image adaptation sets
+    const imageAdaptationsNodes = Array.from(adaptationNodes).filter(
+      adaptation => XmlUtils.parseAttr(adaptation, 'contentType') === AdaptationSet.ContentType.IMAGE
+    );
+    if (imageAdaptationsNodes.length > 0) {
+      this._adaptationSets = imageAdaptationsNodes.map(adaptation => new AdaptationSet(adaptation));
+      this._logger.debug('Found image adaptation set', this._adaptationSets);
+    }
+  };
 
   get adaptationSets(): Array<AdaptationSet> {
     return this._adaptationSets;

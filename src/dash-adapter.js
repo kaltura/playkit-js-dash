@@ -172,6 +172,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _isDestroyInProgress: boolean = false;
+  /**
+   * Custom dash manifest parser.
+   * @type {DashManifestParser}
+   * @private
+   */
+  _manifestParser: DashManifestParser;
 
   /**
    * Factory method to create media source adapter.
@@ -637,6 +643,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     });
   }
 
+  /**
+   * Custom parser to retrieve image adaptation sets.
+   * @param {ArrayBuffer} manifestBuffer - The array buffer manifest from the response.
+   * @function _parseManifest
+   * @private
+   * @returns {void}
+   */
   _parseManifest(manifestBuffer: ArrayBuffer): void {
     this._manifestParser = new DashManifestParser(manifestBuffer);
     this._manifestParser.parseManifest();
