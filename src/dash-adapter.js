@@ -542,7 +542,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       // 1 second different between duration and current time will signal as end - will enable replay button
       if (Math.floor(this.duration - this.currentTime) === 0) {
         this._lastTimeDetach = 0;
-      } else {
+      } else if (this.currentTime > 0) {
         this._lastTimeDetach = this.currentTime;
       }
       this._reset().then(() => {
