@@ -7,7 +7,7 @@ class Representation {
   _bandwidth: number;
   _width: number;
   _height: number;
-  _essentialProperty: EssentialProperty;
+  _essentialProperty: ?EssentialProperty;
 
   constructor(elem: HTMLElement) {
     this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.ID);
@@ -36,7 +36,7 @@ class Representation {
     return this._height;
   }
 
-  get essentialProperty(): EssentialProperty {
+  get essentialProperty(): ?EssentialProperty {
     return this._essentialProperty;
   }
 }

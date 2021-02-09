@@ -9,8 +9,8 @@ class DashManifestParser {
   _adaptationSets: Array<AdaptationSet>;
 
   constructor(manifest: ArrayBuffer) {
+    this._logger.debug('Initialize manifest parser');
     const xmlStr = ParserUtils.BufferToStr(manifest);
-    this._logger.debug('Initialize manifest parser', manifest, xmlStr);
     this._xmlDoc = XmlUtils.parseXml(xmlStr);
     this._adaptationSets = [];
   }
@@ -20,8 +20,9 @@ class DashManifestParser {
       this._logger.debug('Start parsing dash manifest');
       // For now parse only adaptation sets
       this._parseAdaptionSets();
+      this._logger.debug('Manifest parsing finished successfully');
     } catch (e) {
-      this._logger.error('Manifest parsing failed.', e);
+      this._logger.error('Manifest parsing failed', e);
     }
   }
 

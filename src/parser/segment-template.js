@@ -2,6 +2,13 @@
 import {MpdUtils, XmlUtils} from './parser-utils';
 
 class SegmentTemplate {
+  static MediaTemplateType: {[key: string]: string} = {
+    REPRESENTATION: '$RepresentationID$',
+    NUMBER: '$Number$',
+    BANDWIDTH: '$Bandwidth$',
+    TIME: '$Time$'
+  };
+
   _media: string;
   _duration: number;
   _startNumber: number;
