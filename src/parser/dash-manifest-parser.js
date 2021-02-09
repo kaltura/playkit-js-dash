@@ -45,6 +45,8 @@ class DashManifestParser {
     if (imageAdaptationsNodes.length > 0) {
       this._adaptationSets = imageAdaptationsNodes.map(adaptation => new AdaptationSet(adaptation));
       this._logger.debug('Found image adaptation set', this._adaptationSets);
+    } else {
+      this._logger.debug('No image adaptations were found in manifest');
     }
   };
 
