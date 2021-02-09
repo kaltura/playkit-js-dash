@@ -152,7 +152,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @type {number}
    * @private
    */
-  _lastTimeDetach: number = 0;
+  _lastTimeDetach: number = NaN;
   /**
    * Whether the request filter threw an error
    * @type {boolean}
@@ -529,20 +529,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         Utils.Dom.removeAttribute(this._videoElement, 'src');
       }
       this._init();
-      const _seekAfterDetach = () => {
-        if (isNaN(this._lastTimeDetach)) return;
-        if (parseInt(this._lastTimeDetach) === parseInt(this.duration)) {
-          this.currentTime = 0;
-        } else {
-          this.currentTime = this._lastTimeDetach;
-        }
-        this._lastTimeDetach = NaN;
-      };
-      if (!isNaN(this._lastTimeDetach)) {
-        this._eventManager.listenOnce(this._videoElement, EventType.LOADED_DATA, _seekAfterDetach);
-        //change to NaN to avoid the seek after detach whenever seeked fired before - SmartTV issue
-        this._eventManager.listenOnce(this._videoElement, EventType.SEEKED, () => (this._lastTimeDetach = NaN));
-      }
     }
   }
 
@@ -553,7 +539,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   detachMediaSource(): void {
     if (this._shaka) {
-      this._lastTimeDetach = this.currentTime;
+      // 1 second different between duration and current time will signal as end - will enable replay button
+      if (Math.floor(this.duration - this.currentTime) === 0) {
+        this._lastTimeDetach = 0;
+      } else if (this.currentTime > 0) {
+        this._lastTimeDetach = this.currentTime;
+      }
       this._reset().then(() => {
         this._shaka = null;
         this._loadPromise = null;
@@ -647,7 +638,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
-          const shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
+          let shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
+          shakaStartTime = isNaN(this._lastTimeDetach) ? shakaStartTime : this._lastTimeDetach;
+          this._lastTimeDetach = NaN;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(url => {
               return this._shaka.load(url, shakaStartTime);
