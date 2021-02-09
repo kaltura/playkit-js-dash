@@ -10,9 +10,9 @@ class DashManifestParser {
 
   constructor(manifest: ArrayBuffer) {
     this._logger.debug('Initialize manifest parser');
+    this._adaptationSets = [];
     const xmlStr = ParserUtils.BufferToStr(manifest);
     this._xmlDoc = XmlUtils.parseXml(xmlStr);
-    this._adaptationSets = [];
   }
 
   parseManifest() {
