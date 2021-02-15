@@ -8,11 +8,17 @@ class DashManifestParser {
   _xmlDoc: Document;
   _adaptationSets: Array<AdaptationSet>;
 
+  static isValid(): boolean {
+    return window.TextEncoder && window.TextDecoder;
+  }
+
   constructor(manifest: ArrayBuffer) {
     this._logger.debug('Initialize manifest parser');
     this._adaptationSets = [];
     const xmlStr = ParserUtils.BufferToStr(manifest);
-    this._xmlDoc = XmlUtils.parseXml(xmlStr);
+    if (xmlStr) {
+      this._xmlDoc = XmlUtils.parseXml(xmlStr);
+    }
   }
 
   parseManifest() {

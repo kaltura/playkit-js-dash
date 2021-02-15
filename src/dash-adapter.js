@@ -642,8 +642,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _parseManifest(manifestBuffer: ArrayBuffer): void {
-    this._manifestParser = new DashManifestParser(manifestBuffer);
-    this._manifestParser.parseManifest();
+    if (DashManifestParser.isValid()) {
+      this._manifestParser = new DashManifestParser(manifestBuffer);
+      this._manifestParser.parseManifest();
+    }
   }
 
   /**

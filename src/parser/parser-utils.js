@@ -1,12 +1,18 @@
 // @flow
 const ParserUtils = {
-  BufferToStr: (buffer: ArrayBuffer): string => {
-    const textDecoder = new TextDecoder();
-    return textDecoder.decode(buffer);
+  BufferToStr: (buffer: ArrayBuffer): ?string => {
+    if (TextDecoder) {
+      const textDecoder = new TextDecoder();
+      return textDecoder.decode(buffer);
+    }
+    return null;
   },
-  StrToBuffer: (str: string): Uint8Array => {
-    const textEncoder = new TextEncoder();
-    return textEncoder.encode(str);
+  StrToBuffer: (str: string): ?Uint8Array => {
+    if (TextEncoder) {
+      const textEncoder = new TextEncoder();
+      return textEncoder.encode(str);
+    }
+    return null;
   }
 };
 
