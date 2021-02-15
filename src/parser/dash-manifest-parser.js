@@ -22,22 +22,16 @@ class DashManifestParser {
       this._parseAdaptionSets();
       this._logger.debug('Manifest parsing finished successfully');
     } catch (e) {
-      this._logger.error('Manifest parsing failed', e);
+      this._logger.warn('Manifest parsing failed', e);
     }
   }
 
   getAdaptationSet(type: string): ?AdaptationSet {
-    if (type) {
-      const adaptationSets = this._adaptationSets.filter((adaptationSet: AdaptationSet) => adaptationSet.contentType === type);
-      if (adaptationSets) {
-        return adaptationSets[0];
-      }
-    }
-    return null;
+    return this._adaptationSets.find((adaptationSet: AdaptationSet) => adaptationSet.contentType === type);
   }
 
   _parseAdaptionSets = () => {
-    const adaptationNodes = XmlUtils.findElement(this._xmlDoc, MpdUtils.TagTypes.ADAPTATION_SET);
+    const adaptationNodes = XmlUtils.findElements(this._xmlDoc, MpdUtils.TagTypes.ADAPTATION_SET);
     // For now parse only image adaptation sets
     const imageAdaptationsNodes = Array.from(adaptationNodes).filter(
       adaptation => XmlUtils.parseAttr(adaptation, MpdUtils.AttributeTypes.CONTENT_TYPE) === AdaptationSet.ContentType.IMAGE

@@ -48,7 +48,7 @@ const XmlUtils = {
     }
     return parsedValue == null ? defaultValue : parsedValue;
   },
-  findElement: (node: HTMLElement, name: string): HTMLCollection<HTMLElement> => {
+  findElements: (node: HTMLElement, name: string): HTMLCollection<HTMLElement> => {
     return node.getElementsByTagName(name);
   },
   findChild(elem: HTMLElement, name: string): ?HTMLElement {
