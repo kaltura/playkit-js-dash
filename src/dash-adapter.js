@@ -1,21 +1,22 @@
 // @flow
 import shaka from 'shaka-player';
 import {
-  DrmScheme,
   AudioTrack,
   BaseMediaSourceAdapter,
+  DrmScheme,
   Error,
   EventType,
+  RequestType,
   TextTrack,
   Track,
   Utils,
-  VideoTrack,
-  RequestType
+  VideoTrack
 } from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
 import './assets/syle.css';
+import {DashManifestParser} from './parser/dash-manifest-parser';
 
 type ShakaEventType = {[event: string]: string};
 
@@ -171,6 +172,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _isDestroyInProgress: boolean = false;
+  /**
+   * Custom dash manifest parser.
+   * @type {DashManifestParser}
+   * @private
+   */
+  _manifestParser: DashManifestParser;
 
   /**
    * Factory method to create media source adapter.
@@ -367,6 +374,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
     });
   }
+
   /**
    * get the redirected URL
    * @param {string} url - The url to check for redirection
@@ -620,10 +628,25 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           });
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
+          this._parseManifest(response.data);
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
           break;
       }
     });
+  }
+
+  /**
+   * Custom parser to retrieve image adaptation sets.
+   * @param {ArrayBuffer} manifestBuffer - The array buffer manifest from the response.
+   * @function _parseManifest
+   * @private
+   * @returns {void}
+   */
+  _parseManifest(manifestBuffer: ArrayBuffer): void {
+    if (DashManifestParser.isValid()) {
+      this._manifestParser = new DashManifestParser(manifestBuffer);
+      this._manifestParser.parseManifest();
+    }
   }
 
   /**
