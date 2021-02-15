@@ -630,6 +630,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
           this._parseManifest(response.data);
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
+          break;
       }
     });
   }
