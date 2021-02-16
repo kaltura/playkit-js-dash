@@ -16,7 +16,7 @@ describe('DashManifestParser', () => {
     manifestParser.parseManifest();
     manifestParser.adaptationSets.should.have.lengthOf(1);
 
-    const imageSet = manifestParser.getAdaptationSet(AdaptationSet.ContentType.IMAGE);
+    const imageSet = manifestParser.getImageSet();
     imageSet.should.be.an.instanceof(AdaptationSet);
     (imageSet.essentialProperty === undefined).should.be.true;
     imageSet.id.should.equal('3');
@@ -50,7 +50,7 @@ describe('DashManifestParser', () => {
     manifestParser.parseManifest();
     manifestParser.adaptationSets.should.have.lengthOf(1);
 
-    const imageSet = manifestParser.getAdaptationSet(AdaptationSet.ContentType.IMAGE);
+    const imageSet = manifestParser.getImageSet();
     imageSet.should.be.an.instanceof(AdaptationSet);
     (imageSet.essentialProperty === undefined).should.be.true;
     imageSet.id.should.equal('3');
@@ -96,7 +96,7 @@ describe('DashManifestParser', () => {
     manifestParser.parseManifest();
     manifestParser.adaptationSets.should.have.lengthOf(1);
 
-    const imageSet = manifestParser.getAdaptationSet(AdaptationSet.ContentType.IMAGE);
+    const imageSet = manifestParser.getImageSet();
     imageSet.should.be.an.instanceof(AdaptationSet);
     imageSet.id.should.equal('thumbnails');
     imageSet.contentType.should.equal(AdaptationSet.ContentType.IMAGE);

@@ -1,6 +1,4 @@
-import {ParserUtils} from '../../../src/parser/parser-utils';
-
-const ImageAdaptationSetWithOneRepresentation = ParserUtils.StrToBuffer(`
+const ImageAdaptationSetWithOneRepresentation = `
   <MPD mediaPresentationDuration="PT634.566S" minBufferTime="PT2.00S" profiles="urn:hbbtv:dash:profile:isoff-live:2012,urn:mpeg:dash:profile:isoff-live:2011" type="static" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 DASH-MPD.xsd">
  <BaseURL>./</BaseURL>
  <Period>
@@ -33,9 +31,9 @@ const ImageAdaptationSetWithOneRepresentation = ParserUtils.StrToBuffer(`
   </AdaptationSet>
  </Period>
 </MPD>
-  `);
+  `;
 
-const ImageAdaptationSetWithMultipleRepresentations = ParserUtils.StrToBuffer(`
+const ImageAdaptationSetWithMultipleRepresentations = `
  <MPD mediaPresentationDuration="PT634.566S" minBufferTime="PT2.00S" profiles="urn:hbbtv:dash:profile:isoff-live:2012,urn:mpeg:dash:profile:isoff-live:2011" type="static" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 DASH-MPD.xsd">
     <BaseURL>./</BaseURL>
     <Period>
@@ -71,9 +69,9 @@ const ImageAdaptationSetWithMultipleRepresentations = ParserUtils.StrToBuffer(`
         </AdaptationSet>
     </Period>
 </MPD>
-  `);
+  `;
 
-const ImageAdaptationWithEssentialUnderAdaptation = ParserUtils.StrToBuffer(`
+const ImageAdaptationWithEssentialUnderAdaptation = `
 <MPD mediaPresentationDuration="PT634.566S" minBufferTime="PT2.00S" profiles="urn:hbbtv:dash:profile:isoff-live:2012,urn:mpeg:dash:profile:isoff-live:2011" type="static" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 DASH-MPD.xsd">
     <BaseURL>./</BaseURL>
     <Period>
@@ -106,6 +104,6 @@ const ImageAdaptationWithEssentialUnderAdaptation = ParserUtils.StrToBuffer(`
         </AdaptationSet>
     </Period>
 </MPD>
-`);
+`;
 
 export {ImageAdaptationSetWithOneRepresentation, ImageAdaptationSetWithMultipleRepresentations, ImageAdaptationWithEssentialUnderAdaptation};

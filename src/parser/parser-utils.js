@@ -1,4 +1,34 @@
 // @flow
+import {SegmentTemplate} from './segment-template';
+
+const UrlUtils = {
+  resolve: (url: string, data: {id?: string, index?: number, bitrate?: number, time?: number}): string => {
+    const {id, index, bitrate, time} = data;
+    const regExp = /\$([a-zA-Z]+)\$/g;
+    const expressions = url.match(regExp);
+    const replaceTokens = (url: string, exp: string, token: any) => (token ? url.replace(exp, token) : url);
+    if (expressions) {
+      expressions.forEach((exp: string) => {
+        switch (exp) {
+          case SegmentTemplate.MediaTemplateType.REPRESENTATION:
+            url = replaceTokens(url, exp, id);
+            break;
+          case SegmentTemplate.MediaTemplateType.NUMBER:
+            url = replaceTokens(url, exp, index);
+            break;
+          case SegmentTemplate.MediaTemplateType.BANDWIDTH:
+            url = replaceTokens(url, exp, bitrate);
+            break;
+          case SegmentTemplate.MediaTemplateType.TIME:
+            url = replaceTokens(url, exp, time);
+            break;
+        }
+      });
+    }
+    return url;
+  }
+};
+
 const ParserUtils = {
   BufferToStr: (buffer: ArrayBuffer): ?string => {
     if (TextDecoder) {
@@ -69,6 +99,10 @@ const XmlUtils = {
       return child instanceof Element && child.tagName === name;
     });
   },
+  parseInt: (intString: string): ?number => {
+    const n = Number(intString);
+    return n % 1 === 0 ? n : null;
+  },
   parsePositiveInt: (intString: string): ?number => {
     const n = Number(intString);
     return n % 1 === 0 && n > 0 ? n : null;
@@ -79,4 +113,4 @@ const XmlUtils = {
   }
 };
 
-export {ParserUtils, MpdUtils, XmlUtils};
+export {ParserUtils, MpdUtils, XmlUtils, UrlUtils};

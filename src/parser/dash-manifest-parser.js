@@ -12,10 +12,15 @@ class DashManifestParser {
     return window.TextEncoder && window.TextDecoder;
   }
 
-  constructor(manifest: ArrayBuffer) {
+  constructor(manifest: ArrayBuffer | string) {
     this._logger.debug('Initialize manifest parser');
     this._adaptationSets = [];
-    const xmlStr = ParserUtils.BufferToStr(manifest);
+    let xmlStr;
+    if (manifest instanceof ArrayBuffer) {
+      xmlStr = ParserUtils.BufferToStr(manifest);
+    } else {
+      xmlStr = manifest;
+    }
     if (xmlStr) {
       this._xmlDoc = XmlUtils.parseXml(xmlStr);
     }
@@ -32,8 +37,16 @@ class DashManifestParser {
     }
   }
 
-  getAdaptationSet(type: string): ?AdaptationSet {
-    return this._adaptationSets.find((adaptationSet: AdaptationSet) => adaptationSet.contentType === type);
+  getImageSet(): ?AdaptationSet {
+    return this._adaptationSets.find((adaptationSet: AdaptationSet) => adaptationSet.contentType === AdaptationSet.ContentType.IMAGE);
+  }
+
+  hasImageSet(): boolean {
+    return !!this.getImageSet();
+  }
+
+  get adaptationSets(): Array<AdaptationSet> {
+    return this._adaptationSets;
   }
 
   _parseAdaptionSets = () => {
@@ -49,10 +62,6 @@ class DashManifestParser {
       this._logger.debug('No image adaptations were found in manifest');
     }
   };
-
-  get adaptationSets(): Array<AdaptationSet> {
-    return this._adaptationSets;
-  }
 }
 
 export {DashManifestParser};
