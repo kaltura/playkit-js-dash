@@ -1098,7 +1098,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       DashAdapter._logger.error(error);
       // Stop all adapter processes on critical error
       if (error.severity === Error.Severity.CRITICAL) {
-        return this.destroy();
+        this.destroy();
       }
     }
   }
