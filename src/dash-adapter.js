@@ -187,12 +187,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _thumbnailController: ?DashThumbnailController;
-  /**
-   * Flag to indicate whether to disable the manifest parser or not.
-   * @type {boolean}
-   * @private
-   */
-  _isParserDisabled: boolean = false;
 
   /**
    * Factory method to create media source adapter.
@@ -658,24 +652,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _parseManifest(manifestBuffer: ArrayBuffer): void {
-    const parseManifest = () => {
+    if (!this._manifestParser && DashManifestParser.isValid()) {
+      DashAdapter._logger.debug('Creating parser for the first time');
       this._manifestParser = new DashManifestParser(manifestBuffer);
       this._manifestParser.parseManifest();
-    };
-    if (!this._isParserDisabled && DashManifestParser.isValid()) {
-      if (!this._manifestParser) {
-        DashAdapter._logger.debug('Creating parser for the first time');
-        parseManifest();
-      } else if (!this._manifestParser.hasImageSet()) {
-        DashAdapter._logger.debug('Manifest parsed with no image set - disabling parser');
-        // Disable parser to avoid redundant parsing operations on every refresh
-        this._isParserDisabled = true;
-        this._manifestParser = null;
-      } else if (this.isLive()) {
-        DashAdapter._logger.debug('Manifest refresh with image set - parse and update tracks');
-        parseManifest();
-        this._trigger(EventType.TRACKS_CHANGED, {tracks: this._getParsedTracks()});
-      }
     }
   }
 
@@ -764,7 +744,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
-    this._isParserDisabled = false;
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
       this._eventManager.removeAll();
@@ -1096,10 +1075,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
       this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
       DashAdapter._logger.error(error);
-      // Stop all adapter processes on critical error
-      if (error.severity === Error.Severity.CRITICAL) {
-        this.destroy();
-      }
     }
   }
 

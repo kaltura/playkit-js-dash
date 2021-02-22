@@ -30,18 +30,18 @@ class DashThumbnailController {
   }
 
   getThumbnail(time: number): ThumbnailInfo {
-    const thumbnailInfo = new ThumbnailInfo();
     const activeTrack = this.getActiveTrack();
     const {duration, rows, cols, sliceWidth, sliceHeight, customData} = activeTrack;
     const page = Math.floor(time / duration) + customData.startNumber;
     const offset = time % duration;
     const thumbIndex = Math.floor((offset * rows * cols) / duration);
-    thumbnailInfo.width = Math.floor(sliceWidth);
-    thumbnailInfo.height = Math.floor(sliceHeight);
-    thumbnailInfo.x = Math.floor(thumbIndex % rows) * sliceWidth;
-    thumbnailInfo.y = Math.floor(thumbIndex / rows) * sliceHeight;
-    thumbnailInfo.url = this._buildUrlFromTemplate(activeTrack, page);
-    return thumbnailInfo;
+    return new ThumbnailInfo({
+      width: Math.floor(sliceWidth),
+      height: Math.floor(sliceHeight),
+      x: Math.floor(thumbIndex % rows) * sliceWidth,
+      y: Math.floor(thumbIndex / rows) * sliceHeight,
+      url: this._buildUrlFromTemplate(activeTrack, page)
+    });
   }
 
   _parseTracks = (set: AdaptationSet, playerUrl: string): void => {
