@@ -1828,41 +1828,4 @@ describe('DashAdapter: in-stream thumbnails', () => {
       })
       .catch(done);
   });
-
-  it('should refresh dvr manifest successfully', done => {
-    let refreshCount = 0;
-    const targetRefreshCount = 3;
-    dashInstance = DashAdapter.createAdapter(video, dvrInStreamThumbnailSource, config);
-    dashInstance.addEventListener(EventType.TRACKS_CHANGED, event => {
-      refreshCount++;
-      event.payload.tracks.should.have.lengthOf(3);
-      event.payload.tracks.filter(t => t instanceof ImageTrack).should.have.lengthOf(1);
-      if (refreshCount === targetRefreshCount) {
-        done();
-      }
-    });
-    dashInstance.load().catch(done);
-  });
-
-  it('should disable parser for dvr stream when no image tracks in stream', done => {
-    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
-    dashInstance
-      .load()
-      .then(() => {
-        try {
-          dashInstance._isParserDisabled.should.be.false;
-          dashInstance._shaka.getNetworkingEngine().registerResponseFilter(type => {
-            switch (type) {
-              case shaka.net.NetworkingEngine.RequestType.MANIFEST:
-                dashInstance._isParserDisabled.should.be.true;
-                done();
-                break;
-            }
-          });
-        } catch (e) {
-          done(e);
-        }
-      })
-      .catch(done);
-  });
 });
