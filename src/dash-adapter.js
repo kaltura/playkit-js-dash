@@ -10,13 +10,16 @@ import {
   TextTrack,
   Track,
   Utils,
-  VideoTrack
+  VideoTrack,
+  ImageTrack,
+  ThumbnailInfo
 } from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
 import './assets/syle.css';
 import {DashManifestParser} from './parser/dash-manifest-parser';
+import {DashThumbnailController} from './dash-thumbnail-controller';
 
 type ShakaEventType = {[event: string]: string};
 
@@ -177,7 +180,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @type {DashManifestParser}
    * @private
    */
-  _manifestParser: DashManifestParser;
+  _manifestParser: ?DashManifestParser;
+  /**
+   * Dash thumbnail controller.
+   * @type {DashThumbnailController}
+   * @private
+   */
+  _thumbnailController: ?DashThumbnailController;
 
   /**
    * Factory method to create media source adapter.
@@ -643,7 +652,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _parseManifest(manifestBuffer: ArrayBuffer): void {
-    if (DashManifestParser.isValid()) {
+    if (!this._manifestParser && DashManifestParser.isValid()) {
+      DashAdapter._logger.debug('Creating parser for the first time');
       this._manifestParser = new DashManifestParser(manifestBuffer);
       this._manifestParser.parseManifest();
     }
@@ -669,7 +679,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
               return this._shaka.load(url, shakaStartTime);
             })
             .then(() => {
-              let data = {tracks: this._getParsedTracks()};
+              const data = {tracks: this._getParsedTracks()};
               this._maybeApplyAbrRestrictions();
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
@@ -709,6 +719,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   *  Returns in-stream thumbnail for a chosen time.
+   * @param {number} time - playback time.
+   * @public
+   * @return {?ThumbnailInfo} - Thumbnail info
+   */
+  getThumbnail(time: number): ?ThumbnailInfo {
+    if (this._thumbnailController) {
+      return this._thumbnailController.getThumbnail(time);
+    }
+  }
+
+  /**
    * reset shaka instance and its bindings
    * @function _reset
    * @private
@@ -720,6 +742,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._playingSent = false;
     this._requestFilterError = false;
     this._responseFilterError = false;
+    this._manifestParser = null;
+    this._thumbnailController = null;
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
       this._eventManager.removeAll();
@@ -780,10 +804,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _getParsedTracks(): Array<Track> {
     if (this._shaka) {
-      let videoTracks = this._getParsedVideoTracks();
-      let audioTracks = this._getParsedAudioTracks();
-      let textTracks = this._getParsedTextTracks();
-      return videoTracks.concat(audioTracks).concat(textTracks);
+      const videoTracks = this._getParsedVideoTracks();
+      const audioTracks = this._getParsedAudioTracks();
+      const textTracks = this._getParsedTextTracks();
+      const imageTracks = this._getParsedImageTracks();
+      return videoTracks.concat(audioTracks).concat(textTracks).concat(imageTracks);
     }
     return [];
   }
@@ -862,6 +887,23 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Get the parsed image tracks
+   * @function _getParsedImageTracks
+   * @returns {Array<ImageTrack>} - The parsed image tracks
+   * @private
+   */
+  _getParsedImageTracks(): Array<ImageTrack> {
+    if (this._manifestParser) {
+      const imageSet = this._manifestParser.getImageSet();
+      if (imageSet) {
+        this._thumbnailController = new DashThumbnailController(imageSet, this.src);
+        return this._thumbnailController.getTracks();
+      }
+    }
+    return [];
+  }
+
+  /**
    * Select a video track
    * @function selectVideoTrack
    * @param {VideoTrack} videoTrack - the video track to select
@@ -913,6 +955,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
       this._shaka.selectTextLanguage(textTrack.language);
       this._onTrackChanged(textTrack);
+    }
+  }
+
+  selectImageTrack(imageTrack: ImageTrack): void {
+    if (this._shaka && this._thumbnailController && imageTrack instanceof ImageTrack && !imageTrack.active) {
+      this._thumbnailController.selectTrack(imageTrack);
+      this._onTrackChanged(ImageTrack);
     }
   }
 

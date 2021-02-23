@@ -5,22 +5,34 @@ import {Widevine} from '../../src/drm/widevine';
 import {PlayReady} from '../../src/drm/playready';
 import {wwDrmData, prDrmData} from './drm/fake-drm-data';
 import shaka from 'shaka-player';
+import {ImageTrack, ThumbnailInfo} from '@playkit-js/playkit-js/dist/playkit';
+
 const targetId = 'player-placeholder_dash-adapter.spec';
 
-let vodSource = {
+const vodSource = {
   mimetype: 'application/dash+xml',
   url:
     'https://cfvod.kaltura.com/dasha/p/1740481/sp/174048100/serveFlavor/entryId/1_ez6mf1n8/v/,1/ev/3/flavorId/1_fwvuvqym,1/ev/3/flavorId/1_5zyuykzo,1/ev/3/flavorId/1_4xul4cg0,1/ev/3/flavorId/1_5jovgwnt,1/ev/3/flavorId/1_dt7bjb0q,2/ev/3/flavorId/0_og64h1z3,2/ev/3/flavorId/0_mgociiko,2/ev/3/flavorId/0_dxxbalt0,/forceproxy/true/name/a.mp4.urlset/manifest.mpd'
 };
 
-let liveSource = {
+const liveSource = {
   mimetype: 'application/dash+xml',
   url: 'http://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvtime.mpd'
 };
 
-let dvrSource = {
+const dvrSource = {
   mimetype: 'application/dash+xml',
   url: 'http://klive-a.akamaihd.net/dc-1/live/dash/p/1897241/e/1_gffgxm38/t/e83cor13pmTGTQ7kPZiopg/manifest.mpd'
+};
+
+const vodInStreamThumbnailSource = {
+  mimetype: 'application/dash+xml',
+  url: 'http://dash.edgesuite.net/akamai/bbb_30fps/bbb_with_multiple_tiled_thumbnails.mpd'
+};
+
+const dvrInStreamThumbnailSource = {
+  mimetype: 'application/dash+xml',
+  url: 'http://pf5.broadpeak-vcdn.com/bpk-tv/tvr/default/index.mpd'
 };
 
 describe.skip('DashAdapter [debugging and testing manually]', () => {
@@ -244,7 +256,14 @@ describe('DashAdapter: load', () => {
   });
 
   it('should fail load if URL is corrupted/return 403', done => {
-    dashInstance = DashAdapter.createAdapter(video, {mimetype: 'application/dash+xml', url: 'some/corrupted/url'}, config);
+    dashInstance = DashAdapter.createAdapter(
+      video,
+      {
+        mimetype: 'application/dash+xml',
+        url: 'some/corrupted/url'
+      },
+      config
+    );
 
     dashInstance.load().catch(error => {
       error.should.be.exist;
@@ -1736,5 +1755,77 @@ describe('DashAdapter: response filter', () => {
         done(e);
       }
     });
+  });
+});
+
+describe('DashAdapter: in-stream thumbnails', () => {
+  let video, dashInstance, config;
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach(done => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should load vod stream successfully', done => {
+    dashInstance = DashAdapter.createAdapter(video, vodInStreamThumbnailSource, config);
+    dashInstance
+      .load()
+      .then(result => {
+        try {
+          dashInstance._shaka.should.exist;
+          dashInstance._config.should.exist;
+          dashInstance._videoElement.should.exist;
+          dashInstance._sourceObj.should.exist;
+          dashInstance._manifestParser.should.exist;
+          dashInstance._thumbnailController.should.exist;
+          result.tracks.filter(t => t instanceof ImageTrack).should.have.lengthOf(2);
+          dashInstance._manifestParser.hasImageSet().should.be.true;
+          dashInstance._manifestParser.getImageSet().should.exist;
+          dashInstance._manifestParser._adaptationSets.should.have.lengthOf(1);
+          dashInstance._thumbnailController.getTracks().should.have.lengthOf(2);
+          dashInstance.getThumbnail(1000).should.be.instanceOf(ThumbnailInfo);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      })
+      .catch(done);
+  });
+
+  it('should load dvr stream successfully', done => {
+    dashInstance = DashAdapter.createAdapter(video, dvrInStreamThumbnailSource, config);
+    dashInstance
+      .load()
+      .then(result => {
+        try {
+          dashInstance._shaka.should.exist;
+          dashInstance._config.should.exist;
+          dashInstance._videoElement.should.exist;
+          dashInstance._sourceObj.should.exist;
+          dashInstance._manifestParser.should.exist;
+          dashInstance._thumbnailController.should.exist;
+          result.tracks.filter(t => t instanceof ImageTrack).should.have.lengthOf(1);
+          dashInstance._manifestParser.hasImageSet().should.be.true;
+          dashInstance._manifestParser.getImageSet().should.exist;
+          dashInstance._manifestParser._adaptationSets.should.have.lengthOf(1);
+          dashInstance._thumbnailController.getTracks().should.have.lengthOf(1);
+          dashInstance.getThumbnail(1000).should.be.instanceOf(ThumbnailInfo);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      })
+      .catch(done);
   });
 });

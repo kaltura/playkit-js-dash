@@ -19,10 +19,10 @@ class SegmentTemplate {
 
   constructor(elem: HTMLElement) {
     this._media = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.MEDIA);
-    this._startNumber = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.START_NUMBER, XmlUtils.parsePositiveInt);
+    this._startNumber = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.START_NUMBER, XmlUtils.parseInt, 1);
     this._duration = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.DURATION, XmlUtils.parseFloat);
-    this._timescale = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.TIMESCALE, XmlUtils.parsePositiveInt);
-    this._presentationTimeOffset = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.PRESENTATION_TIME_OFFSET, XmlUtils.parsePositiveInt);
+    this._timescale = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.TIMESCALE, XmlUtils.parsePositiveInt, 1);
+    this._presentationTimeOffset = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.PRESENTATION_TIME_OFFSET, XmlUtils.parseInt, 0);
     this._endNumber = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.END_NUMBER, XmlUtils.parsePositiveInt);
   }
 
