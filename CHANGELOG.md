@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.22.0](https://github.com/kaltura/playkit-js-dash/compare/v1.21.2...v1.22.0) (2021-02-24)
+
+
+### Bug Fixes
+
+* **FEC-10773:** reuse Shaka load option to start load from the detached point ([#130](https://github.com/kaltura/playkit-js-dash/issues/130)) ([98282f5](https://github.com/kaltura/playkit-js-dash/commit/98282f5))
+* **FEC-10995:** update shaka to 3.0.8 ([#132](https://github.com/kaltura/playkit-js-dash/issues/132)) ([a310ef6](https://github.com/kaltura/playkit-js-dash/commit/a310ef6))
+
+
+### Features
+
+* **FEC-10768:** expose in-stream DASH thumbnails ([#133](https://github.com/kaltura/playkit-js-dash/issues/133)) ([03b577c](https://github.com/kaltura/playkit-js-dash/commit/03b577c))
+* **FEC-10973:** parse image tracks from dash manifest ([#131](https://github.com/kaltura/playkit-js-dash/issues/131)) ([c10efb8](https://github.com/kaltura/playkit-js-dash/commit/c10efb8))
+
+
+
 ### [1.21.2](https://github.com/kaltura/playkit-js-dash/compare/v1.21.1...v1.21.2) (2021-01-28)
 
 
