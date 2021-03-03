@@ -491,25 +491,23 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _maybeApplyAbrRestrictionsByBitrate(ABRConfig: config): void {
-    if (ABRConfig.enabled) {
-      if (ABRConfig.restrictions) {
-        const restrictions = ABRConfig.restrictions;
-        const minBitrate = restrictions.minBitrate ? restrictions.minBitrate : 0;
-        const maxBitrate = restrictions.maxBitrate ? restrictions.maxBitrate : Infinity;
-        if (maxBitrate < minBitrate) {
-          if (restrictions.minBitrate >= 0) {
-            this._config.capLevelToPlayerSize = false;
-            this._config.shakaConfig.abr.restrictions.minBandwidth = restrictions.minBitrate;
-          }
-          if (restrictions.maxBitrate && restrictions.maxBitrate < Infinity) {
-            this._config.capLevelToPlayerSize = false;
-            this._config.shakaConfig.abr.restrictions.maxBandwidth = restrictions.maxBitrate;
-          }
-        } else {
-          DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
+    if (ABRConfig.restrictions) {
+      const restrictions = ABRConfig.restrictions;
+      const minBitrate = restrictions.minBitrate ? restrictions.minBitrate : 0;
+      const maxBitrate = restrictions.maxBitrate ? restrictions.maxBitrate : Infinity;
+      if (maxBitrate < minBitrate) {
+        if (restrictions.minBitrate >= 0) {
+          this._config.capLevelToPlayerSize = false;
+          this._config.shakaConfig.abr.restrictions.minBandwidth = restrictions.minBitrate;
         }
-        this._shaka.configure({abr: this._config.shakaConfig.abr});
+        if (restrictions.maxBitrate && restrictions.maxBitrate < Infinity) {
+          this._config.capLevelToPlayerSize = false;
+          this._config.shakaConfig.abr.restrictions.maxBandwidth = restrictions.maxBitrate;
+        }
+      } else {
+        DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
       }
+      this._shaka.configure({abr: this._config.shakaConfig.abr});
     }
   }
   /**
