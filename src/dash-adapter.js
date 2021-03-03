@@ -490,7 +490,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @param {Object} ABRConfig - abr config
    * @returns {void}
    */
-  _maybeApplyAbrRestrictionsByBitrate(ABRConfig: config): void {
+  _maybeApplyAbrRestrictionsByBitrate(ABRConfig: Object): void {
     if (ABRConfig.restrictions) {
       const restrictions = ABRConfig.restrictions;
       const minBitrate = restrictions.minBitrate ? restrictions.minBitrate : 0;
