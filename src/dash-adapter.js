@@ -221,6 +221,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
       if (abr.restrictions) {
         if (abr.restrictions.minBitrate > 0) {
+          adapterConfig.capLevelToPlayerSize = false;
           adapterConfig.shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
         }
         if (abr.restrictions.maxBitrate < Infinity) {
@@ -486,9 +487,38 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * apply ABR restrictions
    * @private
+   * @param {Object} ABRConfig - abr config
    * @returns {void}
    */
-  _maybeApplyAbrRestrictions(): void {
+  _maybeApplyAbrRestrictionsByBitrate(ABRConfig: config): void {
+    if (ABRConfig.enabled) {
+      this._config.shakaConfig.abr.enabled = ABRConfig.enabled;
+    }
+    if (ABRConfig.restrictions) {
+      const restrictions = ABRConfig.restrictions;
+      const minBitrate = restrictions.minBitrate ? restrictions.minBitrate : 0;
+      const maxBitrate = restrictions.maxBitrate ? restrictions.maxBitrate : Infinity;
+      if (maxBitrate < minBitrate) {
+        if (restrictions.minBitrate >= 0) {
+          this._config.capLevelToPlayerSize = false;
+          this._config.shakaConfig.abr.restrictions.minBandwidth = restrictions.minBitrate;
+        }
+        if (restrictions.maxBitrate && restrictions.maxBitrate < Infinity) {
+          this._config.capLevelToPlayerSize = false;
+          this._config.shakaConfig.abr.restrictions.maxBandwidth = restrictions.maxBitrate;
+        }
+      } else {
+        DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
+      }
+    }
+    this._shaka.configure({abr: this._config.shakaConfig.abr});
+  }
+  /**
+   * apply ABR restrictions
+   * @private
+   * @returns {void}
+   */
+  _maybeApplyAbrRestrictionsBySize(): void {
     if (this._config.capLevelToPlayerSize) {
       const videoTracks = this._getVideoTracks();
       const getMinDimensions = (dim): number =>
@@ -680,7 +710,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
-              this._maybeApplyAbrRestrictions();
+              this._maybeApplyAbrRestrictionsBySize();
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
             })
@@ -1002,6 +1032,17 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       return shakaConfig.abr.enabled;
     }
     return false;
+  }
+
+  /**
+   * Apply ABR restriction.
+   * @function applyABRRestriction
+   * @param {Object} ABRConfig - abr config
+   * @returns {void}
+   * @public
+   */
+  applyABRRestriction(ABRConfig: Object): void {
+    this._maybeApplyAbrRestrictionsByBitrate(ABRConfig);
   }
 
   /**
