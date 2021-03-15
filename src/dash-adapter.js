@@ -491,11 +491,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   _maybeApplyAbrRestrictionsByBitrate(ABRConfig: Object): void {
-    if (ABRConfig.restrictions) {
-      const restrictions = ABRConfig.restrictions;
+    const {restrictions} = ABRConfig;
+    if (restrictions) {
       const minBitrate = restrictions.minBitrate ? restrictions.minBitrate : 0;
       const maxBitrate = restrictions.maxBitrate ? restrictions.maxBitrate : Infinity;
-      if (maxBitrate < minBitrate) {
+      if (maxBitrate >= minBitrate) {
         if (restrictions.minBitrate >= 0) {
           this._config.capLevelToPlayerSize = false;
           this._config.shakaConfig.abr.restrictions.minBandwidth = restrictions.minBitrate;
@@ -517,47 +517,42 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeApplyAbrRestrictionsBySize(): void {
     if (this._config.capLevelToPlayerSize) {
-      const videoTracks = this._getVideoTracks();
-      const getMinDimensions = (dim): number =>
-        Math.min.apply(
-          null,
-          videoTracks.map(variant => variant[dim])
-        );
-      //Get minimal allowed dimensions
-      const minWidth = getMinDimensions('width');
-      const minHeight = getMinDimensions('height');
-      const updateAbrRestrictions = () => {
-        const curHeight = this._videoHeight;
-        const curWidth = this._videoWidth;
-        if (typeof curWidth === 'number' && typeof curHeight === 'number') {
-          //check if current player size is smaller than smallest rendition
-          //setting restriction below smallest rendition size will result in shaka emitting restriction unmet error
-          if (curHeight >= minHeight && curWidth >= minWidth) {
-            DashAdapter._logger.debug(`applying dimension restriction: width < ${curWidth}, height < ${curHeight}`);
-            this._shaka.configure({
-              abr: {
-                restrictions: {
-                  maxHeight: curHeight,
-                  maxWidth: curWidth
-                }
-              }
-            });
-          } else {
-            DashAdapter._logger.debug(`applying dimension restriction: width < ${minHeight}, height < ${minWidth}`);
-            this._shaka.configure({
-              abr: {
-                restrictions: {
-                  maxHeight: minHeight,
-                  maxWidth: minWidth
-                }
-              }
-            });
-          }
-        }
-      };
       this._clearVideoUpdateTimer();
-      this._videoSizeUpdateTimer = setInterval(updateAbrRestrictions, ABR_RESTRICTION_UPDATE_INTERVAL);
-      updateAbrRestrictions();
+      this._videoSizeUpdateTimer = setInterval(
+        () => this._updateRestrictionBySize(this._videoHeight, this._videoWidth),
+        ABR_RESTRICTION_UPDATE_INTERVAL
+      );
+      this._updateRestrictionBySize(this._videoHeight, this._videoWidth);
+    }
+  }
+
+  _updateRestrictionBySize(maxHeight?: number, maxWidth?: number): void {
+    const getMinDimensions = (dim): number => {
+      const videoTracks = this._getVideoTracks();
+      return Math.min.apply(
+        null,
+        videoTracks.map(variant => variant[dim])
+      );
+    };
+    const configureShakaRestriction = (prop: string, value: number, minValue: number) => {
+      DashAdapter._logger.debug(`applying dimension restriction: ${prop} < ${value}`);
+      let restrictions = {};
+      //check if requested player size is smaller than smallest rendition
+      //setting restriction below smallest rendition size will result in shaka emitting restriction unmet error
+      restrictions[prop] = value >= minValue ? value : minValue;
+      this._shaka.configure({
+        abr: {
+          restrictions
+        }
+      });
+    };
+    if (typeof maxHeight === 'number') {
+      const minHeight = getMinDimensions('height');
+      configureShakaRestriction('maxHeight', maxHeight, minHeight);
+    }
+    if (typeof maxWidth === 'number') {
+      const minWidth = getMinDimensions('width');
+      configureShakaRestriction('maxWidth', maxWidth, minWidth);
     }
   }
 
@@ -1039,7 +1034,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   applyABRRestriction(ABRConfig: Object): void {
-    this._maybeApplyAbrRestrictionsByBitrate(ABRConfig);
+    const {maxHeight, maxWidth} = ABRConfig.restrictions;
+    if (maxHeight || maxWidth) {
+      this._updateRestrictionBySize(maxHeight, maxWidth);
+    } else {
+      this._maybeApplyAbrRestrictionsByBitrate(ABRConfig);
+    }
   }
 
   /**
