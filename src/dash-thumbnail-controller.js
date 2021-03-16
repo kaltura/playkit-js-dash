@@ -17,8 +17,7 @@ class DashThumbnailController {
   }
 
   selectTrack(track: ImageTrack): void {
-    this._tracks.forEach((t: ImageTrack) => (t.active = false));
-    track.active = true;
+    this._tracks.forEach((t: ImageTrack) => (t.index === track.index ? (t.active = true) : (t.active = false)));
   }
 
   getTracks(): Array<ImageTrack> {
