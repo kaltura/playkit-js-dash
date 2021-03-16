@@ -526,7 +526,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 
-  _updateRestrictionBySize(maxHeight?: number, maxWidth?: number): void {
+  _updateRestrictionBySize(maxHeight: ?number, maxWidth: ?number): void {
     const getMinDimensions = (dim): number => {
       const videoTracks = this._getVideoTracks();
       return Math.min.apply(
