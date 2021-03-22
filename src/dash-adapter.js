@@ -222,7 +222,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
       if (abr.restrictions) {
         const {maxHeight, minHeight, maxWidth, minWidth, maxBitrate, minBitrate} = abr.restrictions;
-        if (new Set([minHeight, minWidth, minBitrate]) === new Set([0]) || new Set([maxHeight, maxWidth, maxBitrate]) === new Set([Infinity])) {
+        if (minHeight !== 0 || minWidth !== 0 || minBitrate !== 0 || maxHeight !== Infinity || maxWidth !== Infinity || maxBitrate !== Infinity) {
           adapterConfig.capLevelToPlayerSize = false;
         }
         if (maxHeight > minHeight) {
