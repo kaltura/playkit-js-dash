@@ -225,15 +225,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         if (minHeight !== 0 || minWidth !== 0 || minBitrate !== 0 || maxHeight !== Infinity || maxWidth !== Infinity || maxBitrate !== Infinity) {
           adapterConfig.capLevelToPlayerSize = false;
         }
-        if (maxHeight > minHeight) {
+        if (maxHeight >= minHeight) {
           adapterConfig.shakaConfig.abr.restrictions.minHeight = minHeight;
           adapterConfig.shakaConfig.abr.restrictions.maxHeight = maxHeight;
         }
-        if (maxWidth > minWidth) {
+        if (maxWidth >= minWidth) {
           adapterConfig.shakaConfig.abr.restrictions.minWidth = minWidth;
           adapterConfig.shakaConfig.abr.restrictions.maxWidth = maxWidth;
         }
-        if (maxBitrate > minBitrate) {
+        if (maxBitrate >= minBitrate) {
           adapterConfig.shakaConfig.abr.restrictions.minBandwidth = minBitrate;
           adapterConfig.shakaConfig.abr.restrictions.maxBandwidth = maxBitrate;
         }
@@ -585,8 +585,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let restrictionsShakaConfig = {};
     const shakaConfig = this._shaka.getConfiguration().abr.restrictions;
     if (restrictions) {
-      let {maxHeight, maxWidth, minHeight, minWidth} = restrictions;
-      if (maxHeight || maxWidth || minHeight || minWidth) {
+      let {maxHeight, maxWidth, maxBitrate, minHeight, minWidth, minBitrate} = restrictions;
+      if (maxHeight !== Infinity || maxWidth !== Infinity || minHeight !== 0 || minWidth !== 0) {
         let {maxHeight, maxWidth, minHeight, minWidth} = Utils.Object.mergeDeep({}, shakaConfig, restrictions);
         if (maxHeight >= minHeight) {
           const minVideoHeight = getMinDimensions('height');
@@ -602,9 +602,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         } else {
           DashAdapter._logger.warn('Invalid maxWidth restriction, maxWidth must be greater than minWidth', minWidth, maxWidth);
         }
-      } else {
-        const minBitrate = restrictions.minBitrate || shakaConfig.minBandwidth;
-        const maxBitrate = restrictions.maxBitrate || shakaConfig.maxBandwidth;
+      }
+      if (maxBitrate !== Infinity || minBitrate !== 0) {
+        const maxBitrate = maxBitrate || shakaConfig.maxBandwidth;
+        const minBitrate = minBitrate || shakaConfig.minBandwidth;
         if (maxBitrate >= minBitrate) {
           if (minBitrate) {
             restrictionsShakaConfig.minBandwidth = minBitrate;
@@ -616,6 +617,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
         }
       }
+      //shaka config exist
       if (Object.keys(restrictionsShakaConfig).length !== 0) {
         this._config.capLevelToPlayerSize = false;
       }
