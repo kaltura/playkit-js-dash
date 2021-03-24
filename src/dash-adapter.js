@@ -585,21 +585,21 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let restrictionsShakaConfig = {};
     if (restrictions) {
       let {maxHeight, maxWidth, maxBitrate, minHeight, minWidth, minBitrate} = restrictions;
-      if (maxHeight >= minHeight) {
+      if ((maxHeight || Infinity) >= (minHeight || 0)) {
         const minVideoHeight = getMinDimensions('height');
         restrictionsShakaConfig.minHeight = minHeight >= 0 ? minHeight : 0;
         restrictionsShakaConfig.maxHeight = maxHeight >= minVideoHeight ? maxHeight : minVideoHeight;
       } else {
         DashAdapter._logger.warn('Invalid maxHeight restriction, maxHeight must be greater than minHeight', minHeight, maxHeight);
       }
-      if (maxWidth >= minWidth) {
+      if ((maxWidth || Infinity) >= (minWidth || 0)) {
         const minVideoWidth = getMinDimensions('width');
         restrictionsShakaConfig.minWidth = minWidth >= 0 ? minWidth : 0;
         restrictionsShakaConfig.maxWidth = maxWidth >= minVideoWidth ? maxWidth : minVideoWidth;
       } else {
         DashAdapter._logger.warn('Invalid maxWidth restriction, maxWidth must be greater than minWidth', minWidth, maxWidth);
       }
-      if (maxBitrate >= minBitrate) {
+      if ((maxBitrate || Infinity) >= (minBitrate || 0)) {
         if (minBitrate) {
           restrictionsShakaConfig.minBandwidth = minBitrate;
         }
