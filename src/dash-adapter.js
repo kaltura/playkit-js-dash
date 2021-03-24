@@ -585,33 +585,29 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let restrictionsShakaConfig = {};
     if (restrictions) {
       let {maxHeight, maxWidth, maxBitrate, minHeight, minWidth, minBitrate} = restrictions;
-      if (maxHeight !== Infinity || maxWidth !== Infinity || minHeight !== 0 || minWidth !== 0) {
-        if (maxHeight >= minHeight) {
-          const minVideoHeight = getMinDimensions('height');
-          restrictionsShakaConfig.minHeight = minHeight >= 0 ? minHeight : 0;
-          restrictionsShakaConfig.maxHeight = maxHeight >= minVideoHeight ? maxHeight : minVideoHeight;
-        } else {
-          DashAdapter._logger.warn('Invalid maxHeight restriction, maxHeight must be greater than minHeight', minHeight, maxHeight);
-        }
-        if (maxWidth >= minWidth) {
-          const minVideoWidth = getMinDimensions('width');
-          restrictionsShakaConfig.minWidth = minWidth >= 0 ? minWidth : 0;
-          restrictionsShakaConfig.maxWidth = maxWidth >= minVideoWidth ? maxWidth : minVideoWidth;
-        } else {
-          DashAdapter._logger.warn('Invalid maxWidth restriction, maxWidth must be greater than minWidth', minWidth, maxWidth);
-        }
+      if (maxHeight >= minHeight) {
+        const minVideoHeight = getMinDimensions('height');
+        restrictionsShakaConfig.minHeight = minHeight >= 0 ? minHeight : 0;
+        restrictionsShakaConfig.maxHeight = maxHeight >= minVideoHeight ? maxHeight : minVideoHeight;
+      } else {
+        DashAdapter._logger.warn('Invalid maxHeight restriction, maxHeight must be greater than minHeight', minHeight, maxHeight);
       }
-      if (maxBitrate !== Infinity || minBitrate !== 0) {
-        if (maxBitrate >= minBitrate) {
-          if (minBitrate) {
-            restrictionsShakaConfig.minBandwidth = minBitrate;
-          }
-          if (maxBitrate) {
-            restrictionsShakaConfig.maxBandwidth = maxBitrate;
-          }
-        } else {
-          DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
+      if (maxWidth >= minWidth) {
+        const minVideoWidth = getMinDimensions('width');
+        restrictionsShakaConfig.minWidth = minWidth >= 0 ? minWidth : 0;
+        restrictionsShakaConfig.maxWidth = maxWidth >= minVideoWidth ? maxWidth : minVideoWidth;
+      } else {
+        DashAdapter._logger.warn('Invalid maxWidth restriction, maxWidth must be greater than minWidth', minWidth, maxWidth);
+      }
+      if (maxBitrate >= minBitrate) {
+        if (minBitrate) {
+          restrictionsShakaConfig.minBandwidth = minBitrate;
         }
+        if (maxBitrate) {
+          restrictionsShakaConfig.maxBandwidth = maxBitrate;
+        }
+      } else {
+        DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
       }
       //shaka config exist
       if (Object.keys(restrictionsShakaConfig).length !== 0) {
