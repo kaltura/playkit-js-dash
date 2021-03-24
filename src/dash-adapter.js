@@ -583,11 +583,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       );
     };
     let restrictionsShakaConfig = {};
-    const shakaConfig = this._shaka.getConfiguration().abr.restrictions;
     if (restrictions) {
       let {maxHeight, maxWidth, maxBitrate, minHeight, minWidth, minBitrate} = restrictions;
       if (maxHeight !== Infinity || maxWidth !== Infinity || minHeight !== 0 || minWidth !== 0) {
-        let {maxHeight, maxWidth, minHeight, minWidth} = Utils.Object.mergeDeep({}, shakaConfig, restrictions);
         if (maxHeight >= minHeight) {
           const minVideoHeight = getMinDimensions('height');
           restrictionsShakaConfig.minHeight = minHeight >= 0 ? minHeight : 0;
@@ -604,8 +602,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         }
       }
       if (maxBitrate !== Infinity || minBitrate !== 0) {
-        const maxBitrate = maxBitrate || shakaConfig.maxBandwidth;
-        const minBitrate = minBitrate || shakaConfig.minBandwidth;
         if (maxBitrate >= minBitrate) {
           if (minBitrate) {
             restrictionsShakaConfig.minBandwidth = minBitrate;
