@@ -475,7 +475,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._updateRestriction({maxHeight: this._videoHeight, maxWidth: this._videoWidth});
     } else {
       this._clearVideoUpdateTimer();
-      this._updateRestriction(this._config.abr.restrictions);
+      if (Utils.Object.hasPropertyPath(this._config, 'abr.restrictions')) {
+        this._updateRestriction(this._config.abr.restrictions);
+      }
     }
   }
 
@@ -1013,7 +1015,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   applyABRRestriction(restrictions: PKABRRestrictionObject): void {
-    Utils.Object.mergeDeep(this._config.abr.restrictions, restrictions);
+    Utils.Object.createPropertyPath(this._config, 'abr.restrictions', restrictions);
     this._maybeApplyAbrRestrictions();
   }
 
