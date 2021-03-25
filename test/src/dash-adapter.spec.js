@@ -1107,7 +1107,7 @@ describe('DashAdapter: _getLiveEdge', () => {
       .load()
       .then(() => {
         try {
-          dashInstance._getLiveEdge().should.equal(dashInstance._shaka.seekRange().end);
+          Math.floor(Math.abs(dashInstance._getLiveEdge() - dashInstance._shaka.seekRange().end)).should.equal(0);
           done();
         } catch (e) {
           done(e);
