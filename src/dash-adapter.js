@@ -221,7 +221,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         adapterConfig.shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
       }
       if (abr.restrictions) {
-        adapterConfig.abr.restrictions = abr.restrictions;
+        Utils.Object.createPropertyPath(adapterConfig, 'abr.restrictions', abr.restrictions);
       }
     }
 
@@ -684,7 +684,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
-              this._maybeApplyAbrRestrictionsBySize();
+              this._maybeApplyAbrRestrictions();
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
             })
