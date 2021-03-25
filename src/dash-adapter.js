@@ -474,7 +474,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       );
       this._updateRestriction({maxHeight: this._videoHeight, maxWidth: this._videoWidth});
     } else {
-      this._updateRestriction(this._config.restrictions);
+      this._clearVideoUpdateTimer();
+      this._updateRestriction(this._config.abr.restrictions);
     }
   }
 
@@ -529,10 +530,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         }
       } else {
         DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
-      }
-      //shaka config exist
-      if (Object.keys(restrictionsShakaConfig).length !== 0) {
-        this._config.capLevelToPlayerSize = false;
       }
     }
     return restrictionsShakaConfig;
@@ -1016,7 +1013,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   applyABRRestriction(restrictions: PKABRRestrictionObject): void {
-    this._updateRestriction(restrictions);
+    Utils.Object.mergeDeep(this._config.abr.restrictions, restrictions);
+    this._maybeApplyAbrRestrictions();
   }
 
   /**
