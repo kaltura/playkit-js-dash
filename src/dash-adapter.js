@@ -221,22 +221,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         adapterConfig.shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
       }
       if (abr.restrictions) {
-        const {maxHeight, minHeight, maxWidth, minWidth, maxBitrate, minBitrate} = abr.restrictions;
-        if (minHeight !== 0 || minWidth !== 0 || minBitrate !== 0 || maxHeight !== Infinity || maxWidth !== Infinity || maxBitrate !== Infinity) {
-          adapterConfig.capLevelToPlayerSize = false;
-        }
-        if (maxHeight >= minHeight) {
-          adapterConfig.shakaConfig.abr.restrictions.minHeight = minHeight;
-          adapterConfig.shakaConfig.abr.restrictions.maxHeight = maxHeight;
-        }
-        if (maxWidth >= minWidth) {
-          adapterConfig.shakaConfig.abr.restrictions.minWidth = minWidth;
-          adapterConfig.shakaConfig.abr.restrictions.maxWidth = maxWidth;
-        }
-        if (maxBitrate >= minBitrate) {
-          adapterConfig.shakaConfig.abr.restrictions.minBandwidth = minBitrate;
-          adapterConfig.shakaConfig.abr.restrictions.maxBandwidth = maxBitrate;
-        }
+        adapterConfig.abr.restrictions = abr.restrictions;
       }
     }
 
@@ -480,7 +465,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    * @returns {void}
    */
-  _maybeApplyAbrRestrictionsBySize(): void {
+  _maybeApplyAbrRestrictions(): void {
     if (this._config.capLevelToPlayerSize) {
       this._clearVideoUpdateTimer();
       this._videoSizeUpdateTimer = setInterval(
@@ -488,6 +473,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         ABR_RESTRICTION_UPDATE_INTERVAL
       );
       this._updateRestriction({maxHeight: this._videoHeight, maxWidth: this._videoWidth});
+    } else {
+      this._updateRestriction(this._config.restrictions);
     }
   }
 
@@ -506,74 +493,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     });
   }
 
-  /**
-   * apply ABR restrictions by size
-   * @private
-   * @param {PKABRRestrictionObject} restrictions - abr restrictions config
-   * @returns {void}
-   */
-  // _updateRestrictionBySize(restrictions: PKABRRestrictionObject): void {
-  // const getMinDimensions = (dim): number => {
-  //   const videoTracks = this._getVideoTracks();
-  //   return Math.min.apply(
-  //     null,
-  //     videoTracks.map(variant => variant[dim])
-  //   );
-  // };
-  // const configureShakaRestriction = (prop: string, value: number, minValue: number) => {
-  //   DashAdapter._logger.debug(`applying dimension restriction: ${prop} < ${value}`);
-  //   let restrictions = {};
-  //   //check if requested player size is smaller than smallest rendition
-  //   //setting restriction below smallest rendition size will result in shaka emitting restriction unmet error
-  //   restrictions[prop] = value >= minValue ? value : minValue;
-  //   this._shaka.configure({
-  //     abr: {
-  //       restrictions
-  //     }
-  //   });
-  // };
-  // if (maxHeight >= minHeight) {
-  //   const minVideoHeight = getMinDimensions('height');
-  //   configureShakaRestriction('minHeight', minHeight, 0);
-  //   configureShakaRestriction('maxHeight', maxHeight, minVideoHeight);
-  // } else {
-  //   DashAdapter._logger.warn('Invalid maxHeight restriction, maxHeight must be greater than minHeight', minHeight, maxHeight);
-  // }
-  // if (maxWidth >= minWidth) {
-  //   const minVideoWidth = getMinDimensions('width');
-  //   configureShakaRestriction('minWidth', minWidth, 0);
-  //   configureShakaRestriction('maxWidth', maxWidth, minVideoWidth);
-  // } else {
-  //   DashAdapter._logger.warn('Invalid maxWidth restriction, maxWidth must be greater than minWidth', minWidth, maxWidth);
-  // }
-  // }
-
-  /**
-   * apply ABR restrictions by bitrate
-   * @private
-   * @param {PKABRRestrictionObject} restrictions - abr restrictions config
-   * @returns {void}
-   */
-  // _maybeApplyAbrRestrictionsByBitrate(restrictions: PKABRRestrictionObject): void {
-  // if (restrictions) {
-  //   const minBitrate = restrictions.minBitrate ? restrictions.minBitrate : 0;
-  //   const maxBitrate = restrictions.maxBitrate ? restrictions.maxBitrate : Infinity;
-  //   if (maxBitrate >= minBitrate) {
-  //     if (restrictions.minBitrate >= 0) {
-  //       this._config.capLevelToPlayerSize = false;
-  //       this._config.shakaConfig.abr.restrictions.minBandwidth = restrictions.minBitrate;
-  //     }
-  //     if (restrictions.maxBitrate && restrictions.maxBitrate < Infinity) {
-  //       this._config.capLevelToPlayerSize = false;
-  //       this._config.shakaConfig.abr.restrictions.maxBandwidth = restrictions.maxBitrate;
-  //     }
-  //     this._shaka.configure({abr: this._config.shakaConfig.abr});
-  //   } else {
-  //     DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
-  //   }
-  // }
-  // }
-
   _getRestrictionShakaConfig(restrictions: PKABRRestrictionObject): Object {
     const getMinDimensions = (dim): number => {
       const videoTracks = this._getVideoTracks();
@@ -585,17 +504,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let restrictionsShakaConfig = {};
     if (restrictions) {
       let {maxHeight, maxWidth, maxBitrate, minHeight, minWidth, minBitrate} = restrictions;
-      if ((maxHeight || Infinity) >= (minHeight || 0)) {
-        const minVideoHeight = getMinDimensions('height');
+      const minVideoHeight = getMinDimensions('height');
+      const maxHeightValue = maxHeight >= minVideoHeight ? maxHeight : minVideoHeight;
+      if ((maxHeightValue || Infinity) >= (minHeight || 0)) {
         restrictionsShakaConfig.minHeight = minHeight >= 0 ? minHeight : 0;
-        restrictionsShakaConfig.maxHeight = maxHeight >= minVideoHeight ? maxHeight : minVideoHeight;
+        restrictionsShakaConfig.maxHeight = maxHeightValue;
       } else {
         DashAdapter._logger.warn('Invalid maxHeight restriction, maxHeight must be greater than minHeight', minHeight, maxHeight);
       }
+      const minVideoWidth = getMinDimensions('width');
+      const maxWidthValue = maxWidth >= minVideoWidth ? maxWidth : minVideoWidth;
       if ((maxWidth || Infinity) >= (minWidth || 0)) {
-        const minVideoWidth = getMinDimensions('width');
         restrictionsShakaConfig.minWidth = minWidth >= 0 ? minWidth : 0;
-        restrictionsShakaConfig.maxWidth = maxWidth >= minVideoWidth ? maxWidth : minVideoWidth;
+        restrictionsShakaConfig.maxWidth = maxWidthValue;
       } else {
         DashAdapter._logger.warn('Invalid maxWidth restriction, maxWidth must be greater than minWidth', minWidth, maxWidth);
       }
