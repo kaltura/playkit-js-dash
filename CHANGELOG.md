@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.23.0](https://github.com/kaltura/playkit-js-dash/compare/v1.22.0...v1.23.0) (2021-04-06)
+
+
+### Bug Fixes
+
+* **FEC-10590:** remove the logic from dash adapter ([#137](https://github.com/kaltura/playkit-js-dash/issues/137)) ([571ae30](https://github.com/kaltura/playkit-js-dash/commit/571ae30)), closes [kaltura/playkit-js#552](https://github.com/kaltura/playkit-js-dash/issues/552)
+
+
+### Features
+
+* **FEC-10941:** Use In-Stream DASH thumbnails on the timeline ([#135](https://github.com/kaltura/playkit-js-dash/issues/135)) ([7687a43](https://github.com/kaltura/playkit-js-dash/commit/7687a43))
+
+
+
 ## [1.22.0](https://github.com/kaltura/playkit-js-dash/compare/v1.21.2...v1.22.0) (2021-02-24)
 
 
