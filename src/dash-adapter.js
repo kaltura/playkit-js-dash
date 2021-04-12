@@ -187,7 +187,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _thumbnailController: ?DashThumbnailController;
-
   /**
    * Factory method to create media source adapter.
    * @function createAdapter
@@ -201,6 +200,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let adapterConfig: Object = Utils.Object.copyDeep(DefaultConfig);
     if (Utils.Object.hasPropertyPath(config, 'text.useNativeTextTrack')) {
       adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'text.useNativeTextTrack');
+    }
+    if (Utils.Object.hasPropertyPath(config, 'text.useShakaTextTrackDisplay')) {
+      adapterConfig.useShakaTextTrackDisplay = Utils.Object.getPropertyPath(config, 'text.useShakaTextTrackDisplay');
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
@@ -358,7 +360,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
     //render text tracks to our own container
-    if (this._config.shakaConfig.useShakaTextTrackDisplay) {
+    if (this._config.useShakaTextTrackDisplay) {
       this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
     }
     this._maybeSetFilters();
@@ -856,8 +858,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let parsedTracks = [];
     if (textTracks) {
       for (let i = 0; i < textTracks.length; i++) {
+        let kind = textTracks[i].kind ? textTracks[i].kind + 's' : '';
+        kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
         let settings = {
-          kind: textTracks[i].kind ? textTracks[i].kind + 's' : '',
+          kind: kind,
           active: false,
           label: textTracks[i].label,
           language: textTracks[i].language,
