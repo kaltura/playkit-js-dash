@@ -859,7 +859,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (textTracks) {
       for (let i = 0; i < textTracks.length; i++) {
         let kind = textTracks[i].kind ? textTracks[i].kind + 's' : '';
-        kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
+        kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'smtpe-tt-captions' : kind;
         let settings = {
           kind: kind,
           active: false,
@@ -938,7 +938,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   selectTextTrack(textTrack: TextTrack): void {
-    if (this._shaka && textTrack instanceof TextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
+    if (
+      this._shaka &&
+      textTrack instanceof TextTrack &&
+      !textTrack.active &&
+      (textTrack.kind === 'subtitles' || textTrack.kind === 'captions' || textTrack.kind === 'smtpe-tt-captions')
+    ) {
       this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
       this._shaka.selectTextLanguage(textTrack.language);
       this._onTrackChanged(textTrack);
