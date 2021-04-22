@@ -187,6 +187,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _thumbnailController: ?DashThumbnailController;
+
   /**
    * Factory method to create media source adapter.
    * @function createAdapter
@@ -410,6 +411,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             .then(updatedRequest => {
               request.uris = [updatedRequest.url];
               request.headers = updatedRequest.headers;
+              if (typeof updatedRequest.withCredentials === 'boolean') {
+                request.allowCrossSiteCredentials = updatedRequest.withCredentials;
+              }
               if (request.method === 'POST') {
                 request.body = updatedRequest.body;
               } else if (updatedRequest.body) {
