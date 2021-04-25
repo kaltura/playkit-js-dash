@@ -43,6 +43,20 @@ const ShakaEvent: ShakaEventType = {
 const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
 
 /**
+ * the interval for stall detection
+ * @type {number}
+ * @const
+ */
+const STALL_DETECTION_INTERVAL = 2000;
+
+/**
+ * the threshold needed to break the stall
+ * @type {number}
+ * @const
+ */
+const STALL_BREAK_THRESHOLD = 0.1;
+
+/**
  * Adapter of shaka lib for dash content
  * @classdesc
  */
@@ -211,8 +225,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'text.useShakaTextTrackDisplay')) {
       adapterConfig.useShakaTextTrackDisplay = Utils.Object.getPropertyPath(config, 'text.useShakaTextTrackDisplay');
     }
-    if (Utils.Object.hasPropertyPath(config, 'playback.forceBreakStall')) {
-      adapterConfig.forceBreakStall = Utils.Object.getPropertyPath(config, 'playback.forceBreakStall');
+    if (Utils.Object.hasPropertyPath(config, 'streaming.forceBreakStall')) {
+      adapterConfig.forceBreakStall = Utils.Object.getPropertyPath(config, 'streaming.forceBreakStall');
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
@@ -392,11 +406,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let lastCurrentTime = this._videoElement.currentTime;
     this._stallInterval = setInterval(() => {
       if (lastCurrentTime === this._videoElement.currentTime) {
-        this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + 0.1;
+        this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
       } else {
         this._clearStallInterval();
       }
-    }, 2 * 1000);
+    }, STALL_DETECTION_INTERVAL);
   }
 
   /**
