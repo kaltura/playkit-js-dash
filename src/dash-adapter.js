@@ -145,6 +145,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _videoSizeUpdateTimer: ?IntervalID = null;
 
   /**
+   * stall interval to break the stall on Smart TV
+   * @type {null|number}
+   * @private
+   */
+  _stallInterval: ?IntervalID = null;
+
+  /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
    * @member {number} - VIDEO_ERROR_CODE
    * @type {number}
@@ -365,8 +372,40 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
+    this._maybeBreakStalls();
     this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
+  }
+
+  _clearStallInterval(): void {
+    if (this._stallInterval) {
+      clearInterval(this._stallInterval);
+      this._stallInterval = null;
+    }
+  }
+
+  _stallSmartTVHandler(): void {
+    this._clearStallInterval();
+    let lastCurrentTime = this._videoElement.currentTime;
+    this._stallInterval = setInterval(() => {
+      if (lastCurrentTime === this._videoElement.currentTime) {
+        this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + 0.1;
+      } else {
+        this._clearStallInterval();
+      }
+    }, 2 * 1000);
+  }
+
+  /**
+   * register to event to break the stalls on smart TV
+   * @returns {void}
+   * @private
+   */
+  _maybeBreakStalls(): void {
+    if (this._config.playback.forceBreakStall) {
+      this._eventManager.listenOnce(EventType.STALLED, this._stallSmartTVHandler);
+      this._eventManager.listenOnce(EventType.SEEKED, this._stallSmartTVHandler);
+    }
   }
 
   /**
@@ -729,6 +768,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
+    this._clearStallInterval();
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
       this._eventManager.removeAll();
