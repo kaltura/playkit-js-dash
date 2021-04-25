@@ -211,6 +211,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'text.useShakaTextTrackDisplay')) {
       adapterConfig.useShakaTextTrackDisplay = Utils.Object.getPropertyPath(config, 'text.useShakaTextTrackDisplay');
     }
+    if (Utils.Object.hasPropertyPath(config, 'playback.forceBreakStall')) {
+      adapterConfig.forceBreakStall = Utils.Object.getPropertyPath(config, 'playback.forceBreakStall');
+    }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
       adapterConfig.forceRedirectExternalStreams = options.forceRedirectExternalStreams;
