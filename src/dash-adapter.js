@@ -405,7 +405,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _maybeBreakStalls(): void {
-    if (this._config.playback.forceBreakStall) {
+    if (this._config.forceBreakStall) {
       this._eventManager.listenOnce(EventType.STALLED, this._stallSmartTVHandler);
       this._eventManager.listenOnce(EventType.SEEKED, this._stallSmartTVHandler);
     }
