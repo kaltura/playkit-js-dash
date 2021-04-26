@@ -410,6 +410,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       } else {
         this._clearStallInterval();
       }
+      lastCurrentTime = this._videoElement.currentTime;
     }, STALL_DETECTION_INTERVAL);
   }
 
