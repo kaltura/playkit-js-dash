@@ -57,6 +57,13 @@ const STALL_DETECTION_INTERVAL = 2000;
 const STALL_BREAK_THRESHOLD = 0.1;
 
 /**
+ * the number of stalls until we stop
+ * @type {number}
+ * @const
+ */
+const MAX_NUMBER_OF_STALLS = 5;
+
+/**
  * Adapter of shaka lib for dash content
  * @classdesc
  */
@@ -166,7 +173,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _stallInterval: ?IntervalID = null;
 
   /**
-   * stall interval to break the stall on Smart TV
+   * start time requested
    * @type {number}
    * @private
    */
@@ -410,9 +417,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   _stallSmartTVHandler(): void {
     this._clearStallInterval();
-    let lastUpdateTime = this._startTime ? this._startTime : this._videoElement.currentTime;
+    let stallHandlerCounter = 0;
+    let lastUpdateTime = this._startTime > this._videoElement.currentTime ? this._startTime : this._videoElement.currentTime;
     this._stallInterval = setInterval(() => {
-      if (lastUpdateTime === this._videoElement.currentTime) {
+      if (lastUpdateTime === this._videoElement.currentTime && ++stallHandlerCounter <= MAX_NUMBER_OF_STALLS) {
         DashAdapter._logger.debug('stall found, break the stall');
         this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
       } else {
