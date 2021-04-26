@@ -404,14 +404,23 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _stallSmartTVHandler(): void {
     this._clearStallInterval();
     let lastCurrentTime = this._videoElement.currentTime;
-    this._stallInterval = setInterval(() => {
-      if (lastCurrentTime === this._videoElement.currentTime) {
-        this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
-      } else {
-        this._clearStallInterval();
-      }
-      lastCurrentTime = this._videoElement.currentTime;
-    }, STALL_DETECTION_INTERVAL);
+    const initInterval = () => {
+      this._stallInterval = setInterval(() => {
+        if (!this._videoElement.paused) {
+          if (lastCurrentTime === this._videoElement.currentTime) {
+            DashAdapter._logger.debug('stall found, break the stall');
+            this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
+          } else {
+            this._clearStallInterval();
+          }
+        } else {
+          this._clearStallInterval();
+          this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => initInterval());
+        }
+        lastCurrentTime = this._videoElement.currentTime;
+      }, STALL_DETECTION_INTERVAL);
+    };
+    initInterval();
   }
 
   /**
@@ -421,8 +430,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeBreakStalls(): void {
     if (this._config.forceBreakStall) {
-      this._eventManager.listenOnce(EventType.STALLED, this._stallSmartTVHandler);
-      this._eventManager.listenOnce(EventType.SEEKED, this._stallSmartTVHandler);
+      this._eventManager.listenOnce(this._videoElement, EventType.STALLED, () => this._stallSmartTVHandler());
+      this._eventManager.listenOnce(this._videoElement, EventType.SEEKED, () => this._stallSmartTVHandler());
     }
   }
 
