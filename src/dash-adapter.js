@@ -508,22 +508,32 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (restrictions) {
       let {maxHeight, maxWidth, maxBitrate, minHeight, minWidth, minBitrate} = restrictions;
       const minVideoHeight = getMinDimensions('height');
-      const maxHeightValue = maxHeight >= minVideoHeight ? maxHeight : minVideoHeight;
-      if ((maxHeightValue || Infinity) >= (minHeight || 0)) {
-        restrictionsShakaConfig.minHeight = minHeight >= 0 ? minHeight : 0;
-        restrictionsShakaConfig.maxHeight = maxHeightValue;
+      const minHeightValue = minHeight && minHeight >= 0 ? minHeight : 0;
+      const maxHeightValue = maxHeight && maxHeight >= minVideoHeight ? maxHeight : minVideoHeight;
+      if (maxHeightValue >= minHeightValue) {
+        if (minHeight) {
+          restrictionsShakaConfig.minHeight = minHeightValue;
+        }
+        if (maxHeight) {
+          restrictionsShakaConfig.maxHeight = maxHeightValue;
+        }
       } else {
         DashAdapter._logger.warn('Invalid maxHeight restriction, maxHeight must be greater than minHeight', minHeight, maxHeight);
       }
       const minVideoWidth = getMinDimensions('width');
-      const maxWidthValue = maxWidth >= minVideoWidth ? maxWidth : minVideoWidth;
-      if ((maxWidth || Infinity) >= (minWidth || 0)) {
-        restrictionsShakaConfig.minWidth = minWidth >= 0 ? minWidth : 0;
-        restrictionsShakaConfig.maxWidth = maxWidthValue;
+      const minWidthValue = minWidth && minWidth >= 0 ? minWidth : 0;
+      const maxWidthValue = maxWidth && maxWidth >= minVideoWidth ? maxWidth : minVideoWidth;
+      if (maxWidthValue >= minWidthValue) {
+        if (minWidth) {
+          restrictionsShakaConfig.minWidth = minWidthValue;
+        }
+        if (maxWidth) {
+          restrictionsShakaConfig.maxWidth = maxWidthValue;
+        }
       } else {
         DashAdapter._logger.warn('Invalid maxWidth restriction, maxWidth must be greater than minWidth', minWidth, maxWidth);
       }
-      if ((maxBitrate || Infinity) >= (minBitrate || 0)) {
+      if (maxBitrate >= minBitrate) {
         if (minBitrate) {
           restrictionsShakaConfig.minBandwidth = minBitrate;
         }
