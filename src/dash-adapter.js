@@ -43,6 +43,27 @@ const ShakaEvent: ShakaEventType = {
 const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
 
 /**
+ * the interval for stall detection
+ * @type {number}
+ * @const
+ */
+const STALL_DETECTION_INTERVAL = 2000;
+
+/**
+ * the threshold needed to break the stall
+ * @type {number}
+ * @const
+ */
+const STALL_BREAK_THRESHOLD = 0.1;
+
+/**
+ * the number of stalls until we stop
+ * @type {number}
+ * @const
+ */
+const MAX_NUMBER_OF_STALLS = 10;
+
+/**
  * Adapter of shaka lib for dash content
  * @classdesc
  */
@@ -145,6 +166,26 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _videoSizeUpdateTimer: ?IntervalID = null;
 
   /**
+   * stall interval to break the stall on Smart TV
+   * @type {null|IntervalID}
+   * @private
+   */
+  _stallInterval: ?IntervalID = null;
+
+  /**
+   * start time requested
+   * @type {null|number}
+   * @private
+   */
+  _startTime: ?number;
+
+  /**
+   * playback started to play
+   * @type {boolean}
+   * @private
+   */
+  _isPlaybackStarted: boolean = false;
+  /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
    * @member {number} - VIDEO_ERROR_CODE
    * @type {number}
@@ -204,6 +245,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
     if (Utils.Object.hasPropertyPath(config, 'text.useShakaTextTrackDisplay')) {
       adapterConfig.useShakaTextTrackDisplay = Utils.Object.getPropertyPath(config, 'text.useShakaTextTrackDisplay');
+    }
+    if (Utils.Object.hasPropertyPath(config, 'streaming.forceBreakStall')) {
+      adapterConfig.forceBreakStall = Utils.Object.getPropertyPath(config, 'streaming.forceBreakStall');
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
@@ -366,8 +410,42 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
+    this._maybeBreakStalls();
     this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
+  }
+
+  _clearStallInterval(): void {
+    if (this._stallInterval) {
+      clearInterval(this._stallInterval);
+      this._stallInterval = null;
+    }
+  }
+
+  _stallHandler(): void {
+    this._clearStallInterval();
+    let stallHandlerCounter = 0;
+    let lastUpdateTime = !this._isPlaybackStarted && this._startTime ? this._startTime : this._videoElement.currentTime;
+    this._stallInterval = setInterval(() => {
+      if (lastUpdateTime === this._videoElement.currentTime && stallHandlerCounter++ < MAX_NUMBER_OF_STALLS) {
+        DashAdapter._logger.debug('stall found, break the stall');
+        this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
+      } else {
+        this._clearStallInterval();
+      }
+      lastUpdateTime = this._videoElement.currentTime;
+    }, STALL_DETECTION_INTERVAL);
+  }
+
+  /**
+   * register to event to break the stalls on smart TV
+   * @returns {void}
+   * @private
+   */
+  _maybeBreakStalls(): void {
+    if (this._config.forceBreakStall) {
+      this._eventManager.listen(this._videoElement, EventType.STALLED, () => this._stallHandler());
+    }
   }
 
   /**
@@ -612,9 +690,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
-    this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () =>
-      this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering)
-    );
+    this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
+      this._isPlaybackStarted = true;
+      this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
+    });
+
     // called when a resource is downloaded
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
       switch (type) {
@@ -660,12 +740,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
-          let shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
-          shakaStartTime = isNaN(this._lastTimeDetach) ? shakaStartTime : this._lastTimeDetach;
+          this._startTime = startTime && startTime > -1 ? startTime : undefined;
+          this._startTime = isNaN(this._lastTimeDetach) ? this._startTime : this._lastTimeDetach;
           this._lastTimeDetach = NaN;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(url => {
-              return this._shaka.load(url, shakaStartTime);
+              return this._shaka.load(url, this._startTime);
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
@@ -733,6 +813,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
+    this._isPlaybackStarted = false;
+    this._clearStallInterval();
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
       this._eventManager.removeAll();
