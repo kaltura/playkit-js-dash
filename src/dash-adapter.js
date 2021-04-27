@@ -61,7 +61,7 @@ const STALL_BREAK_THRESHOLD = 0.1;
  * @type {number}
  * @const
  */
-const MAX_NUMBER_OF_STALLS = 5;
+const MAX_NUMBER_OF_STALLS = 10;
 
 /**
  * Adapter of shaka lib for dash content
@@ -174,10 +174,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   /**
    * start time requested
-   * @type {number}
+   * @type {null|number}
    * @private
    */
-  _startTime: Number = 0;
+  _startTime: ?number = 0;
 
   /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
