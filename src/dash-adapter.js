@@ -445,7 +445,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _maybeBreakStalls(): void {
     if (this._config.forceBreakStall) {
       this._eventManager.listen(this._videoElement, EventType.STALLED, () => this._stallSmartTVHandler());
-      this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => (this._isPlaybackStarted = true));
     }
   }
 
@@ -691,9 +690,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
-    this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () =>
-      this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering)
-    );
+    this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
+      this._isPlaybackStarted = true;
+      this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
+    });
+
     // called when a resource is downloaded
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
       switch (type) {
@@ -812,6 +813,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
+    this._isPlaybackStarted = false;
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
