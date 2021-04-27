@@ -422,12 +422,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 
-  _stallSmartTVHandler(): void {
+  _stallHandler(): void {
     this._clearStallInterval();
     let stallHandlerCounter = 0;
     let lastUpdateTime = !this._isPlaybackStarted && this._startTime ? this._startTime : this._videoElement.currentTime;
     this._stallInterval = setInterval(() => {
-      if (lastUpdateTime === this._videoElement.currentTime && ++stallHandlerCounter <= MAX_NUMBER_OF_STALLS) {
+      if (lastUpdateTime === this._videoElement.currentTime && stallHandlerCounter++ < MAX_NUMBER_OF_STALLS) {
         DashAdapter._logger.debug('stall found, break the stall');
         this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
       } else {
@@ -444,7 +444,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeBreakStalls(): void {
     if (this._config.forceBreakStall) {
-      this._eventManager.listen(this._videoElement, EventType.STALLED, () => this._stallSmartTVHandler());
+      this._eventManager.listen(this._videoElement, EventType.STALLED, () => this._stallHandler());
     }
   }
 
