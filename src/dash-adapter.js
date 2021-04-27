@@ -180,6 +180,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _startTime: ?number = 0;
 
   /**
+   * playback started to play
+   * @type {boolean}
+   * @private
+   */
+  _isPlaybackStarted: boolean = false;
+  /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
    * @member {number} - VIDEO_ERROR_CODE
    * @type {number}
@@ -419,7 +425,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _stallSmartTVHandler(): void {
     this._clearStallInterval();
     let stallHandlerCounter = 0;
-    let lastUpdateTime = this._startTime > this._videoElement.currentTime ? this._startTime : this._videoElement.currentTime;
+    let lastUpdateTime = !this._isPlaybackStarted ? this._startTime : this._videoElement.currentTime;
     this._stallInterval = setInterval(() => {
       if (lastUpdateTime === this._videoElement.currentTime && ++stallHandlerCounter <= MAX_NUMBER_OF_STALLS) {
         DashAdapter._logger.debug('stall found, break the stall');
@@ -438,7 +444,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeBreakStalls(): void {
     if (this._config.forceBreakStall) {
-      this._eventManager.listenOnce(this._videoElement, EventType.STALLED, () => this._stallSmartTVHandler());
+      this._eventManager.listen(this._videoElement, EventType.STALLED, () => this._stallSmartTVHandler());
+      this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => (this._isPlaybackStarted = true));
     }
   }
 
