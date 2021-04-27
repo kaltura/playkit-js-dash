@@ -177,7 +177,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @type {null|number}
    * @private
    */
-  _startTime: ?number = 0;
+  _startTime: ?number;
 
   /**
    * playback started to play
@@ -425,7 +425,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _stallSmartTVHandler(): void {
     this._clearStallInterval();
     let stallHandlerCounter = 0;
-    let lastUpdateTime = !this._isPlaybackStarted ? this._startTime : this._videoElement.currentTime;
+    let lastUpdateTime = !this._isPlaybackStarted && this._startTime ? this._startTime : this._videoElement.currentTime;
     this._stallInterval = setInterval(() => {
       if (lastUpdateTime === this._videoElement.currentTime && ++stallHandlerCounter <= MAX_NUMBER_OF_STALLS) {
         DashAdapter._logger.debug('stall found, break the stall');
