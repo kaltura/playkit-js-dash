@@ -47,7 +47,14 @@ const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
  * @type {number}
  * @const
  */
-const STALL_DETECTION_INTERVAL = 2000;
+const STALL_DETECTION_INTERVAL = 500;
+
+/**
+ * the interval for stall detection
+ * @type {number}
+ * @const
+ */
+const STALL_DETECTION_THRSEHOLD = 2000;
 
 /**
  * the threshold needed to break the stall
@@ -424,16 +431,26 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   _stallHandler(): void {
     this._clearStallInterval();
+
+    const getCurrentTimeInSeconds = () => {
+      return Date.now() / 1000;
+    };
     let stallHandlerCounter = 0;
-    let lastUpdateTime = !this._isPlaybackStarted && this._startTime ? this._startTime : this._videoElement.currentTime;
+    let lastUpdateTime = getCurrentTimeInSeconds();
+    let lastCurrentTime = !this._isPlaybackStarted && this._startTime ? this._startTime : this._videoElement.currentTime;
+
     this._stallInterval = setInterval(() => {
-      if (lastUpdateTime === this._videoElement.currentTime && stallHandlerCounter++ < MAX_NUMBER_OF_STALLS) {
-        DashAdapter._logger.debug('stall found, break the stall');
-        this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
-      } else {
-        this._clearStallInterval();
+      const stallSeconds = getCurrentTimeInSeconds() - lastUpdateTime;
+      if (stallSeconds > STALL_DETECTION_THRSEHOLD && !this._videoElement.paused) {
+        if (lastCurrentTime === this._videoElement.currentTime && stallHandlerCounter++ < MAX_NUMBER_OF_STALLS) {
+          DashAdapter._logger.debug('stall found, break the stall');
+          lastUpdateTime = getCurrentTimeInSeconds();
+          this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
+        } else {
+          this._clearStallInterval();
+        }
       }
-      lastUpdateTime = this._videoElement.currentTime;
+      lastCurrentTime = this._videoElement.currentTime;
     }, STALL_DETECTION_INTERVAL);
   }
 
