@@ -450,7 +450,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeBreakStalls(): void {
     if (this._config.forceBreakStall) {
-      this._eventManager.listen(this._videoElement, EventType.SEEKED, () => this._stallHandler());
+      this._eventManager.listen(this._videoElement, EventType.SEEKING, () => this._stallHandler());
     }
   }
 
