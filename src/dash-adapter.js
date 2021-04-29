@@ -54,7 +54,7 @@ const STALL_DETECTION_INTERVAL = 500;
  * @type {number}
  * @const
  */
-const STALL_DETECTION_THRESHOLD = 2;
+const STALL_DETECTION_THRESHOLD = 3;
 
 /**
  * the threshold needed to break the stall
