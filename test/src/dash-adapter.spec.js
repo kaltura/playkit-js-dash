@@ -1803,7 +1803,7 @@ describe('DashAdapter: in-stream thumbnails', () => {
       .catch(done);
   });
 
-  it('should load dvr stream successfully', done => {
+  it.skip('should load dvr stream successfully', done => {
     dashInstance = DashAdapter.createAdapter(video, dvrInStreamThumbnailSource, config);
     dashInstance
       .load()
