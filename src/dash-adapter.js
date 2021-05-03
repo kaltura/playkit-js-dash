@@ -43,11 +43,18 @@ const ShakaEvent: ShakaEventType = {
 const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
 
 /**
- * the interval for stall detection
+ * the interval for stall detection in milliseconds
  * @type {number}
  * @const
  */
-const STALL_DETECTION_INTERVAL = 2000;
+const STALL_DETECTION_INTERVAL = 500;
+
+/**
+ * the threshold for stall detection in seconds
+ * @type {number}
+ * @const
+ */
+const STALL_DETECTION_THRESHOLD = 3;
 
 /**
  * the threshold needed to break the stall
@@ -55,13 +62,6 @@ const STALL_DETECTION_INTERVAL = 2000;
  * @const
  */
 const STALL_BREAK_THRESHOLD = 0.1;
-
-/**
- * the number of stalls until we stop
- * @type {number}
- * @const
- */
-const MAX_NUMBER_OF_STALLS = 10;
 
 /**
  * Adapter of shaka lib for dash content
@@ -172,19 +172,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _stallInterval: ?IntervalID = null;
 
-  /**
-   * start time requested
-   * @type {null|number}
-   * @private
-   */
-  _startTime: ?number;
-
-  /**
-   * playback started to play
-   * @type {boolean}
-   * @private
-   */
-  _isPlaybackStarted: boolean = false;
   /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
    * @member {number} - VIDEO_ERROR_CODE
@@ -424,16 +411,24 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   _stallHandler(): void {
     this._clearStallInterval();
-    let stallHandlerCounter = 0;
-    let lastUpdateTime = !this._isPlaybackStarted && this._startTime ? this._startTime : this._videoElement.currentTime;
+
+    const getCurrentTimeInSeconds = () => {
+      return Date.now() / 1000;
+    };
+    const lastUpdateTime = getCurrentTimeInSeconds();
+    let lastCurrentTime = this._videoElement.currentTime;
+
     this._stallInterval = setInterval(() => {
-      if (lastUpdateTime === this._videoElement.currentTime && stallHandlerCounter++ < MAX_NUMBER_OF_STALLS) {
-        DashAdapter._logger.debug('stall found, break the stall');
-        this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
-      } else {
+      const stallSeconds = getCurrentTimeInSeconds() - lastUpdateTime;
+      //waiting for 3 sec until checking stalling
+      if (stallSeconds > STALL_DETECTION_THRESHOLD && !this._videoElement.paused) {
+        if (lastCurrentTime === this._videoElement.currentTime) {
+          DashAdapter._logger.debug('stall found, break the stall');
+          this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
+        }
         this._clearStallInterval();
       }
-      lastUpdateTime = this._videoElement.currentTime;
+      lastCurrentTime = this._videoElement.currentTime;
     }, STALL_DETECTION_INTERVAL);
   }
 
@@ -444,7 +439,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeBreakStalls(): void {
     if (this._config.forceBreakStall) {
-      this._eventManager.listen(this._videoElement, EventType.STALLED, () => this._stallHandler());
+      this._eventManager.listen(this._videoElement, EventType.SEEKING, () => this._stallHandler());
     }
   }
 
@@ -691,7 +686,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
     this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
-      this._isPlaybackStarted = true;
       this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     });
 
@@ -740,12 +734,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
-          this._startTime = startTime && startTime > -1 ? startTime : undefined;
-          this._startTime = isNaN(this._lastTimeDetach) ? this._startTime : this._lastTimeDetach;
+          let shakaStartTime = startTime && startTime > -1 ? startTime : undefined;
+          shakaStartTime = isNaN(this._lastTimeDetach) ? shakaStartTime : this._lastTimeDetach;
           this._lastTimeDetach = NaN;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(url => {
-              return this._shaka.load(url, this._startTime);
+              return this._shaka.load(url, shakaStartTime);
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
@@ -813,7 +807,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
-    this._isPlaybackStarted = false;
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
