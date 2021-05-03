@@ -415,7 +415,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const getCurrentTimeInSeconds = () => {
       return Date.now() / 1000;
     };
-    let lastUpdateTime = getCurrentTimeInSeconds();
+    const lastUpdateTime = getCurrentTimeInSeconds();
     let lastCurrentTime = this._videoElement.currentTime;
 
     this._stallInterval = setInterval(() => {
