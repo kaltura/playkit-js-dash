@@ -420,7 +420,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
     this._stallInterval = setInterval(() => {
       const stallSeconds = getCurrentTimeInSeconds() - lastUpdateTime;
-      //waiting for STALL_DETECTION_THRESHOLD=3 until checking stalling
+      //waiting for 3 sec until checking stalling
       if (stallSeconds > STALL_DETECTION_THRESHOLD && !this._videoElement.paused) {
         if (lastCurrentTime === this._videoElement.currentTime) {
           DashAdapter._logger.debug('stall found, break the stall');
