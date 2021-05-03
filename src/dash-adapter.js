@@ -64,13 +64,6 @@ const STALL_DETECTION_THRESHOLD = 3;
 const STALL_BREAK_THRESHOLD = 0.1;
 
 /**
- * the number of stalls until we stop
- * @type {number}
- * @const
- */
-const MAX_NUMBER_OF_STALLS = 10;
-
-/**
  * Adapter of shaka lib for dash content
  * @classdesc
  */
@@ -422,21 +415,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const getCurrentTimeInSeconds = () => {
       return Date.now() / 1000;
     };
-    let stallHandlerCounter = 0;
     let lastUpdateTime = getCurrentTimeInSeconds();
     let lastCurrentTime = this._videoElement.currentTime;
 
     this._stallInterval = setInterval(() => {
       const stallSeconds = getCurrentTimeInSeconds() - lastUpdateTime;
       if (stallSeconds > STALL_DETECTION_THRESHOLD && !this._videoElement.paused) {
-        if (lastCurrentTime === this._videoElement.currentTime && stallHandlerCounter++ < MAX_NUMBER_OF_STALLS) {
+        if (lastCurrentTime === this._videoElement.currentTime) {
           DashAdapter._logger.debug('stall found, break the stall');
           lastUpdateTime = getCurrentTimeInSeconds();
           this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
-        } else {
-          DashAdapter._logger.debug('clear interval');
-          this._clearStallInterval();
         }
+        this._clearStallInterval();
       }
       lastCurrentTime = this._videoElement.currentTime;
     }, STALL_DETECTION_INTERVAL);
