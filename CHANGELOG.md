@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.24.3](https://github.com/kaltura/playkit-js-dash/compare/v1.24.2...v1.24.3) (2021-05-04)
+
+
+### Bug Fixes
+
+* **FEC-11136:** Tizen 4 got stuck on the middle of the media ([#144](https://github.com/kaltura/playkit-js-dash/issues/144)) ([2562f1e](https://github.com/kaltura/playkit-js-dash/commit/2562f1e))
+
+
+
 ### [1.24.2](https://github.com/kaltura/playkit-js-dash/compare/v1.24.1...v1.24.2) (2021-04-28)
 
 
