@@ -44,6 +44,27 @@ const ShakaEvent: ShakaEventType = {
 const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
 
 /**
+ * the interval for stall detection in milliseconds
+ * @type {number}
+ * @const
+ */
+const STALL_DETECTION_INTERVAL = 500;
+
+/**
+ * the threshold for stall detection in seconds
+ * @type {number}
+ * @const
+ */
+const STALL_DETECTION_THRESHOLD = 3;
+
+/**
+ * the threshold needed to break the stall
+ * @type {number}
+ * @const
+ */
+const STALL_BREAK_THRESHOLD = 0.1;
+
+/**
  * Adapter of shaka lib for dash content
  * @classdesc
  */
@@ -146,6 +167,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _videoSizeUpdateTimer: ?IntervalID = null;
 
   /**
+   * stall interval to break the stall on Smart TV
+   * @type {null|IntervalID}
+   * @private
+   */
+  _stallInterval: ?IntervalID = null;
+
+  /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
    * @member {number} - VIDEO_ERROR_CODE
    * @type {number}
@@ -202,6 +230,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let adapterConfig: Object = Utils.Object.copyDeep(DefaultConfig);
     if (Utils.Object.hasPropertyPath(config, 'text.useNativeTextTrack')) {
       adapterConfig.textTrackVisibile = Utils.Object.getPropertyPath(config, 'text.useNativeTextTrack');
+    }
+    if (Utils.Object.hasPropertyPath(config, 'text.useShakaTextTrackDisplay')) {
+      adapterConfig.useShakaTextTrackDisplay = Utils.Object.getPropertyPath(config, 'text.useShakaTextTrackDisplay');
+    }
+    if (Utils.Object.hasPropertyPath(config, 'streaming.forceBreakStall')) {
+      adapterConfig.forceBreakStall = Utils.Object.getPropertyPath(config, 'streaming.forceBreakStall');
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
@@ -352,13 +386,55 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
     //render text tracks to our own container
-    if (this._config.shakaConfig.useShakaTextTrackDisplay) {
+    if (this._config.useShakaTextTrackDisplay) {
       this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
     }
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
+    this._maybeBreakStalls();
     this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
+  }
+
+  _clearStallInterval(): void {
+    if (this._stallInterval) {
+      clearInterval(this._stallInterval);
+      this._stallInterval = null;
+    }
+  }
+
+  _stallHandler(): void {
+    this._clearStallInterval();
+
+    const getCurrentTimeInSeconds = () => {
+      return Date.now() / 1000;
+    };
+    const lastUpdateTime = getCurrentTimeInSeconds();
+    let lastCurrentTime = this._videoElement.currentTime;
+
+    this._stallInterval = setInterval(() => {
+      const stallSeconds = getCurrentTimeInSeconds() - lastUpdateTime;
+      //waiting for 3 sec until checking stalling
+      if (stallSeconds > STALL_DETECTION_THRESHOLD && !this._videoElement.paused) {
+        if (lastCurrentTime === this._videoElement.currentTime) {
+          DashAdapter._logger.debug('stall found, break the stall');
+          this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
+        }
+        this._clearStallInterval();
+      }
+      lastCurrentTime = this._videoElement.currentTime;
+    }, STALL_DETECTION_INTERVAL);
+  }
+
+  /**
+   * register to event to break the stalls on smart TV
+   * @returns {void}
+   * @private
+   */
+  _maybeBreakStalls(): void {
+    if (this._config.forceBreakStall) {
+      this._eventManager.listen(this._videoElement, EventType.SEEKING, () => this._stallHandler());
+    }
   }
 
   /**
@@ -402,6 +478,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             .then(updatedRequest => {
               request.uris = [updatedRequest.url];
               request.headers = updatedRequest.headers;
+              if (typeof updatedRequest.withCredentials === 'boolean') {
+                request.allowCrossSiteCredentials = updatedRequest.withCredentials;
+              }
               if (request.method === 'POST') {
                 request.body = updatedRequest.body;
               } else if (updatedRequest.body) {
@@ -639,9 +718,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
-    this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () =>
-      this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering)
-    );
+    this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
+      this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
+    });
+
     // called when a resource is downloaded
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
       switch (type) {
@@ -760,6 +840,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
+    this._clearStallInterval();
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
       this._eventManager.removeAll();
@@ -889,8 +970,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     let parsedTracks = [];
     if (textTracks) {
       for (let i = 0; i < textTracks.length; i++) {
+        let kind = textTracks[i].kind ? textTracks[i].kind + 's' : '';
+        kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
         let settings = {
-          kind: textTracks[i].kind ? textTracks[i].kind + 's' : '',
+          kind: kind,
           active: false,
           label: textTracks[i].label,
           language: textTracks[i].language,
