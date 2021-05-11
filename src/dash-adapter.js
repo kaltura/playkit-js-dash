@@ -696,7 +696,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
-              this._maybeApplyAbrRestrictions();
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
             })
