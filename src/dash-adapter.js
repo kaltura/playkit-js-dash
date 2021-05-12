@@ -546,27 +546,17 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeApplyAbrRestrictions(): void {
     if (this._config.capLevelToPlayerSize) {
-      this._clearVideoUpdateTimer();
-      this._videoSizeUpdateTimer = setInterval(
-        () =>
-          this._updateRestriction({
-            minHeight: 0,
-            maxHeight: this._videoHeight,
-            minWidth: 0,
-            maxWidth: this._videoWidth,
-            minBitrate: 0,
-            maxBitrate: Infinity
-          }),
-        ABR_RESTRICTION_UPDATE_INTERVAL
-      );
-      this._updateRestriction({
+      const restrictions = {
         minHeight: 0,
         maxHeight: this._videoHeight,
         minWidth: 0,
         maxWidth: this._videoWidth,
         minBitrate: 0,
         maxBitrate: Infinity
-      });
+      };
+      this._clearVideoUpdateTimer();
+      this._videoSizeUpdateTimer = setInterval(() => this._updateRestriction(restrictions), ABR_RESTRICTION_UPDATE_INTERVAL);
+      this._updateRestriction(restrictions);
     } else {
       this._clearVideoUpdateTimer();
       if (Utils.Object.hasPropertyPath(this._config, 'abr.restrictions')) {
