@@ -13,7 +13,8 @@ import {
   VideoTrack,
   ImageTrack,
   ThumbnailInfo,
-  PKABRRestrictionObject
+  PKABRRestrictionObject,
+  filterTracksByRestriction
 } from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
@@ -561,6 +562,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._clearVideoUpdateTimer();
       if (Utils.Object.hasPropertyPath(this._config, 'abr.restrictions')) {
         this._updateRestriction(this._config.abr.restrictions);
+        if (!this.isAdaptiveBitrateEnabled()) {
+          const videoTracks = this._getParsedVideoTracks();
+          const availableTracks = filterTracksByRestriction(videoTracks, this._config.abr.restrictions);
+          if (availableTracks.length) {
+            const activeTrackInRange = availableTracks.find(track => track.active);
+            if (!activeTrackInRange) {
+              this.selectVideoTrack(availableTracks[0]);
+            }
+          }
+        }
       }
     }
   }
@@ -857,9 +868,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   _getActiveTrack(): Object {
-    return this._shaka.getVariantTracks().filter(variantTrack => {
-      return variantTrack.active;
-    })[0];
+    return this._shaka.getVariantTracks().find(variantTrack => variantTrack.active);
   }
 
   /**
@@ -1145,9 +1154,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onAdaptation(): void {
-    let selectedVideoTrack = this._getParsedVideoTracks().filter(function (videoTrack) {
-      return videoTrack.active;
-    })[0];
+    let selectedVideoTrack = this._getParsedVideoTracks().find(videoTrack => videoTrack.active);
     DashAdapter._logger.debug('Video track changed', selectedVideoTrack);
     this._onTrackChanged(selectedVideoTrack);
   }
