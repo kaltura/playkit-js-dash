@@ -12,7 +12,9 @@ import {
   Utils,
   VideoTrack,
   ImageTrack,
-  ThumbnailInfo
+  ThumbnailInfo,
+  PKABRRestrictionObject,
+  filterTracksByRestriction
 } from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
@@ -254,14 +256,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         adapterConfig.shakaConfig.abr.defaultBandwidthEstimate = abr.defaultBandwidthEstimate;
       }
       if (abr.restrictions) {
-        if (abr.restrictions.minBitrate > 0) {
-          adapterConfig.shakaConfig.abr.restrictions.minBandwidth = abr.restrictions.minBitrate;
-        }
-        if (abr.restrictions.maxBitrate < Infinity) {
-          //You can either set capping by size or bitrate, if bitrate is set then disable size capping
-          adapterConfig.capLevelToPlayerSize = false;
-          adapterConfig.shakaConfig.abr.restrictions.maxBandwidth = abr.restrictions.maxBitrate;
-        }
+        Utils.Object.createPropertyPath(adapterConfig, 'abr.restrictions', abr.restrictions);
       }
     }
 
@@ -552,48 +547,89 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _maybeApplyAbrRestrictions(): void {
     if (this._config.capLevelToPlayerSize) {
-      const videoTracks = this._getVideoTracks();
-      const getMinDimensions = (dim): number =>
-        Math.min.apply(
-          null,
-          videoTracks.map(variant => variant[dim])
-        );
-      //Get minimal allowed dimensions
-      const minWidth = getMinDimensions('width');
-      const minHeight = getMinDimensions('height');
-      const updateAbrRestrictions = () => {
-        const curHeight = this._videoHeight;
-        const curWidth = this._videoWidth;
-        if (typeof curWidth === 'number' && typeof curHeight === 'number') {
-          //check if current player size is smaller than smallest rendition
-          //setting restriction below smallest rendition size will result in shaka emitting restriction unmet error
-          if (curHeight >= minHeight && curWidth >= minWidth) {
-            DashAdapter._logger.debug(`applying dimension restriction: width < ${curWidth}, height < ${curHeight}`);
-            this._shaka.configure({
-              abr: {
-                restrictions: {
-                  maxHeight: curHeight,
-                  maxWidth: curWidth
-                }
-              }
-            });
-          } else {
-            DashAdapter._logger.debug(`applying dimension restriction: width < ${minHeight}, height < ${minWidth}`);
-            this._shaka.configure({
-              abr: {
-                restrictions: {
-                  maxHeight: minHeight,
-                  maxWidth: minWidth
-                }
-              }
-            });
-          }
-        }
+      const getRestrictions = () => {
+        return {
+          minHeight: 0,
+          maxHeight: this._videoHeight,
+          minWidth: 0,
+          maxWidth: this._videoWidth,
+          minBitrate: 0,
+          maxBitrate: Infinity
+        };
       };
       this._clearVideoUpdateTimer();
-      this._videoSizeUpdateTimer = setInterval(updateAbrRestrictions, ABR_RESTRICTION_UPDATE_INTERVAL);
-      updateAbrRestrictions();
+      this._videoSizeUpdateTimer = setInterval(() => this._updateRestriction(getRestrictions()), ABR_RESTRICTION_UPDATE_INTERVAL);
+      this._updateRestriction(getRestrictions());
+    } else {
+      this._clearVideoUpdateTimer();
+      if (Utils.Object.hasPropertyPath(this._config, 'abr.restrictions')) {
+        this._updateRestriction(this._config.abr.restrictions);
+        if (!this.isAdaptiveBitrateEnabled()) {
+          const videoTracks = this._getParsedVideoTracks();
+          const availableTracks = filterTracksByRestriction(videoTracks, this._config.abr.restrictions);
+          if (availableTracks.length) {
+            const activeTrackInRange = availableTracks.find(track => track.active);
+            if (!activeTrackInRange) {
+              this.selectVideoTrack(availableTracks[0]);
+            }
+          }
+        }
+      }
     }
+  }
+
+  /**
+   * apply ABR restrictions by size
+   * @private
+   * @param {PKABRRestrictionObject} restrictions - abr restrictions config
+   * @returns {void}
+   */
+  _updateRestriction(restrictions: PKABRRestrictionObject): void {
+    const shakaRestrictionsConfig = this._getRestrictionShakaConfig(restrictions);
+    this._shaka.configure({
+      abr: {
+        restrictions: shakaRestrictionsConfig
+      }
+    });
+  }
+
+  _getRestrictionShakaConfig(restrictions: PKABRRestrictionObject): Object {
+    const getMinDimensions = (dim): number => {
+      const videoTracks = this._getVideoTracks();
+      return Math.min.apply(
+        null,
+        videoTracks.map(variant => variant[dim])
+      );
+    };
+    let restrictionsShakaConfig = {};
+    if (restrictions) {
+      let {maxHeight, maxWidth, maxBitrate, minHeight, minWidth, minBitrate} = restrictions;
+      const minHeightValue = Math.max(minHeight, 0);
+      const maxHeightValue = Math.max(maxHeight, getMinDimensions('height'));
+      if (maxHeightValue >= minHeightValue) {
+        restrictionsShakaConfig.minHeight = minHeightValue;
+        restrictionsShakaConfig.maxHeight = maxHeightValue;
+      } else {
+        DashAdapter._logger.warn('Invalid maxHeight restriction, maxHeight must be greater than minHeight', minHeight, maxHeight);
+      }
+      const minWidthValue = Math.max(minWidth, 0);
+      const maxWidthValue = Math.max(maxWidth, getMinDimensions('width'));
+      if (maxWidthValue >= minWidthValue) {
+        restrictionsShakaConfig.minWidth = minWidthValue;
+        restrictionsShakaConfig.maxWidth = maxWidthValue;
+      } else {
+        DashAdapter._logger.warn('Invalid maxWidth restriction, maxWidth must be greater than minWidth', minWidth, maxWidth);
+      }
+      const minBitrateValue = Math.max(minBitrate, 0);
+      const maxBitrateValue = Math.max(maxBitrate, getMinDimensions('bandwidth'));
+      if (maxBitrateValue >= minBitrateValue) {
+        restrictionsShakaConfig.minBandwidth = minBitrateValue;
+        restrictionsShakaConfig.maxBandwidth = maxBitrateValue;
+      } else {
+        DashAdapter._logger.warn('Invalid maxBitrate restriction, maxBitrate must be greater than minBitrate', minBitrate, maxBitrate);
+      }
+    }
+    return restrictionsShakaConfig;
   }
 
   /**
@@ -743,7 +779,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
-              this._maybeApplyAbrRestrictions();
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
             })
@@ -835,9 +870,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   _getActiveTrack(): Object {
-    return this._shaka.getVariantTracks().filter(variantTrack => {
-      return variantTrack.active;
-    })[0];
+    return this._shaka.getVariantTracks().find(variantTrack => variantTrack.active);
   }
 
   /**
@@ -1071,6 +1104,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Apply ABR restriction.
+   * @function applyABRRestriction
+   * @param {PKABRRestrictionObject} restrictions - abr restrictions config
+   * @returns {void}
+   * @public
+   */
+  applyABRRestriction(restrictions: PKABRRestrictionObject): void {
+    Utils.Object.createPropertyPath(this._config, 'abr.restrictions', restrictions);
+    this._maybeApplyAbrRestrictions();
+  }
+
+  /**
    * Returns the live edge
    * @returns {number} - live edge
    * @private
@@ -1111,10 +1156,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onAdaptation(): void {
-    let selectedVideoTrack = this._getParsedVideoTracks().filter(function (videoTrack) {
-      return videoTrack.active;
-    })[0];
-    DashAdapter._logger.debug('Video track changed', selectedVideoTrack);
+    let selectedVideoTrack = this._getParsedVideoTracks().find(videoTrack => videoTrack.active);
     this._onTrackChanged(selectedVideoTrack);
   }
 
