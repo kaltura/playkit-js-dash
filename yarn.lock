@@ -853,9 +853,10 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
-"@playkit-js/playkit-js@https://github.com/kaltura/playkit-js.git#master":
-  version "0.70.1"
-  resolved "https://github.com/kaltura/playkit-js.git#a8a3e9f6be377b3ad080c571a59a0a8c67963377"
+"@playkit-js/playkit-js@0.71.0-canary.a8a3e9f":
+  version "0.71.0-canary.a8a3e9f"
+  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.71.0-canary.a8a3e9f.tgz#067d7b53ed39fcb6fd20d25f530759e61fafd56f"
+  integrity sha512-wyaS7+hsfclNgnVLEPsdKe2yldpsIFc8cjZQz5QFFxgOp7zMawYlaf+rx3XGaEHrI/BrJy+XoxMNrtLJ7SO8zQ==
   dependencies:
     js-logger "^1.6.0"
     ua-parser-js "^0.7.21"
