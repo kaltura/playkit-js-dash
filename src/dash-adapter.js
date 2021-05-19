@@ -564,16 +564,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._clearVideoUpdateTimer();
       if (Utils.Object.hasPropertyPath(this._config, 'abr.restrictions')) {
         this._updateRestriction(this._config.abr.restrictions);
-        if (!this.isAdaptiveBitrateEnabled()) {
-          const videoTracks = this._getParsedVideoTracks();
-          const availableTracks = filterTracksByRestriction(videoTracks, this._config.abr.restrictions);
-          if (availableTracks.length) {
-            const activeTrackInRange = availableTracks.find(track => track.active);
-            if (!activeTrackInRange) {
-              this.selectVideoTrack(availableTracks[0]);
-            }
-          }
-        }
       }
     }
   }
@@ -1113,6 +1103,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   applyABRRestriction(restrictions: PKABRRestrictionObject): void {
     Utils.Object.createPropertyPath(this._config, 'abr.restrictions', restrictions);
     this._maybeApplyAbrRestrictions();
+    if (!this.isAdaptiveBitrateEnabled()) {
+      const videoTracks = this._getParsedVideoTracks();
+      const availableTracks = filterTracksByRestriction(videoTracks, this._config.abr.restrictions);
+      if (availableTracks.length) {
+        const activeTrackInRange = availableTracks.find(track => track.active);
+        if (!activeTrackInRange) {
+          this.selectVideoTrack(availableTracks[0]);
+        }
+      }
+    }
   }
 
   /**
