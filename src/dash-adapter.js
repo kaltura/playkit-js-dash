@@ -541,11 +541,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * apply ABR restrictions
+   * apply Capping to player size restrictions
    * @private
    * @returns {void}
    */
-  _maybeApplyAbrRestrictions(): void {
+  _maybeCapLevelToPlayerSize(): void {
     if (this._config.capLevelToPlayerSize) {
       const getRestrictions = () => {
         return {
@@ -560,7 +560,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._clearVideoUpdateTimer();
       this._videoSizeUpdateTimer = setInterval(() => this._updateRestriction(getRestrictions()), ABR_RESTRICTION_UPDATE_INTERVAL);
       this._updateRestriction(getRestrictions());
-    } else {
+    }
+  }
+
+  /**
+   * apply ABR restrictions
+   * @private
+   * @returns {void}
+   */
+  _maybeApplyAbrRestrictions(): void {
+    if (!this._config.capLevelToPlayerSize) {
       this._clearVideoUpdateTimer();
       if (Utils.Object.hasPropertyPath(this._config, 'abr.restrictions')) {
         this._updateRestriction(this._config.abr.restrictions);
@@ -769,6 +778,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
+              this._maybeCapLevelToPlayerSize();
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
             })
