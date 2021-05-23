@@ -769,6 +769,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
+              //handle cap player to level size
+              if (this._config.capLevelToPlayerSize) {
+                this._maybeApplyAbrRestrictions();
+              }
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
             })
