@@ -917,7 +917,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       for (let i = 0; i < videoTracks.length; i++) {
         let settings = {
           id: videoTracks[i].id,
-          bandwidth: videoTracks[i].bandwidth,
+          bandwidth: videoTracks[i].videoBandwidth || videoTracks[i].bandwidth,
           width: videoTracks[i].width,
           height: videoTracks[i].height,
           active: videoTracks[i].active,
