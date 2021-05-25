@@ -1150,6 +1150,28 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Gets the segment duration of the stream
+   * @return {number} - Segment duration in seconds
+   */
+  get liveDuration() {
+    return this._getLiveEdge();
+  }
+
+  /**
+   * Gets the live duration
+   * @return {number} - live duration
+   */
+  getSegmentDuration(): number {
+    if (this._shaka) {
+      const manifest = this._shaka.getManifest();
+      if (manifest && manifest.presentationTimeline) {
+        return manifest.presentationTimeline.getMaxSegmentDuration();
+      }
+    }
+    return 0;
+  }
+
+  /**
    * An handler to shaka adaptation event
    * @function _onAdaptation
    * @returns {void}
@@ -1256,9 +1278,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   getStartTimeOfDvrWindow(): number {
     if (this.isLive() && this._shaka) {
       return this._shaka.seekRange().start;
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   /**
