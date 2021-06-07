@@ -3,7 +3,6 @@ import shaka from 'shaka-player';
 import {
   AudioTrack,
   BaseMediaSourceAdapter,
-  DrmScheme,
   Error,
   EventType,
   RequestType,
@@ -1228,7 +1227,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _onDrmSessionUpdate(): void {
     this._trigger(EventType.DRM_LICENSE_LOADED, {
       licenseTime: this._shaka.getStats().licenseTime,
-      scheme: DrmScheme.WIDEVINE
+      scheme: this._shaka.drmInfo().keySystem
     });
   }
 
