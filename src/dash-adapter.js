@@ -3,7 +3,6 @@ import shaka from 'shaka-player';
 import {
   AudioTrack,
   BaseMediaSourceAdapter,
-  DrmScheme,
   Error,
   EventType,
   RequestType,
@@ -541,11 +540,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * apply ABR restrictions
+   * apply Capping to player size restrictions
    * @private
    * @returns {void}
    */
-  _maybeApplyAbrRestrictions(): void {
+  _maybeCapLevelToPlayerSize(): void {
     if (this._config.capLevelToPlayerSize) {
       const getRestrictions = () => {
         return {
@@ -560,20 +559,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._clearVideoUpdateTimer();
       this._videoSizeUpdateTimer = setInterval(() => this._updateRestriction(getRestrictions()), ABR_RESTRICTION_UPDATE_INTERVAL);
       this._updateRestriction(getRestrictions());
-    } else {
+    }
+  }
+
+  /**
+   * apply ABR restrictions
+   * @private
+   * @returns {void}
+   */
+  _maybeApplyAbrRestrictions(): void {
+    if (!this._config.capLevelToPlayerSize) {
       this._clearVideoUpdateTimer();
       if (Utils.Object.hasPropertyPath(this._config, 'abr.restrictions')) {
         this._updateRestriction(this._config.abr.restrictions);
-        if (!this.isAdaptiveBitrateEnabled()) {
-          const videoTracks = this._getParsedVideoTracks();
-          const availableTracks = filterTracksByRestriction(videoTracks, this._config.abr.restrictions);
-          if (availableTracks.length) {
-            const activeTrackInRange = availableTracks.find(track => track.active);
-            if (!activeTrackInRange) {
-              this.selectVideoTrack(availableTracks[0]);
-            }
-          }
-        }
       }
     }
   }
@@ -779,6 +777,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
+              this._maybeCapLevelToPlayerSize();
               DashAdapter._logger.debug('The source has been loaded successfully');
               resolve(data);
             })
@@ -923,7 +922,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       for (let i = 0; i < videoTracks.length; i++) {
         let settings = {
           id: videoTracks[i].id,
-          bandwidth: videoTracks[i].bandwidth,
+          bandwidth: videoTracks[i].videoBandwidth || videoTracks[i].bandwidth,
           width: videoTracks[i].width,
           height: videoTracks[i].height,
           active: videoTracks[i].active,
@@ -1113,6 +1112,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   applyABRRestriction(restrictions: PKABRRestrictionObject): void {
     Utils.Object.createPropertyPath(this._config, 'abr.restrictions', restrictions);
     this._maybeApplyAbrRestrictions();
+    if (!this.isAdaptiveBitrateEnabled()) {
+      const videoTracks = this._getParsedVideoTracks();
+      const availableTracks = filterTracksByRestriction(videoTracks, this._config.abr.restrictions);
+      if (availableTracks.length) {
+        const activeTrackInRange = availableTracks.find(track => track.active);
+        if (!activeTrackInRange) {
+          this.selectVideoTrack(availableTracks[0]);
+        }
+      }
+    }
   }
 
   /**
@@ -1240,7 +1249,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _onDrmSessionUpdate(): void {
     this._trigger(EventType.DRM_LICENSE_LOADED, {
       licenseTime: this._shaka.getStats().licenseTime,
-      scheme: DrmScheme.WIDEVINE
+      scheme: this._shaka.drmInfo().keySystem
     });
   }
 

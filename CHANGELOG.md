@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.25.0](https://github.com/kaltura/playkit-js-dash/compare/v1.24.3...v1.25.0) (2021-06-02)
+
+
+### Bug Fixes
+
+* **FEC-11126:** select the lowest value if we're not adaptive mode ([#150](https://github.com/kaltura/playkit-js-dash/issues/150)) ([9b083a5](https://github.com/kaltura/playkit-js-dash/commit/9b083a5))
+* **FEC-11268:** incorrect video bandwidth parsed ([#151](https://github.com/kaltura/playkit-js-dash/issues/151)) ([750cc75](https://github.com/kaltura/playkit-js-dash/commit/750cc75))
+* **FEC-11270:** cap to player size doesn't apply ([#152](https://github.com/kaltura/playkit-js-dash/issues/152)) ([1ca44b1](https://github.com/kaltura/playkit-js-dash/commit/1ca44b1))
+
+
+### Features
+
+* **FEC-10980:** Enable setting ABR settings on-the-fly ([#134](https://github.com/kaltura/playkit-js-dash/issues/134)) ([a400399](https://github.com/kaltura/playkit-js-dash/commit/a400399))
+
+
+
 ### [1.24.3](https://github.com/kaltura/playkit-js-dash/compare/v1.24.2...v1.24.3) (2021-05-04)
 
 
