@@ -732,6 +732,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             bytes: response.data.byteLength,
             url: response.uri
           });
+          if (this.isLive()) {
+            this._videoElement.dispatchEvent(new window.Event(EventType.DURATION_CHANGE));
+          }
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
           this._parseManifest(response.data);
