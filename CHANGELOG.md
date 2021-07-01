@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.26.0](https://github.com/kaltura/playkit-js-dash/compare/v1.25.0...v1.26.0) (2021-07-01)
+
+
+### Bug Fixes
+
+* **FEC-11140:** DRM scheme might be incorrect in DRM_LICENSE_LOADED event ([#155](https://github.com/kaltura/playkit-js-dash/issues/155)) ([bb6c018](https://github.com/kaltura/playkit-js-dash/commit/bb6c018))
+
+
+### Features
+
+* **FEC-10817:** expose the current time of the video element in live streams ([#156](https://github.com/kaltura/playkit-js-dash/issues/156)) ([c298892](https://github.com/kaltura/playkit-js-dash/commit/c298892))
+
+
+
 ## [1.25.0](https://github.com/kaltura/playkit-js-dash/compare/v1.24.3...v1.25.0) (2021-06-02)
 
 
