@@ -1175,10 +1175,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   getSegmentDuration(): number {
     if (this._shaka) {
-      const manifest = this._shaka.getManifest();
-      if (manifest && manifest.presentationTimeline) {
-        return manifest.presentationTimeline.getMaxSegmentDuration();
-      }
+      return this._shaka.getStats().maxSegmentDuration;
     }
     return 0;
   }
@@ -1301,11 +1298,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   get targetBuffer(): number {
     let targetBufferVal = NaN;
     if (!this._shaka) return NaN;
+    const manifest = this._shaka.getManifest();
     if (this.isLive()) {
-      if (this._shaka.getManifest() && this._shaka.getManifest().presentationTimeline) {
+      if (manifest && manifest.presentationTimeline) {
         targetBufferVal =
-          this._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
-          this._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
+          manifest.presentationTimeline.getSegmentAvailabilityEnd() -
+          this._shaka.seekRange().end -
           (this._videoElement.currentTime - this._getLiveEdge());
       }
     } else {
@@ -1313,12 +1311,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       targetBufferVal = this._videoElement.duration - this._videoElement.currentTime;
     }
 
-    if (this._shaka.getManifest() && this._shaka.getManifest().presentationTimeline) {
-      targetBufferVal = Math.min(
-        targetBufferVal,
-        this._shaka.getConfiguration().streaming.bufferingGoal + this._shaka.getManifest().presentationTimeline.getMaxSegmentDuration()
-      );
-    }
+    targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal + this._shaka.getStats().maxSegmentDuration);
     return targetBufferVal;
   }
 }
