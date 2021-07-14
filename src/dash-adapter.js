@@ -116,7 +116,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _shaka: any;
-  _manifest: any;
   /**
    * an object containing all the events we bind and unbind to.
    * @member {Object} - _adapterEventsBindings
@@ -845,7 +844,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
-    this._manifest = null;
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
