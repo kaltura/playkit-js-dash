@@ -116,6 +116,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _shaka: any;
+  _manifest: any;
   /**
    * an object containing all the events we bind and unbind to.
    * @member {Object} - _adapterEventsBindings
@@ -844,6 +845,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
+    this._manifest = null;
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
     if (this._eventManager) {
@@ -1175,12 +1177,21 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   getSegmentDuration(): number {
     if (this._shaka) {
-      const manifest = this._shaka.getManifest();
+      const manifest = this._getManifest();
       if (manifest && manifest.presentationTimeline) {
         return manifest.presentationTimeline.getMaxSegmentDuration();
       }
     }
     return 0;
+  }
+
+  _getManifest(): any {
+    if (this._shaka) {
+      if (!this._manifest) {
+        this._manifest = this._shaka.getManifest();
+      }
+      return this._manifest;
+    }
   }
 
   /**
@@ -1301,11 +1312,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   get targetBuffer(): number {
     let targetBufferVal = NaN;
     if (!this._shaka) return NaN;
+    const manifest = this._getManifest();
     if (this.isLive()) {
-      if (this._shaka.getManifest() && this._shaka.getManifest().presentationTimeline) {
+      if (manifest && manifest.presentationTimeline) {
         targetBufferVal =
-          this._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
-          this._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
+          manifest.presentationTimeline.getSegmentAvailabilityEnd() -
+          manifest.presentationTimeline.getSeekRangeEnd() -
           (this._videoElement.currentTime - this._getLiveEdge());
       }
     } else {
@@ -1313,10 +1325,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       targetBufferVal = this._videoElement.duration - this._videoElement.currentTime;
     }
 
-    if (this._shaka.getManifest() && this._shaka.getManifest().presentationTimeline) {
+    if (manifest && manifest.presentationTimeline) {
       targetBufferVal = Math.min(
         targetBufferVal,
-        this._shaka.getConfiguration().streaming.bufferingGoal + this._shaka.getManifest().presentationTimeline.getMaxSegmentDuration()
+        this._shaka.getConfiguration().streaming.bufferingGoal + manifest.presentationTimeline.getMaxSegmentDuration()
       );
     }
     return targetBufferVal;
