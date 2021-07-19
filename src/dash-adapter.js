@@ -1286,7 +1286,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   getStartTimeOfDvrWindow(): number {
     if (this.isLive() && this._shaka) {
-      return this._shaka.seekRange().start;
+      return this._shaka.seekRange().start + this._shaka.getConfiguration().streaming.safeSeekOffset;
     }
     return 0;
   }
