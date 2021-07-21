@@ -1144,7 +1144,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   seekToLiveEdge(): void {
     if (this._shaka && this._videoElement.readyState > 0) {
-      this._videoElement.currentTime = this._shaka.seekRange().end;
+      this._videoElement.currentTime = this._getLiveEdge();
     }
   }
 
@@ -1298,14 +1298,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   get targetBuffer(): number {
     let targetBufferVal = NaN;
     if (!this._shaka) return NaN;
-    const manifest = this._shaka.getManifest();
     if (this.isLive()) {
-      if (manifest && manifest.presentationTimeline) {
-        targetBufferVal =
-          manifest.presentationTimeline.getSegmentAvailabilityEnd() -
-          this._shaka.seekRange().end -
-          (this._videoElement.currentTime - this._getLiveEdge());
-      }
+      targetBufferVal = this._getLiveEdge() - this._videoElement.currentTime;
     } else {
       // consideration of the end of the playback in the target buffer calc
       targetBufferVal = this._videoElement.duration - this._videoElement.currentTime;
