@@ -1346,7 +1346,9 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
       .load()
       .then(() => {
         try {
-          dashInstance.getStartTimeOfDvrWindow().should.equal(dashInstance._shaka.seekRange().start);
+          Math.floor(dashInstance.getStartTimeOfDvrWindow()).should.equal(
+            Math.floor(dashInstance._shaka.seekRange().start + dashInstance._shaka.getConfiguration().streaming.safeSeekOffset)
+          );
           done();
         } catch (e) {
           done(e);
