@@ -334,11 +334,7 @@ describe('DashAdapter: targetBuffer', () => {
         Utils.Object.mergeDeep(config, {playback: {options: {html5: {dash: {streaming: {bufferingGoal: 120}}}}}})
       );
       video.addEventListener(EventType.PLAYING, () => {
-        let targetBufferVal =
-          dashInstance._shaka.getManifest().presentationTimeline.getSegmentAvailabilityEnd() -
-          dashInstance._shaka.getManifest().presentationTimeline.getSeekRangeEnd() -
-          (video.currentTime - dashInstance._getLiveEdge());
-
+        let targetBufferVal = dashInstance._getLiveEdge() - video.currentTime;
         Math.round(dashInstance.targetBuffer - targetBufferVal).should.equal(0);
         done();
       });
@@ -359,10 +355,7 @@ describe('DashAdapter: targetBuffer', () => {
         Utils.Object.mergeDeep(config, {playback: {options: {html5: {dash: {streaming: {bufferingGoal: 10}}}}}})
       );
       video.addEventListener(EventType.PLAYING, () => {
-        let targetBufferVal =
-          dashInstance._shaka.getConfiguration().streaming.bufferingGoal +
-          dashInstance._shaka.getManifest().presentationTimeline.getMaxSegmentDuration();
-
+        let targetBufferVal = dashInstance._getLiveEdge() - video.currentTime;
         Math.round(dashInstance.targetBuffer - targetBufferVal).should.equal(0);
         done();
       });
