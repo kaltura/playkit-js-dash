@@ -733,7 +733,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             url: response.uri
           });
           if (this.isLive()) {
-            this._videoElement.dispatchEvent(new window.Event(EventType.DURATION_CHANGE));
+            this._dispatchNativeEvent(EventType.DURATION_CHANGE);
           }
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
@@ -1228,16 +1228,27 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (event.buffering) {
       if (!this._waitingSent) {
         // The player enters the buffering state and 'waiting' event hasn't been sent by the HTMLVideoElement.
-        this._videoElement.dispatchEvent(new window.Event(EventType.WAITING));
+        this._dispatchNativeEvent(EventType.WAITING);
         this._buffering = true;
       }
     } else {
       this._buffering = false;
       if (!this._videoElement.paused && !this._playingSent) {
         //the player leaves the buffering state. and 'playing' event hasn't been sent by the HTMLVideoElement.
-        this._videoElement.dispatchEvent(new window.Event(EventType.PLAYING));
+        this._dispatchNativeEvent(EventType.PLAYING);
       }
     }
+  }
+
+  _dispatchNativeEvent(type: string): void {
+    let event;
+    if (typeof window.Event === 'function') {
+      event = new Event(type);
+    } else {
+      event = document.createEvent('Event');
+      event.initEvent(type, true, true);
+    }
+    this._videoElement.dispatchEvent(event);
   }
 
   /**
@@ -1275,7 +1286,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._waitingSent = false;
     if (this._buffering) {
       // The player is in buffering state.
-      this._videoElement.dispatchEvent(new window.Event(EventType.WAITING));
+      this._dispatchNativeEvent(EventType.WAITING);
     }
   }
 
