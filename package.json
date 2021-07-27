@@ -105,7 +105,7 @@
   },
   "peerDependencies": {
     "@playkit-js/playkit-js": "0.68.0-canary.3b1d78e",
-    "shaka-player": "3.0.8"
+    "shaka-player": "3.0.13"
   },
   "publishConfig": {
     "access": "public"
