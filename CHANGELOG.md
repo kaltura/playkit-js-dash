@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.27.0](https://github.com/kaltura/playkit-js-dash/compare/v1.26.0...v1.27.0) (2021-07-27)
+
+
+### Bug Fixes
+
+* **FEC-11409:** many shaka warnings printed in the log ([#159](https://github.com/kaltura/playkit-js-dash/issues/159)) ([51f7adf](https://github.com/kaltura/playkit-js-dash/commit/51f7adf))
+* **FEC-11409:** many shaka warnings printed in the log ([#163](https://github.com/kaltura/playkit-js-dash/issues/163)) ([081cb8d](https://github.com/kaltura/playkit-js-dash/commit/081cb8d))
+* **FEC-11419:** explore why Live Start over starts with few seconds delay ([#160](https://github.com/kaltura/playkit-js-dash/issues/160)) ([c9ea3f8](https://github.com/kaltura/playkit-js-dash/commit/c9ea3f8))
+* **FEC-11429:** something went wrong when start playing live dash on IE11 - regression ([#164](https://github.com/kaltura/playkit-js-dash/issues/164)) ([9bf98d0](https://github.com/kaltura/playkit-js-dash/commit/9bf98d0))
+
+
+### Build System
+
+* **FEC-11389:** reduce builds from travis ([28e4de0](https://github.com/kaltura/playkit-js-dash/commit/28e4de0))
+
+
+### Features
+
+* **FEC-11423:** upgrade shaka to 3.0.13 ([#161](https://github.com/kaltura/playkit-js-dash/issues/161)) ([4bdd80e](https://github.com/kaltura/playkit-js-dash/commit/4bdd80e))
+
+
+
 ## [1.26.0](https://github.com/kaltura/playkit-js-dash/compare/v1.25.0...v1.26.0) (2021-07-01)
 
 
