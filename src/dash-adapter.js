@@ -216,6 +216,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _thumbnailController: ?DashThumbnailController;
+  _seekRangeStart: ?number;
 
   /**
    * Factory method to create media source adapter.
