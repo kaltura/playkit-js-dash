@@ -216,7 +216,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _thumbnailController: ?DashThumbnailController;
-  _seekRangeStart: ?number;
+  _seekRangeStart: number;
 
   /**
    * Factory method to create media source adapter.
@@ -740,7 +740,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
           this._parseManifest(response.data);
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
-          this._seekRangeStart = null;
+          this._seekRangeStart = this._shaka.seekRange().start;
           break;
       }
     });
@@ -1299,7 +1299,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   getStartTimeOfDvrWindow(): number {
     if (this.isLive() && this._shaka) {
-      this._seekRangeStart = this._seekRangeStart || this._shaka.seekRange().start;
       return this._seekRangeStart + this._shaka.getConfiguration().streaming.safeSeekOffset;
     }
     return 0;
