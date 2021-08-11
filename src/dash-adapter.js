@@ -1299,14 +1299,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   getStartTimeOfDvrWindow(): number {
     if (this.isLive() && this._shaka) {
+      const newSeekRangeStart = this._shaka.seekRange().start;
       if (!this._isStartOver) {
-        if (this._seekRangeStart > this._shaka.seekRange().start) {
+        if (this._seekRangeStart > newSeekRangeStart) {
           // seekRange().start seeked back means this is start over
           this._isStartOver = true;
         }
-        this._seekRangeStart = this._shaka.seekRange().start;
+        this._seekRangeStart = newSeekRangeStart;
       }
-      return (this._isStartOver ? this._seekRangeStart : this._shaka.seekRange().start) + this._shaka.getConfiguration().streaming.safeSeekOffset;
+      return (this._isStartOver ? this._seekRangeStart : newSeekRangeStart) + this._shaka.getConfiguration().streaming.safeSeekOffset;
     }
     return 0;
   }
