@@ -1301,6 +1301,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (this.isLive() && this._shaka) {
       if (!this._isStartOver) {
         if (this._seekRangeStart > this._shaka.seekRange().start) {
+          // seekRange().start seeked back means this is start over
           this._isStartOver = true;
         }
         this._seekRangeStart = this._shaka.seekRange().start;
