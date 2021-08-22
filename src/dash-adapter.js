@@ -1229,6 +1229,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
       this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
       DashAdapter._logger.error(error);
+      if (error.severity === Error.Severity.CRITICAL) {
+        this.destroy();
+      }
     }
   }
 
