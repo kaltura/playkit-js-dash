@@ -216,8 +216,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _thumbnailController: ?DashThumbnailController;
-  _isStartOver: boolean = false;
+  _isStartOver: boolean = true;
   _seekRangeStart: number = 0;
+  _startOverTimeout: number;
 
   /**
    * Factory method to create media source adapter.
@@ -721,6 +722,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
+    this._eventManager.listen(this._videoElement, EventType.LOADED_DATA, () => this._onLoadedData());
     this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
       this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     });
@@ -744,6 +746,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           break;
       }
     });
+  }
+
+  _onLoadedData(): void {
+    const segmentDuration = this.getSegmentDuration();
+    this._seekRangeStart = this._shaka.seekRange().start;
+    this._startOverTimeout = setTimeout(() => {
+      if (this._shaka.seekRange().start - this._seekRangeStart >= segmentDuration) {
+        this._isStartOver = false;
+      }
+    }, segmentDuration * 1000);
   }
 
   /**
@@ -848,6 +860,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._thumbnailController = null;
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
+    clearTimeout(this._startOverTimeout);
     if (this._eventManager) {
       this._eventManager.removeAll();
     }
@@ -1299,15 +1312,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   getStartTimeOfDvrWindow(): number {
     if (this.isLive() && this._shaka) {
-      const newSeekRangeStart = this._shaka.seekRange().start;
-      if (!this._isStartOver) {
-        if (this._seekRangeStart > newSeekRangeStart) {
-          // seekRange().start seeked back means this is start over
-          this._isStartOver = true;
-        }
-        this._seekRangeStart = newSeekRangeStart;
-      }
-      return (this._isStartOver ? this._seekRangeStart : newSeekRangeStart) + this._shaka.getConfiguration().streaming.safeSeekOffset;
+      return (this._isStartOver ? this._seekRangeStart : this._shaka.seekRange().start) + this._shaka.getConfiguration().streaming.safeSeekOffset;
     }
     return 0;
   }
