@@ -218,7 +218,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _thumbnailController: ?DashThumbnailController;
   _isStartOver: boolean = true;
   _seekRangeStart: number = 0;
-  _startOverTimeout: number;
+  _startOverTimeout: TimeoutID;
 
   /**
    * Factory method to create media source adapter.
