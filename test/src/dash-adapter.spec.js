@@ -1352,7 +1352,7 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
         } catch (e) {
           done(e);
         }
-      }, (dashInstance.getSegmentDuration() + 1) * 1000);
+      }, (dashInstance.getSegmentDuration() + 2) * 1000);
     });
     dashInstance.load();
   });

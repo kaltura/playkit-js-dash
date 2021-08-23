@@ -756,7 +756,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         // in start over the seekRange().start should be permanent
         this._isStartOver = false;
       }
-    }, segmentDuration * 1000);
+    }, (segmentDuration + 1) * 1000);
   }
 
   /**
