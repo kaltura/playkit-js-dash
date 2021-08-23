@@ -1342,9 +1342,8 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
 
   it('should return the start time of Dvr window for live', done => {
     dashInstance = DashAdapter.createAdapter(video, liveSource, config);
-    dashInstance
-      .load()
-      .then(() => {
+    video.addEventListener(EventType.LOADED_DATA, () => {
+      setTimeout(() => {
         try {
           Math.floor(dashInstance.getStartTimeOfDvrWindow()).should.equal(
             Math.floor(dashInstance._shaka.seekRange().start + dashInstance._shaka.getConfiguration().streaming.safeSeekOffset)
@@ -1353,10 +1352,9 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
         } catch (e) {
           done(e);
         }
-      })
-      .catch(e => {
-        done(e);
-      });
+      }, (dashInstance.getSegmentDuration() + 2) * 1000);
+    });
+    dashInstance.load();
   });
 });
 
