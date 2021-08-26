@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.27.1](https://github.com/kaltura/playkit-js-dash/compare/v1.27.0...v1.27.1) (2021-08-26)
+
+
+### Bug Fixes
+
+* **FEC-11473:** start of dvr window is going back and forth while start over ([#165](https://github.com/kaltura/playkit-js-dash/issues/165)) ([d122166](https://github.com/kaltura/playkit-js-dash/commit/d122166))
+* **FEC-11492:** dash adapter is not destroyed when network is offline ([#167](https://github.com/kaltura/playkit-js-dash/issues/167)) ([1c496b5](https://github.com/kaltura/playkit-js-dash/commit/1c496b5))
+
+
+
 ## [1.27.0](https://github.com/kaltura/playkit-js-dash/compare/v1.26.0...v1.27.0) (2021-07-27)
 
 
