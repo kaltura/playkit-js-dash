@@ -33,7 +33,7 @@ const ParserUtils = {
   BufferToStr: (buffer: ArrayBuffer): ?string => {
     if (TextDecoder) {
       const textDecoder = new TextDecoder();
-      return textDecoder.decode(buffer);
+      return textDecoder.decode(new Uint8Array(buffer));
     }
     return null;
   },
