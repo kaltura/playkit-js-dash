@@ -21,10 +21,8 @@ class DashManifestParser {
     } else {
       xmlStr = manifest;
     }
-    this._logger.error(xmlStr);
     if (xmlStr) {
       this._xmlDoc = XmlUtils.parseXml(xmlStr);
-      this._logger.error(this._xmlDoc);
     }
   }
 
