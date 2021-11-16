@@ -18,7 +18,7 @@ import {
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
 import DefaultConfig from './default-config';
-import './assets/syle.css';
+import './assets/style.css';
 import {DashManifestParser} from './parser/dash-manifest-parser';
 import {DashThumbnailController} from './dash-thumbnail-controller';
 
