@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.27.3](https://github.com/kaltura/playkit-js-dash/compare/v1.27.2...v1.27.3) (2021-11-24)
+
+
+### Bug Fixes
+
+* **FEC-11166:** dash manifest parser fails on LG webOS 3.3 ([#169](https://github.com/kaltura/playkit-js-dash/issues/169)) ([c3259d3](https://github.com/kaltura/playkit-js-dash/commit/c3259d3))
+
+
+
 ### [1.27.2](https://github.com/kaltura/playkit-js-dash/compare/v1.27.1...v1.27.2) (2021-08-26)
 
 
