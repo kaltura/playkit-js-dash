@@ -1296,11 +1296,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _onEmsg(event: any): void {
-    let metadataTrack = Array.from(this._videoElement.textTracks).find(track => track.label === event.type);
+    const {detail, type} = event;
+    let metadataTrack = Array.from(this._videoElement.textTracks).find(track => track.label === type);
     if (!metadataTrack) {
-      metadataTrack = this._videoElement.addTextTrack(TextTrack.KIND.METADATA, event.type);
+      metadataTrack = this._videoElement.addTextTrack(TextTrack.KIND.METADATA, type);
     }
-    const {detail} = event;
     const {startTime, endTime, id} = detail;
 
     const cue = new CuePoint(startTime, endTime, id, CuePoint.TYPE.EMSG, detail);
