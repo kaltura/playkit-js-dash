@@ -8,6 +8,8 @@ import {
   RequestType,
   TextTrack,
   Track,
+  CuePoint,
+  createTextTrackCue,
   Utils,
   VideoTrack,
   ImageTrack,
@@ -33,7 +35,8 @@ const ShakaEvent: ShakaEventType = {
   ERROR: 'error',
   ADAPTATION: 'adaptation',
   BUFFERING: 'buffering',
-  DRM_SESSION_UPDATE: 'drmsessionupdate'
+  DRM_SESSION_UPDATE: 'drmsessionupdate',
+  EMSG: 'emsg'
 };
 
 /**
@@ -127,6 +130,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     [ShakaEvent.ADAPTATION]: () => this._onAdaptation(),
     [ShakaEvent.BUFFERING]: event => this._onBuffering(event),
     [ShakaEvent.DRM_SESSION_UPDATE]: () => this._onDrmSessionUpdate(),
+    [ShakaEvent.EMSG]: event => this._onEmsg(event),
     [EventType.WAITING]: () => this._onWaiting(),
     [EventType.PLAYING]: () => this._onPlaying()
   };
@@ -720,6 +724,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._shaka, ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
     this._eventManager.listen(this._shaka, ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
+    this._eventManager.listen(this._shaka, ShakaEvent.EMSG, this._adapterEventsBindings.emsg);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
     this._eventManager.listen(this._videoElement, EventType.LOADED_DATA, () => this._onLoadedData());
@@ -1281,6 +1286,27 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       licenseTime: this._shaka.getStats().licenseTime,
       scheme: this._shaka.drmInfo().keySystem
     });
+  }
+
+  /**
+   * An handler to shaka emsg event
+   * @function _onEmsg
+   * @param {any} event - the emsg event
+   * @returns {void}
+   * @private
+   */
+  _onEmsg(event: any): void {
+    const {detail, type} = event;
+    let metadataTrack = Array.from(this._videoElement.textTracks).find(track => track.label === type);
+    if (!metadataTrack) {
+      metadataTrack = this._videoElement.addTextTrack(TextTrack.KIND.METADATA, type);
+    }
+    const {startTime, endTime, id} = detail;
+
+    const cue = new CuePoint(startTime, endTime, id, CuePoint.TYPE.EMSG, detail);
+    const textTrackCue = createTextTrackCue({...cue, metadata: JSON.stringify(detail)});
+    metadataTrack.addCue(textTrackCue);
+    this._trigger(EventType.TIMED_METADATA_ADDED, {cues: [cue]});
   }
 
   /**
