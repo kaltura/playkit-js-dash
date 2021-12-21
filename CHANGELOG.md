@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.28.0](https://github.com/kaltura/playkit-js-dash/compare/v1.27.3...v1.28.0) (2021-12-21)
+
+
+### Features
+
+* **FEC-11632:** expose stream timed metadata ([#172](https://github.com/kaltura/playkit-js-dash/issues/172)) ([862a3fd](https://github.com/kaltura/playkit-js-dash/commit/862a3fd))
+
+
+
 ### [1.27.3](https://github.com/kaltura/playkit-js-dash/compare/v1.27.2...v1.27.3) (2021-11-24)
 
 
