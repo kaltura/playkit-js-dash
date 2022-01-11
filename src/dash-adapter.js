@@ -1301,12 +1301,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (!metadataTrack) {
       metadataTrack = this._videoElement.addTextTrack(TextTrack.KIND.METADATA, type);
     }
-    const {startTime, endTime, id} = detail;
+    const {startTime, endTime, id, ...metadata} = detail;
 
-    const cue = new CuePoint(startTime, endTime, id, CuePoint.TYPE.EMSG, detail);
-    const textTrackCue = createTextTrackCue({...cue, metadata: JSON.stringify(detail)});
+    const cuePoint = new CuePoint(startTime, endTime, id, CuePoint.TYPE.EMSG, metadata);
+    const textTrackCue = createTextTrackCue(cuePoint);
     metadataTrack.addCue(textTrackCue);
-    this._trigger(EventType.TIMED_METADATA_ADDED, {cues: [cue]});
+    this._trigger(EventType.TIMED_METADATA_ADDED, {cues: [cuePoint]});
   }
 
   /**
