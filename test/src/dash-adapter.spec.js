@@ -1840,7 +1840,7 @@ describe('DashAdapter: on emsg', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should dispatch TIMED_METADATA_ADDED event on emsg and push to metadata track', () => {
+  it('should dispatch TIMED_METADATA_ADDED event on emsg and push to metadata track', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     const startTime = 10;
     const endTime = 20;
@@ -1856,7 +1856,13 @@ describe('DashAdapter: on emsg', () => {
       metadata: {info1, info2}
     };
     dashInstance.addEventListener(EventType.TIMED_METADATA_ADDED, event => {
-      event.payload.cues[0].should.deep.equal(timedMetadata);
+      try {
+        event.payload.cues[0].should.deep.equal(timedMetadata);
+        createTimedMetadata(video.textTracks[0].cues[0]).should.deep.equal(timedMetadata);
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
     dashInstance._onEmsg({
       detail: {
@@ -1868,6 +1874,5 @@ describe('DashAdapter: on emsg', () => {
       },
       type
     });
-    createTimedMetadata(video.textTracks[0].cues[0]).should.deep.equal(timedMetadata);
   });
 });
