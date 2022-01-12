@@ -1,6 +1,6 @@
 import DashAdapter from '../../src';
 import * as TestUtils from './utils/test-utils';
-import {loadPlayer, VideoTrack, AudioTrack, TextTrack, Utils, RequestType, EventType, Error} from '@playkit-js/playkit-js';
+import {loadPlayer, VideoTrack, AudioTrack, TextTrack, Utils, RequestType, EventType, Error, createTimedMetadata} from '@playkit-js/playkit-js';
 import {Widevine} from '../../src/drm/widevine';
 import {PlayReady} from '../../src/drm/playready';
 import {wwDrmData, prDrmData} from './drm/fake-drm-data';
@@ -1820,5 +1820,59 @@ describe('DashAdapter: in-stream thumbnails', () => {
         }
       })
       .catch(done);
+  });
+});
+
+describe('DashAdapter: on emsg', () => {
+  let video, dashInstance, config;
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+  });
+
+  afterEach(() => {
+    dashInstance.destroy();
+    dashInstance = null;
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should dispatch TIMED_METADATA_ADDED event on emsg and push to metadata track', done => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    const startTime = 10;
+    const endTime = 20;
+    const id = 'id';
+    const info1 = 'info1';
+    const info2 = 'info12';
+    const type = 'emsg';
+    const timedMetadata = {
+      startTime,
+      endTime,
+      id,
+      type,
+      metadata: {info1, info2}
+    };
+    dashInstance.addEventListener(EventType.TIMED_METADATA_ADDED, event => {
+      try {
+        event.payload.cues[0].should.deep.equal(timedMetadata);
+        createTimedMetadata(video.textTracks[0].cues[0]).should.deep.equal(timedMetadata);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    dashInstance._onEmsg({
+      detail: {
+        startTime,
+        endTime,
+        id,
+        info1,
+        info2
+      },
+      type
+    });
   });
 });

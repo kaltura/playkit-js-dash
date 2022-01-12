@@ -16,7 +16,7 @@ module.exports = function (config) {
     singleRun: true,
     colors: true,
     frameworks: ['mocha'],
-    files: ['test/setup/karma.js'],
+    files: ['node_modules/regenerator-runtime/runtime.js', 'test/setup/karma.js'],
     preprocessors: {
       'src/**/*.js': ['webpack', 'sourcemap'],
       'test/setup/karma.js': ['webpack', 'sourcemap']
