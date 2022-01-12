@@ -1840,7 +1840,7 @@ describe('DashAdapter: on emsg', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  it('should dispatch waiting event when buffering is true', () => {
+  it('should dispatch TIMED_METADATA_ADDED event on emsg and push to metadata track', () => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     const startTime = 10;
     const endTime = 20;
