@@ -728,6 +728,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
     this._eventManager.listen(this._videoElement, EventType.LOADED_DATA, () => this._onLoadedData());
+    this._eventManager.listen(this._videoElement, EventType.ENDED, () => this._onEnded());
     this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
       this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     });
@@ -746,6 +747,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           }
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
+          this._sourceObj.url = response.uri;
           this._parseManifest(response.data);
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
           break;
@@ -762,6 +764,21 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._isStartOver = false;
       }
     }, (segmentDuration + 1) * 1000);
+  }
+
+  _onEnded(): void {
+    const gap = this._getLiveEdge() - this._videoElement.currentTime;
+    this.detachMediaSource();
+    this._reset().then(() => {
+      setTimeout(() => {
+        this.attachMediaSource();
+        this.load();
+        this._videoElement.addEventListener('loadeddata', () => {
+          this._videoElement.currentTime = this._videoElement.duration - gap;
+          this._videoElement.play();
+        });
+      });
+    });
   }
 
   /**
@@ -1176,10 +1193,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   isLive(): boolean {
-    if (this._shaka) {
-      return this._shaka.isLive();
-    }
-    return false;
+    return true;
+    // if (this._shaka) {
+    //   return this._shaka.isLive();
+    // }
+    // return false;
   }
 
   /**
