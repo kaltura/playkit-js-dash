@@ -1364,4 +1364,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal + this._shaka.getStats().maxSegmentDuration);
     return targetBufferVal;
   }
+
+  getDrmInfo(): ?string {
+    return this._shaka.drmInfo().keySystem;
+  }
 }
