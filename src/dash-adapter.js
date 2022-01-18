@@ -1365,7 +1365,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return targetBufferVal;
   }
 
-  getDrmInfo(): ?string {
-    return this._shaka.drmInfo().keySystem;
+  getDrmInfo(): ?PKDrmDataObject {
+    const drmInfo = this._shaka.drmInfo();
+    if (!drmInfo) {
+      return null;
+    } else {
+      const {licenseServerUri, keySystem, serverCertificateUri} = drmInfo;
+      const drmDataObject: PKDrmDataObject = {
+        licenseUrl: licenseServerUri,
+        scheme: keySystem
+      };
+      if (serverCertificateUri) drmDataObject.certificate = serverCertificateUri;
+      return drmDataObject;
+    }
   }
 }
