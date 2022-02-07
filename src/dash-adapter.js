@@ -1,7 +1,6 @@
 // @flow
 import shaka from 'shaka-player';
 import {
-  Env,
   AudioTrack,
   BaseMediaSourceAdapter,
   Error,
@@ -368,13 +367,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (resetVttPolyfill) {
       window.VTTCue = undefined;
     }
-    isSupported = isSupported || DashAdapter._isSupportedBrowser();
     DashAdapter._logger.debug('isSupported:' + isSupported);
     return isSupported;
-  }
-
-  static _isSupportedBrowser(): boolean {
-    return Env.browser.name === 'Safari' && Env.os.name === 'Linux';
   }
 
   /**
