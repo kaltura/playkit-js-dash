@@ -59,7 +59,7 @@
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-flow": "^7.10.4",
     "@babel/register": "^7.10.5",
-    "@playkit-js/playkit-js": "canary",
+    "@playkit-js/playkit-js": "kaltura/playkit-js#FEC-11697",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "babel-plugin-istanbul": "^6.0.0",
@@ -104,7 +104,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "peerDependencies": {
-    "@playkit-js/playkit-js": "canary",
+    "@playkit-js/playkit-js": "kaltura/playkit-js#FEC-11697",
     "shaka-player": "3.3.0"
   },
   "publishConfig": {
