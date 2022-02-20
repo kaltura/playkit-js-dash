@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.30.0](https://github.com/kaltura/playkit-js-dash/compare/v1.29.0...v1.30.0) (2022-02-16)
+
+
+### Bug Fixes
+
+* **FEC-11785:** [Web][Youbora] - update youbora options for drm system that is used by the player ([#175](https://github.com/kaltura/playkit-js-dash/issues/175)) ([0923634](https://github.com/kaltura/playkit-js-dash/commit/0923634)), closes [kaltura/kaltura-player-js#515](https://github.com/kaltura/playkit-js-dash/issues/515) [kaltura/playkit-js#624](https://github.com/kaltura/playkit-js-dash/issues/624) [kaltura/playkit-js-youbora#82](https://github.com/kaltura/playkit-js-dash/issues/82)
+* **FEC-11937:** Player Compatible with Metrological Platform / Horizon4 Platform? ([#181](https://github.com/kaltura/playkit-js-dash/issues/181)) ([aec16a4](https://github.com/kaltura/playkit-js-dash/commit/aec16a4))
+
+
+### Features
+
+* **FEC-10548:** Low-Latency support ([#180](https://github.com/kaltura/playkit-js-dash/issues/180)) ([f28fb91](https://github.com/kaltura/playkit-js-dash/commit/f28fb91))
+* **FEC-11214:** upgrade shaka to 3.3 ([#178](https://github.com/kaltura/playkit-js-dash/issues/178)) ([0aff340](https://github.com/kaltura/playkit-js-dash/commit/0aff340))
+
+
+
 ## [1.29.0](https://github.com/kaltura/playkit-js-dash/compare/v1.28.0...v1.29.0) (2022-01-19)
 
 
