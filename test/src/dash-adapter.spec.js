@@ -472,7 +472,7 @@ describe('DashAdapter: _getParsedTracks', () => {
               (track.label === audioTracks[track.index].label).should.be.true;
             }
             if (track instanceof TextTrack) {
-              const dashTrack = textTracks.find(textTrack => textTrack.label === track.label);
+              const dashTrack = textTracks.find(textTrack => textTrack.id === track.id && textTrack.label === track.label);
               track.kind.should.equal(dashTrack.kind + 's');
               track.active.should.be.false;
               track.language.should.equal(dashTrack.language);

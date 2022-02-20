@@ -995,6 +995,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       let kind = textTrack.kind ? textTrack.kind + 's' : '';
       kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
       let settings = {
+        id: textTrack.id,
         kind: kind,
         active: false,
         label: textTrack.label,
