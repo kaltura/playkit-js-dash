@@ -826,6 +826,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       super.destroy().then(() => {
         DashAdapter._logger.debug('destroy');
         this._loadPromise = null;
+        this._adapterEventsBindings = {};
         this._reset()
           .then(resetResult => {
             this._isDestroyInProgress = false;
@@ -872,7 +873,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._eventManager.removeAll();
     }
     if (this._shaka) {
-      this._adapterEventsBindings = {};
       return this._shaka.destroy();
     }
     return Promise.resolve();
