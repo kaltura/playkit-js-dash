@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.30.1](https://github.com/kaltura/playkit-js-dash/compare/v1.30.0...v1.30.1) (2022-05-12)
+
+
+### Bug Fixes
+
+* do not remove shaka event bindings on reset but in destroy ([#189](https://github.com/kaltura/playkit-js-dash/issues/189)) ([1378ba2](https://github.com/kaltura/playkit-js-dash/commit/1378ba2))
+
+
+### Build System
+
+* use node_js 17 in travis ([a93b4c8](https://github.com/kaltura/playkit-js-dash/commit/a93b4c8))
+
+
+
 ## [1.30.0](https://github.com/kaltura/playkit-js-dash/compare/v1.29.0...v1.30.0) (2022-02-16)
 
 
