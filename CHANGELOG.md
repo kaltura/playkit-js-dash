@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.30.2-1](https://github.com/kaltura/playkit-js-dash/compare/v1.30.2-0...v1.30.2-1) (2022-05-15)
+
+
+
 ### [1.30.2-0](https://github.com/kaltura/playkit-js-dash/compare/v1.30.1...v1.30.2-0) (2022-05-15)
 
 
