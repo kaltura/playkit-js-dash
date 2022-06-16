@@ -892,7 +892,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         await this._videoElement.setMediaKeys(null);
         DashAdapter._logger.debug('mediaKeys removed');
       } catch (e) {
-        // non encrypted playback should still work even so we don't reject
+        // non encrypted playback should still work, so we don't reject
         this._logger.warn('mediaKeys not cleared');
       } finally {
         // eslint-disable-next-line no-unsafe-finally
