@@ -270,6 +270,18 @@ describe('DashAdapter: load', () => {
       done();
     });
   });
+
+  it('should try to remove media keys on load', done => {
+    config = {playback: {options: {html5: {dash: {drm: {advanced: {'com.widevine.alpha': {videoRobustness: 'HW_SECURE_ALL'}}}}}}}};
+    DashAdapter._availableDrmProtocol.push(Widevine);
+    dashInstance = DashAdapter.createAdapter(video, {drmData: wwDrmData}, config);
+    global.sinon.stub(dashInstance._shaka, 'attach');
+
+    const removeMediaKeys = global.sinon.spy(dashInstance, '_removeMediaKeys');
+    dashInstance.load();
+    removeMediaKeys.should.have.callCount(1);
+    done();
+  });
 });
 
 describe('DashAdapter: targetBuffer', () => {
