@@ -213,6 +213,38 @@ describe('DashAdapter: load', () => {
       });
   });
 
+  it('should set streaming.lowLatencyMod config to false on vod by default', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+      video.addEventListener(EventType.LOADED_DATA, () => {
+        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(false);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should set streaming.lowLatencyMod config to true on live by default', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+      video.addEventListener(EventType.LOADED_DATA, () => {
+        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
   it('should load successfully when given a valid video to play', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance
