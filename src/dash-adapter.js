@@ -786,8 +786,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @function load
    * @override
    */
-  load(startTime: ?number): Promise<Object> {
+  async load(startTime: ?number): Promise<Object> {
     if (!this._loadPromise) {
+      await this._removeMediaKeys();
       this._shaka.attach(this._videoElement);
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
@@ -876,6 +877,30 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       return this._shaka.destroy();
     }
     return Promise.resolve();
+  }
+
+  /**
+   * Remove mediaKeys from the video element.
+   * mediaKeys are set if an encrypted media was previously played, and must be removed before a new encrypted media can be played.
+   * If mediaKeys are not null it means that shaka reset wasn't called or that it failed to remove them.
+   * @returns {Promise<void>} Promise that resolves when the operation finishes.
+   */
+  async _removeMediaKeys(): Promise<void> {
+    if (this._videoElement && this._videoElement.mediaKeys) {
+      try {
+        DashAdapter._logger.debug('Removing mediaKeys from the video element');
+        await this._videoElement.setMediaKeys(null);
+        DashAdapter._logger.debug('mediaKeys removed');
+      } catch (e) {
+        // non encrypted playback should still work, so we don't reject
+        this._logger.warn('mediaKeys not cleared');
+      } finally {
+        // eslint-disable-next-line no-unsafe-finally
+        return Promise.resolve();
+      }
+    } else {
+      return Promise.resolve();
+    }
   }
 
   /**
