@@ -36,7 +36,8 @@ const ShakaEvent: ShakaEventType = {
   ADAPTATION: 'adaptation',
   BUFFERING: 'buffering',
   DRM_SESSION_UPDATE: 'drmsessionupdate',
-  EMSG: 'emsg'
+  EMSG: 'emsg',
+  TIMELINE_REGION_ENTER: 'timelineregionenter'
 };
 
 /**
@@ -131,6 +132,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     [ShakaEvent.BUFFERING]: event => this._onBuffering(event),
     [ShakaEvent.DRM_SESSION_UPDATE]: () => this._onDrmSessionUpdate(),
     [ShakaEvent.EMSG]: event => this._onEmsg(event),
+    [ShakaEvent.TIMELINE_REGION_ENTER]: event => this.onTimelineRegionEnter(event),
     [EventType.WAITING]: () => this._onWaiting(),
     [EventType.PLAYING]: () => this._onPlaying()
   };
@@ -726,6 +728,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._shaka, ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
     this._eventManager.listen(this._shaka, ShakaEvent.EMSG, this._adapterEventsBindings.emsg);
+    this._eventManager.listen(this._shaka, ShakaEvent.TIMELINE_REGION_ENTER, this._adapterEventsBindings.timelineregionenter);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
     this._eventManager.listen(this._videoElement, EventType.LOADED_DATA, () => this._onLoadedData());
@@ -1333,6 +1336,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const textTrackCue = createTextTrackCue(timedMetadata);
     metadataTrack.addCue(textTrackCue);
     this._trigger(EventType.TIMED_METADATA_ADDED, {cues: [timedMetadata]});
+  }
+
+  onTimelineRegionEnter(event): void {
+    this._trigger('timelineregionenter', event);
   }
 
   /**
