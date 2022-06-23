@@ -336,6 +336,15 @@ describe('DashAdapter: load', () => {
       done();
     });
   });
+
+  it('should try to remove media keys on load', done => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    const removeMediaKeys = global.sinon.spy(dashInstance, '_removeMediaKeys');
+    dashInstance.load();
+    removeMediaKeys.should.have.callCount(1);
+    removeMediaKeys.restore();
+    done();
+  });
 });
 
 describe('DashAdapter: targetBuffer', () => {
