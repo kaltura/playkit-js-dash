@@ -213,7 +213,7 @@ describe('DashAdapter: load', () => {
       });
   });
 
-  it('should set streaming.lowLatencyMod config to false on vod by default', done => {
+  it('should set streaming.lowLatencyMode config to false on vod by default', done => {
     try {
       dashInstance = DashAdapter.createAdapter(video, vodSource, config);
       video.addEventListener(EventType.LOADED_DATA, () => {
@@ -229,11 +229,45 @@ describe('DashAdapter: load', () => {
     }
   });
 
-  it('should set streaming.lowLatencyMod config to true on live by default', done => {
+  it('should set streaming.lowLatencyMode config to true on live by default', done => {
     try {
       dashInstance = DashAdapter.createAdapter(video, liveSource, config);
       video.addEventListener(EventType.LOADED_DATA, () => {
         dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should take the streaming.lowLatencyMode value from config when configured manually - vod', done => {
+    try {
+      const playerConfig = {...config, streaming: {lowLatencyMode: true}};
+      dashInstance = DashAdapter.createAdapter(video, vodSource, playerConfig);
+      video.addEventListener(EventType.LOADED_DATA, () => {
+        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should take the streaming.lowLatencyMode value from config when configured manually - live', done => {
+    try {
+      const playerConfig = {...config, streaming: {lowLatencyMode: false}};
+      dashInstance = DashAdapter.createAdapter(video, vodSource, playerConfig);
+      video.addEventListener(EventType.LOADED_DATA, () => {
+        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(false);
         done();
       });
 
