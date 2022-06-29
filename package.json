@@ -1,6 +1,6 @@
 {
   "name": "@playkit-js/playkit-js-dash",
-  "version": "1.30.2-0",
+  "version": "1.30.2-1.30.2-1.0",
   "description": "",
   "keywords": [
     "kaltura",
@@ -32,7 +32,7 @@
     "precommit": "lint-staged",
     "prettier:fix": "prettier --write .",
     "pushTaggedRelease": "git push --follow-tags --no-verify origin test-shaka-debug",
-    "release": "standard-version --prerelease",
+    "release": "standard-version --prerelease 1.30.2-1",
     "test": "NODE_ENV=test karma start --color --mode development",
     "watch": "webpack --progress --colors --watch --mode development"
   },
