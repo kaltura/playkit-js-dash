@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.30.2-log.0](https://github.com/kaltura/playkit-js-dash/compare/v1.30.2-1.30.2-1.0...v1.30.2-log.0) (2022-06-29)
+
+
+
+### [1.30.2-1.30.2-1.0](https://github.com/kaltura/playkit-js-dash/compare/v1.30.1...v1.30.2-1.30.2-1.0) (2022-06-29)
+
+
+### Bug Fixes
+
+* **FEC-12089:** Tizen playback breaks after ad finishes ([f30030a](https://github.com/kaltura/playkit-js-dash/commit/f30030a))
+* **FEC-12189:** Stream doesn't start if open a program with a bookmark ([#194](https://github.com/kaltura/playkit-js-dash/issues/194)) ([305e772](https://github.com/kaltura/playkit-js-dash/commit/305e772))
+
+
+### Build System
+
+* set prerelease false ([6525241](https://github.com/kaltura/playkit-js-dash/commit/6525241))
+
+
+
+### [1.30.2-0](https://github.com/kaltura/playkit-js-dash/compare/v1.30.1...v1.30.2-0) (2022-06-29)
+
+
+### Bug Fixes
+
+* **FEC-12089:** Tizen playback breaks after ad finishes ([f30030a](https://github.com/kaltura/playkit-js-dash/commit/f30030a))
+* **FEC-12189:** Stream doesn't start if open a program with a bookmark ([#194](https://github.com/kaltura/playkit-js-dash/issues/194)) ([305e772](https://github.com/kaltura/playkit-js-dash/commit/305e772))
+
+
+### Build System
+
+* set prerelease false ([6525241](https://github.com/kaltura/playkit-js-dash/commit/6525241))
+
+
+
 ### [1.30.1](https://github.com/kaltura/playkit-js-dash/compare/v1.30.0...v1.30.1) (2022-05-12)
 
 
