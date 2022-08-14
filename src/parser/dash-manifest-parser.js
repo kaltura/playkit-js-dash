@@ -7,6 +7,7 @@ class DashManifestParser {
   _logger: any = getLogger('DashManifestParser');
   _xmlDoc: Document;
   _adaptationSets: Array<AdaptationSet>;
+  _baseURL: string = '';
 
   static isValid(): boolean {
     return window.TextEncoder && window.TextDecoder;
@@ -37,6 +38,11 @@ class DashManifestParser {
     }
   }
 
+  // return the manifest BaseURL tag textvalue
+  getBaseUrl(): ?string {
+    return this._baseURL;
+  }
+
   getImageSet(): ?AdaptationSet {
     return this._adaptationSets.find((adaptationSet: AdaptationSet) => adaptationSet.contentType === AdaptationSet.ContentType.IMAGE);
   }
@@ -50,6 +56,13 @@ class DashManifestParser {
   }
 
   _parseAdaptionSets = () => {
+    const baseURL = XmlUtils.findElements(this._xmlDoc, MpdUtils.TagTypes.BASE_URL);
+    if (baseURL && baseURL.length > 0) {
+      if (baseURL[0].innerHTML) {
+        this._baseURL = baseURL[0].textContent;
+        console.log(baseURL[0].textContent);
+      }
+    }
     const adaptationNodes = XmlUtils.findElements(this._xmlDoc, MpdUtils.TagTypes.ADAPTATION_SET);
     // For now parse only image adaptation sets
     const imageAdaptationsNodes = Array.from(adaptationNodes).filter(
