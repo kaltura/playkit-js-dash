@@ -270,6 +270,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Merge shaka config with override config, override takes precedence
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       Utils.Object.mergeDeep(adapterConfig.shakaConfig, config.playback.options.html5.dash);
+
+      if (Utils.Object.hasPropertyPath(adapterConfig.shakaConfig, 'manifest.dash.defaultPresentationDelay')) {
+        adapterConfig.shakaConfig.manifest.defaultPresentationDelay = adapterConfig.shakaConfig.manifest.dash.defaultPresentationDelay;
+        delete adapterConfig.shakaConfig.manifest.dash.defaultPresentationDelay;
+      }
     }
     adapterConfig.network = config.network;
     return new this(videoElement, source, adapterConfig);
