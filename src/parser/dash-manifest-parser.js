@@ -60,7 +60,6 @@ class DashManifestParser {
     if (baseURL && baseURL.length > 0) {
       if (baseURL[0].innerHTML) {
         this._baseURL = baseURL[0].textContent;
-        // console.log(baseURL[0].textContent);
       }
     }
     const adaptationNodes = XmlUtils.findElements(this._xmlDoc, MpdUtils.TagTypes.ADAPTATION_SET);
