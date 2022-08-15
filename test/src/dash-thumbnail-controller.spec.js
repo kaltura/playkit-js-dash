@@ -10,7 +10,7 @@ describe('DashThumbnailController', () => {
   it('should parse tracks successfully - one representation', () => {
     manifestParser = new DashManifestParser(ImageAdaptationSetWithOneRepresentation);
     manifestParser.parseManifest();
-    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url);
+    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url, manifestParser.getBaseUrl());
 
     const imageTracks = thumbnailController.getTracks();
     imageTracks.should.have.lengthOf(1);
@@ -37,7 +37,7 @@ describe('DashThumbnailController', () => {
   it('should parse tracks successfully - multiple representations', () => {
     manifestParser = new DashManifestParser(ImageAdaptationSetWithMultipleRepresentations);
     manifestParser.parseManifest();
-    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url);
+    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url, manifestParser.getBaseUrl());
 
     const imageTracks = thumbnailController.getTracks();
     imageTracks.should.have.lengthOf(2);
@@ -82,7 +82,7 @@ describe('DashThumbnailController', () => {
   it('should select track successfully for multiple representations', () => {
     manifestParser = new DashManifestParser(ImageAdaptationSetWithMultipleRepresentations);
     manifestParser.parseManifest();
-    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url);
+    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url, manifestParser.getBaseUrl());
 
     let imageTracks;
     imageTracks = thumbnailController.getTracks();
@@ -102,7 +102,7 @@ describe('DashThumbnailController', () => {
   it('should get thumbnail successfully - one representation', () => {
     manifestParser = new DashManifestParser(ImageAdaptationSetWithOneRepresentation);
     manifestParser.parseManifest();
-    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url);
+    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url, manifestParser.getBaseUrl());
 
     let thumbnailInfo;
     thumbnailInfo = thumbnailController.getThumbnail(10);
@@ -130,7 +130,7 @@ describe('DashThumbnailController', () => {
   it('should get thumbnail successfully - multiple representations', () => {
     manifestParser = new DashManifestParser(ImageAdaptationSetWithMultipleRepresentations);
     manifestParser.parseManifest();
-    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url);
+    thumbnailController = new DashThumbnailController(manifestParser.getImageSet(), url, manifestParser.getBaseUrl());
 
     let thumbnailInfo;
     thumbnailInfo = thumbnailController.getThumbnail(1500);
