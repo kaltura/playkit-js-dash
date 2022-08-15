@@ -8,7 +8,7 @@ import {EssentialProperty} from './parser/essential-property';
 class DashThumbnailController {
   _tracks: Array<ImageTrack> = [];
 
-  constructor(set: AdaptationSet, playerUrl: string, middleBaseURL: string) {
+  constructor(set: AdaptationSet, playerUrl: string, middleBaseURL: ?string) {
     this._parseTracks(set, playerUrl, middleBaseURL);
     if (this._tracks.length > 0) {
       this._tracks.sort((t1: ImageTrack, t2: ImageTrack) => t1.customData.bitrate - t2.customData.bitrate);
@@ -43,7 +43,7 @@ class DashThumbnailController {
     });
   }
 
-  _parseTracks = (set: AdaptationSet, playerUrl: string, middleBaseURL: string): void => {
+  _parseTracks = (set: AdaptationSet, playerUrl: string, middleBaseURL: ?string): void => {
     const {representations, segmentTemplate, essentialProperty} = set;
     representations.forEach((representation: Representation, index: number) => {
       const {id, bandwidth, width, height} = representation;
@@ -87,9 +87,10 @@ class DashThumbnailController {
     return essentialProperty ? essentialProperty.value : representation.essentialProperty ? representation.essentialProperty.value : '';
   };
 
-  _buildTemplateUrl = (mediaTemplate: string, id: string, url: string, middleBaseURL: string): string => {
+  _buildTemplateUrl = (mediaTemplate: string, id: string, url: string, middleBaseURL: ?string): string => {
     const last = url.split('/').pop();
     const baseUrl = url.replace(last, '');
+    middleBaseURL = !middleBaseURL ? '' : middleBaseURL;
     const urlTemplate = `${baseUrl}${middleBaseURL}${mediaTemplate}`;
     return UrlUtils.resolve(urlTemplate, {id});
   };
