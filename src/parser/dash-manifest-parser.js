@@ -39,8 +39,8 @@ class DashManifestParser {
   }
 
   // return the manifest BaseURL tag textvalue
-  getBaseUrl(): ?string {
-    return this._baseURL;
+  getBaseUrl(): string {
+    return this._baseURL || '';
   }
 
   getImageSet(): ?AdaptationSet {

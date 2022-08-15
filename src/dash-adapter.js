@@ -1057,7 +1057,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   _getParsedImageTracks(): Array<ImageTrack> {
     const imageSet = this._manifestParser?.getImageSet();
-    const middleBaseURL = this._manifestParser?.getBaseUrl();
+    const middleBaseURL = this._manifestParser?.getBaseUrl() || '';
     if (imageSet) {
       this._thumbnailController = new DashThumbnailController(imageSet, this._playbackActualUri, middleBaseURL);
       return this._thumbnailController.getTracks();
