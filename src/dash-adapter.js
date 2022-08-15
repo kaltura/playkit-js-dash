@@ -398,9 +398,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
-    //render text tracks to our own container
+    // This will force the player to use shaka UITextDisplayer plugin to render text tracks.
     if (this._config.useShakaTextTrackDisplay) {
-      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
+      const playerContainer = document.getElementsByClassName('playkit-container')[0];
+      this._shaka.setVideoContainer(playerContainer);
     }
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
