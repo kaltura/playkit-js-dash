@@ -753,6 +753,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
           this._parseManifest(response.data);
+          this._playbackActualUri = response.uri;
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
           break;
       }
@@ -1055,12 +1056,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _getParsedImageTracks(): Array<ImageTrack> {
-    if (this._manifestParser) {
-      const imageSet = this._manifestParser.getImageSet();
-      if (imageSet) {
-        this._thumbnailController = new DashThumbnailController(imageSet, this.src);
-        return this._thumbnailController.getTracks();
-      }
+    const imageSet = this._manifestParser?.getImageSet();
+    const mediaTemplatePrefix = this._manifestParser?.getBaseUrl() || '';
+    if (imageSet) {
+      this._thumbnailController = new DashThumbnailController(imageSet, this._playbackActualUri, mediaTemplatePrefix);
+      return this._thumbnailController.getTracks();
     }
     return [];
   }
