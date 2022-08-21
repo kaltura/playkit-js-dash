@@ -400,8 +400,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._shaka = new shaka.Player();
     // This will force the player to use shaka UITextDisplayer plugin to render text tracks.
     if (this._config.useShakaTextTrackDisplay) {
-      const playerContainer = document.getElementsByClassName('playkit-container')[0];
-      this._shaka.setVideoContainer(playerContainer);
+      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
     }
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
