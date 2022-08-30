@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.30.3](https://github.com/kaltura/playkit-js-dash/compare/v1.30.2...v1.30.3) (2022-08-04)
+
+
+
+### [1.30.2](https://github.com/kaltura/playkit-js-dash/compare/v1.30.1...v1.30.2) (2022-07-06)
+
+
+### Bug Fixes
+
+* **FEC-12089:** Tizen playback breaks after ad finishes ([f30030a](https://github.com/kaltura/playkit-js-dash/commit/f30030a))
+* **FEC-12189:** Stream doesn't start if open a program with a bookmark ([#194](https://github.com/kaltura/playkit-js-dash/issues/194)) ([305e772](https://github.com/kaltura/playkit-js-dash/commit/305e772))
+
+
+### Build System
+
+* set prerelease false ([6525241](https://github.com/kaltura/playkit-js-dash/commit/6525241))
+
+
+
+### [1.30.1](https://github.com/kaltura/playkit-js-dash/compare/v1.30.0...v1.30.1) (2022-05-12)
+
+
+### Bug Fixes
+
+* do not remove shaka event bindings on reset but in destroy ([#189](https://github.com/kaltura/playkit-js-dash/issues/189)) ([1378ba2](https://github.com/kaltura/playkit-js-dash/commit/1378ba2))
+
+
+### Build System
+
+* use node_js 17 in travis ([a93b4c8](https://github.com/kaltura/playkit-js-dash/commit/a93b4c8))
+
+
+
 ## [1.30.0](https://github.com/kaltura/playkit-js-dash/compare/v1.29.0...v1.30.0) (2022-02-16)
 
 

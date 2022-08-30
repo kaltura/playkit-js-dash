@@ -48,12 +48,14 @@ const ParserUtils = {
 
 const MpdUtils = {
   TagTypes: {
+    BASE_URL: 'BaseURL',
     SEGMENT_TEMPLATE: 'SegmentTemplate',
     REPRESENTATION: 'Representation',
     ESSENTIAL_PROPERTY: 'EssentialProperty',
     ADAPTATION_SET: 'AdaptationSet'
   },
   AttributeTypes: {
+    BASE_URL: 'BaseURL',
     ID: 'id',
     CONTENT_TYPE: 'contentType',
     MIME_TYPE: 'mimeType',
