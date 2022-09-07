@@ -1030,21 +1030,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _getParsedTextTracks(): Array<TextTrack> {
-    let textTracks = this._shaka.getTextTracks();
     let parsedTracks = [];
-    if (textTracks) {
-      for (let i = 0; i < textTracks.length; i++) {
-        let kind = textTracks[i].kind ? textTracks[i].kind + 's' : '';
-        kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
-        let settings = {
-          kind: kind,
-          active: false,
-          label: textTracks[i].label,
-          language: textTracks[i].language,
-          index: i
-        };
-        parsedTracks.push(new TextTrack(settings));
-      }
+    for (const textTrack of this._shaka.getTextTracks()) {
+      let kind = textTrack.kind ? textTrack.kind + 's' : '';
+      kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
+      let settings = {
+        id: textTrack.id,
+        kind: kind,
+        active: false,
+        label: textTrack.label,
+        language: textTrack.language
+      };
+      parsedTracks.push(new TextTrack(settings));
     }
     return parsedTracks;
   }

@@ -854,9 +854,9 @@
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
 "@playkit-js/playkit-js@canary":
-  version "0.77.0-canary.7812357"
-  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.77.0-canary.7812357.tgz#1e9c9edaba2f17faa86c3ab7d9057be0857e6e07"
-  integrity sha512-19xK5Ro2aBFIsKFg78PNK0PXVhWWqRBsAieGGm2jRmcOSvkp6l34DfyWxpTK5ZRWG1aHu2C7i0CNslLCBHtZ0Q==
+  version "0.78.1-canary.bf28e11"
+  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.78.1-canary.bf28e11.tgz#3e8e3d2be59729781fad6db90574310047516605"
+  integrity sha512-tLGBBS80gVh5DLpYNCfBStFaEvmS50Mk/3emU9sY65HjJkhueq1sj3Nj1UM2x1tksc77Q6NSNLX/DFUtsqpNdg==
   dependencies:
     js-logger "^1.6.0"
     ua-parser-js "1.0.2"
