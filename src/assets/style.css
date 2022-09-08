@@ -1,37 +1,43 @@
-.shaka-text-container{
-  position:absolute;
-  left:0;
-  right:0;
-  top:0;
-  bottom:0;
-  pointer-events:none;
-  width:100%;
-  min-width:48px;
-  transition:bottom cubic-bezier(.4, 0, .6, 1) .1s;
-  transition-delay:0s;
-  font-size:20px;
-  line-height:1.4;
-  color:#fff;
+.shaka-text-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  width: 100%;
+  min-width: 48px;
+  transition: bottom cubic-bezier(0.4, 0, 0.6, 1) 0.1s;
+  transition-delay: 0s;
+  font-size: 20px;
+  line-height: 1.4;
+  color: #fff;
   font-family: Roboto-Regular, Roboto, sans-serif, TengwarTelcontar;
 }
-.shaka-text-container span.shaka-text-wrapper{
-  display:inline;
-  background:0 0;
+.shaka-text-container span.shaka-text-wrapper {
+  display: inline;
+  background: 0 0;
   text-align: center;
 }
 
-:fullscreen .shaka-text-container{
-  font-size:4.4vmin
+:fullscreen .shaka-text-container {
+  font-size: 4.4vmin;
 }
 
-:-webkit-full-screen .shaka-text-container{
-  font-size:4.4vmin
+:-webkit-full-screen .shaka-text-container {
+  font-size: 4.4vmin;
 }
 
-:-moz-full-screen .shaka-text-container{
-  font-size:4.4vmin
+:-moz-full-screen .shaka-text-container {
+  font-size: 4.4vmin;
 }
 
-:-ms-fullscreen .shaka-text-container{
-  font-size:4.4vmin
+:-ms-fullscreen .shaka-text-container {
+  font-size: 4.4vmin;
+}
+
+@media screen and (min-width: 1240px) {
+  .shaka-text-container {
+    font-size: 4.4vmin;
+  }
 }
