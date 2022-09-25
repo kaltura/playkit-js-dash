@@ -9,7 +9,7 @@ import {
   TextTrack,
   Track,
   TimedMetadata,
-  createTextTrackCue,
+  //createTextTrackCue,
   Utils,
   VideoTrack,
   ImageTrack,
@@ -1341,8 +1341,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const {startTime, endTime, id, ...metadata} = detail;
 
     const timedMetadata = new TimedMetadata(startTime, endTime, id, TimedMetadata.TYPE.EMSG, metadata);
-    const textTrackCue = createTextTrackCue(timedMetadata);
-    metadataTrack.addCue(textTrackCue);
+    //const textTrackCue = createTextTrackCue(timedMetadata);
+    //metadataTrack.addCue(textTrackCue);
     this._trigger(EventType.TIMED_METADATA_ADDED, {cues: [timedMetadata]});
   }
 
