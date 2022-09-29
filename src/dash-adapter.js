@@ -1,6 +1,7 @@
 // @flow
 import shaka from 'shaka-player';
 import {
+  Env,
   AudioTrack,
   BaseMediaSourceAdapter,
   Error,
@@ -398,15 +399,22 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
-    // This will force the player to use shaka UITextDisplayer plugin to render text tracks.
-    if (this._config.useShakaTextTrackDisplay) {
-      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
-    }
+    this._setTextDisplayer();
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
     this._maybeBreakStalls();
     this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
+  }
+
+  _setTextDisplayer() {
+    // This will force the player to use shaka UITextDisplayer plugin to render text tracks.
+    if (this._config.useShakaTextTrackDisplay) {
+      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
+      if (Env.isSmartTV) {
+        document.querySelector('.shaka-text-container').style.fontsize = '4.4vmin';
+      }
+    }
   }
 
   _clearStallInterval(): void {
