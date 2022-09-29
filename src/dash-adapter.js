@@ -819,7 +819,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this.selectVideoTrack(this._selectedVideoTrack);
         }
       });
-      
+    });
+  }
+
   _setLowLatencyMode() {
     this._shaka.configure({
       streaming: {
