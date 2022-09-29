@@ -213,6 +213,72 @@ describe('DashAdapter: load', () => {
       });
   });
 
+  it('should set streaming.lowLatencyMode config to false on vod by default', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+      video.addEventListener(EventType.LOADED_DATA, () => {
+        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(false);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should set streaming.lowLatencyMode config to true on live by default', done => {
+    try {
+      dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+      video.addEventListener(EventType.LOADED_DATA, () => {
+        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should take the streaming.lowLatencyMode value from config when configured manually - vod', done => {
+    try {
+      const playerConfig = {...config, streaming: {lowLatencyMode: true}};
+      dashInstance = DashAdapter.createAdapter(video, vodSource, playerConfig);
+      video.addEventListener(EventType.LOADED_DATA, () => {
+        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
+  it('should take the streaming.lowLatencyMode value from config when configured manually - live', done => {
+    try {
+      const playerConfig = {...config, streaming: {lowLatencyMode: false}};
+      dashInstance = DashAdapter.createAdapter(video, vodSource, playerConfig);
+      video.addEventListener(EventType.LOADED_DATA, () => {
+        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(false);
+        done();
+      });
+
+      dashInstance.load().then(() => {
+        video.play();
+      });
+    } catch (e) {
+      done(e);
+    }
+  });
+
   it('should load successfully when given a valid video to play', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     dashInstance
@@ -269,6 +335,15 @@ describe('DashAdapter: load', () => {
       error.should.be.exist;
       done();
     });
+  });
+
+  it('should try to remove media keys on load', done => {
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    const removeMediaKeys = global.sinon.spy(dashInstance, '_removeMediaKeys');
+    dashInstance.load();
+    removeMediaKeys.should.have.callCount(1);
+    removeMediaKeys.restore();
+    done();
   });
 });
 
@@ -472,10 +547,10 @@ describe('DashAdapter: _getParsedTracks', () => {
               (track.label === audioTracks[track.index].label).should.be.true;
             }
             if (track instanceof TextTrack) {
-              track.kind.should.equal(textTracks[track.index].kind + 's');
+              const dashTrack = textTracks.find(textTrack => textTrack.id === track.id && textTrack.label === track.label);
+              track.kind.should.equal(dashTrack.kind + 's');
               track.active.should.be.false;
-              track.language.should.equal(textTracks[track.index].language);
-              (track.label === textTracks[track.index].label).should.be.true;
+              track.language.should.equal(dashTrack.language);
             }
           });
           done();

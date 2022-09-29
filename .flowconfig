@@ -4,3 +4,4 @@
 [libs]
 node_modules/@playkit-js/playkit-js/flow-typed/
 [options]
+esproposal.optional_chaining=enable
