@@ -35,3 +35,9 @@
 :-ms-fullscreen .shaka-text-container {
   font-size: 4.4vmin;
 }
+
+@media screen and (min-width: 1240px) {
+  .shaka-text-container {
+    font-size: 4.4vmin;
+  }
+}
