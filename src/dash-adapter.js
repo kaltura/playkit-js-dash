@@ -243,8 +243,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       adapterConfig.useShakaTextTrackDisplay = Utils.Object.getPropertyPath(config, 'text.useShakaTextTrackDisplay');
     }
     if (Utils.Object.hasPropertyPath(config, 'streaming')) {
-      adapterConfig.forceBreakStall = Utils.Object.getPropertyPath(config, 'streaming.forceBreakStall');
-      adapterConfig.lowLatencyMode = Utils.Object.getPropertyPath(config, 'streaming.lowLatencyMode');
+      const {streaming} = config;
+      if (typeof streaming.forceBreakStall === 'boolean') {
+        adapterConfig.forceBreakStall = streaming.forceBreakStall;
+      }
+      if (typeof streaming.lowLatencyMode === 'boolean') {
+        adapterConfig.lowLatencyMode = streaming.lowLatencyMode;
+      }
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
@@ -769,7 +774,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   _onLoadedData(): void {
-    this._setLowLatencyMode();
     const segmentDuration = this.getSegmentDuration();
     this._seekRangeStart = this._shaka.seekRange().start;
     this._startOverTimeout = setTimeout(() => {
@@ -778,14 +782,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._isStartOver = false;
       }
     }, (segmentDuration + 1) * 1000);
-  }
-
-  _setLowLatencyMode() {
-    this._shaka.configure({
-      streaming: {
-        lowLatencyMode: typeof this._config.lowLatencyMode === 'boolean' ? this._config.lowLatencyMode : this.isLive()
-      }
-    });
   }
 
   /**
