@@ -774,6 +774,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   _onLoadedData(): void {
+    this._setLowLatencyMode();
     const segmentDuration = this.getSegmentDuration();
     this._seekRangeStart = this._shaka.seekRange().start;
     this._startOverTimeout = setTimeout(() => {
@@ -782,6 +783,14 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._isStartOver = false;
       }
     }, (segmentDuration + 1) * 1000);
+  }
+
+  _setLowLatencyMode() {
+    this._shaka.configure({
+      streaming: {
+        lowLatencyMode: typeof this._config.lowLatencyMode === 'boolean' ? this._config.lowLatencyMode : this.isLive()
+      }
+    });
   }
 
   /**
