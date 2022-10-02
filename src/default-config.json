@@ -10,5 +10,6 @@
       "restrictions": {}
     }
   },
-  "forceRedirectExternalStreams": false
+  "forceRedirectExternalStreams": false,
+  "trackEmsgEvents": true
 }
