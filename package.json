@@ -1,6 +1,6 @@
 {
   "name": "@playkit-js/playkit-js-dash",
-  "version": "1.30.1",
+  "version": "1.31.0",
   "description": "",
   "keywords": [
     "kaltura",
@@ -34,6 +34,7 @@
     "pushTaggedRelease": "git push --follow-tags --no-verify origin master",
     "release": "standard-version",
     "test": "NODE_ENV=test karma start --color --mode development",
+    "test:watch": "NODE_ENV=test karma start --browsers=Chrome --single-run=false --auto-watch",
     "watch": "webpack --progress --colors --watch --mode development"
   },
   "husky": {
@@ -93,7 +94,7 @@
     "mocha": "^8.0.1",
     "mocha-cli": "^1.0.1",
     "prettier": "^2.0.5",
-    "shaka-player": "3.3.0",
+    "shaka-player": "4.2.1",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0",
     "standard-version": "^6.0.1",

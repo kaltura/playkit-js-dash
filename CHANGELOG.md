@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.31.0](https://github.com/kaltura/playkit-js-dash/compare/v1.30.3...v1.31.0) (2022-08-31)
+
+
+### Bug Fixes
+
+* **FEC-12238:** [WEB][ShakaPlayer] - upgrade shaka player to v4.1.2 ([#202](https://github.com/kaltura/playkit-js-dash/issues/202)) ([05ea5c2](https://github.com/kaltura/playkit-js-dash/commit/05ea5c2))
+* **FEC-12479:** [Dash] - Subtitles are too small and not centered ([#204](https://github.com/kaltura/playkit-js-dash/issues/204)) ([f7676d9](https://github.com/kaltura/playkit-js-dash/commit/f7676d9))
+
+
+### Features
+
+* **FEC-12450:** build image uri based on redirected uri ([#201](https://github.com/kaltura/playkit-js-dash/issues/201)) ([8916fb9](https://github.com/kaltura/playkit-js-dash/commit/8916fb9))
+
+
+
+### [1.30.3](https://github.com/kaltura/playkit-js-dash/compare/v1.30.2...v1.30.3) (2022-08-04)
+
+
+
+### [1.30.2](https://github.com/kaltura/playkit-js-dash/compare/v1.30.1...v1.30.2) (2022-07-06)
+
+
+### Bug Fixes
+
+* **FEC-12089:** Tizen playback breaks after ad finishes ([f30030a](https://github.com/kaltura/playkit-js-dash/commit/f30030a))
+* **FEC-12189:** Stream doesn't start if open a program with a bookmark ([#194](https://github.com/kaltura/playkit-js-dash/issues/194)) ([305e772](https://github.com/kaltura/playkit-js-dash/commit/305e772))
+
+
+### Build System
+
+* set prerelease false ([6525241](https://github.com/kaltura/playkit-js-dash/commit/6525241))
+
+
+
 ### [1.30.1](https://github.com/kaltura/playkit-js-dash/compare/v1.30.0...v1.30.1) (2022-05-12)
 
 

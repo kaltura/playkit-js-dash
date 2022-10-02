@@ -547,10 +547,10 @@ describe('DashAdapter: _getParsedTracks', () => {
               (track.label === audioTracks[track.index].label).should.be.true;
             }
             if (track instanceof TextTrack) {
-              track.kind.should.equal(textTracks[track.index].kind + 's');
+              const dashTrack = textTracks.find(textTrack => textTrack.id === track.id && textTrack.label === track.label);
+              track.kind.should.equal(dashTrack.kind + 's');
               track.active.should.be.false;
-              track.language.should.equal(textTracks[track.index].language);
-              (track.label === textTracks[track.index].label).should.be.true;
+              track.language.should.equal(dashTrack.language);
             }
           });
           done();

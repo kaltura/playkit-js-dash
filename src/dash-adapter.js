@@ -1,6 +1,7 @@
 // @flow
 import shaka from 'shaka-player';
 import {
+  Env,
   AudioTrack,
   BaseMediaSourceAdapter,
   Error,
@@ -270,6 +271,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Merge shaka config with override config, override takes precedence
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       Utils.Object.mergeDeep(adapterConfig.shakaConfig, config.playback.options.html5.dash);
+
+      if (Utils.Object.hasPropertyPath(adapterConfig.shakaConfig, 'manifest.dash.defaultPresentationDelay')) {
+        adapterConfig.shakaConfig.manifest.defaultPresentationDelay = adapterConfig.shakaConfig.manifest.dash.defaultPresentationDelay;
+        delete adapterConfig.shakaConfig.manifest.dash.defaultPresentationDelay;
+      }
     }
     adapterConfig.network = config.network;
     return new this(videoElement, source, adapterConfig);
@@ -393,15 +399,22 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
     this._shaka = new shaka.Player();
-    //render text tracks to our own container
-    if (this._config.useShakaTextTrackDisplay) {
-      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
-    }
+    this._setTextDisplayer();
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
     this._maybeBreakStalls();
     this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
+  }
+
+  _setTextDisplayer() {
+    // This will force the player to use shaka UITextDisplayer plugin to render text tracks.
+    if (this._config.useShakaTextTrackDisplay) {
+      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
+      if (Env.isSmartTV) {
+        document.querySelector('.shaka-text-container').style.fontsize = '4.4vmin';
+      }
+    }
   }
 
   _clearStallInterval(): void {
@@ -748,6 +761,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           break;
         case shaka.net.NetworkingEngine.RequestType.MANIFEST:
           this._parseManifest(response.data);
+          this._playbackActualUri = response.uri;
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
           break;
       }
@@ -1024,21 +1038,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _getParsedTextTracks(): Array<TextTrack> {
-    let textTracks = this._shaka.getTextTracks();
     let parsedTracks = [];
-    if (textTracks) {
-      for (let i = 0; i < textTracks.length; i++) {
-        let kind = textTracks[i].kind ? textTracks[i].kind + 's' : '';
-        kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
-        let settings = {
-          kind: kind,
-          active: false,
-          label: textTracks[i].label,
-          language: textTracks[i].language,
-          index: i
-        };
-        parsedTracks.push(new TextTrack(settings));
-      }
+    for (const textTrack of this._shaka.getTextTracks()) {
+      let kind = textTrack.kind ? textTrack.kind + 's' : '';
+      kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
+      let settings = {
+        id: textTrack.id,
+        kind: kind,
+        active: false,
+        label: textTrack.label,
+        language: textTrack.language
+      };
+      parsedTracks.push(new TextTrack(settings));
     }
     return parsedTracks;
   }
@@ -1050,12 +1061,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   _getParsedImageTracks(): Array<ImageTrack> {
-    if (this._manifestParser) {
-      const imageSet = this._manifestParser.getImageSet();
-      if (imageSet) {
-        this._thumbnailController = new DashThumbnailController(imageSet, this.src);
-        return this._thumbnailController.getTracks();
-      }
+    const imageSet = this._manifestParser?.getImageSet();
+    const mediaTemplatePrefix = this._manifestParser?.getBaseUrl() || '';
+    if (imageSet) {
+      this._thumbnailController = new DashThumbnailController(imageSet, this._playbackActualUri, mediaTemplatePrefix);
+      return this._thumbnailController.getTracks();
     }
     return [];
   }
