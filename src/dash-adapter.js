@@ -37,8 +37,7 @@ const ShakaEvent: ShakaEventType = {
   ADAPTATION: 'adaptation',
   BUFFERING: 'buffering',
   DRM_SESSION_UPDATE: 'drmsessionupdate',
-  EMSG: 'emsg',
-  UIUpdatedEvent: 'uiupdated'
+  EMSG: 'emsg'
 };
 
 /**
