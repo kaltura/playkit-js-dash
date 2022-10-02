@@ -412,7 +412,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (this._config.useShakaTextTrackDisplay) {
       this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
       if (Env.isSmartTV) {
-        document.querySelector('.shaka-text-container').style.fontsize = '4.4vmin';
+        this._eventManager.listenOnce(this._videoElement, EventType.DURATION_CHANGE, () => {
+          document.querySelector('.shaka-text-container').style.fontSize = '4.4vmin';
+        });
       }
     }
   }
