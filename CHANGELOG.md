@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.31.1](https://github.com/kaltura/playkit-js-dash/compare/v1.31.0...v1.31.1) (2022-10-03)
+
+
+### Bug Fixes
+
+* **FEC-11697:** 2 captions are selected in the menu ([#182](https://github.com/kaltura/playkit-js-dash/issues/182)) ([9964cf0](https://github.com/kaltura/playkit-js-dash/commit/9964cf0)), closes [kaltura/playkit-js#633](https://github.com/kaltura/playkit-js-dash/issues/633) [kaltura/playkit-js-hls#161](https://github.com/kaltura/playkit-js-dash/issues/161) [kaltura/playkit-js#633](https://github.com/kaltura/playkit-js-dash/issues/633)
+* **FEC-12189:** Stream doesn't start if open a program with a bookmark ([#211](https://github.com/kaltura/playkit-js-dash/issues/211)) ([9d300bc](https://github.com/kaltura/playkit-js-dash/commit/9d300bc)), closes [kaltura/playkit-js#652](https://github.com/kaltura/playkit-js-dash/issues/652)
+* **FEC-12539:** Shaka text displayer font size too small on TVs - Regression ([#210](https://github.com/kaltura/playkit-js-dash/issues/210)) ([1041b0a](https://github.com/kaltura/playkit-js-dash/commit/1041b0a))
+* **FEC-12539:** Shaka text displayer font size too small on TVs ([#205](https://github.com/kaltura/playkit-js-dash/issues/205)) ([eaa0949](https://github.com/kaltura/playkit-js-dash/commit/eaa0949))
+* **FEC-12539:** Shaka text displayer font size too small on TVs ([#208](https://github.com/kaltura/playkit-js-dash/issues/208)) ([f224a1e](https://github.com/kaltura/playkit-js-dash/commit/f224a1e))
+* **FEC-12622:** Revert - TV font size bug fixes - regression ([#214](https://github.com/kaltura/playkit-js-dash/issues/214)) ([1ef471b](https://github.com/kaltura/playkit-js-dash/commit/1ef471b)), closes [#208](https://github.com/kaltura/playkit-js-dash/issues/208) [#210](https://github.com/kaltura/playkit-js-dash/issues/210) [#205](https://github.com/kaltura/playkit-js-dash/issues/205)
+
+
+
 ## [1.31.0](https://github.com/kaltura/playkit-js-dash/compare/v1.30.3...v1.31.0) (2022-08-31)
 
 
