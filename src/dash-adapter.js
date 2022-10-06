@@ -249,6 +249,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (typeof streaming.lowLatencyMode === 'boolean') {
         adapterConfig.lowLatencyMode = streaming.lowLatencyMode;
       }
+      if (typeof streaming.trackEmsgEvents === 'boolean') {
+        adapterConfig.trackEmsgEvents = streaming.trackEmsgEvents;
+      }
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
@@ -276,6 +279,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (Utils.Object.hasPropertyPath(config, 'playback.options.html5.dash')) {
       Utils.Object.mergeDeep(adapterConfig.shakaConfig, config.playback.options.html5.dash);
 
+      //for backward compatibility with shaka version < 4
       if (Utils.Object.hasPropertyPath(adapterConfig.shakaConfig, 'manifest.dash.defaultPresentationDelay')) {
         adapterConfig.shakaConfig.manifest.defaultPresentationDelay = adapterConfig.shakaConfig.manifest.dash.defaultPresentationDelay;
         delete adapterConfig.shakaConfig.manifest.dash.defaultPresentationDelay;
@@ -735,13 +739,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._eventManager.listen(this._shaka, ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
     this._eventManager.listen(this._shaka, ShakaEvent.ERROR, this._adapterEventsBindings.error);
     this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
-    this._eventManager.listen(this._shaka, ShakaEvent.EMSG, this._adapterEventsBindings.emsg);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
     this._eventManager.listen(this._videoElement, EventType.LOADED_DATA, () => this._onLoadedData());
     this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
       this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     });
+    if (this._config.trackEmsgEvents) {
+      this._eventManager.listen(this._shaka, ShakaEvent.EMSG, this._adapterEventsBindings.emsg);
+    }
 
     // called when a resource is downloaded
     this._shaka.getNetworkingEngine().registerResponseFilter((type, response) => {
