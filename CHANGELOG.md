@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.31.3](https://github.com/kaltura/playkit-js-dash/compare/v1.31.2...v1.31.3) (2022-11-02)
+
+
+### Bug Fixes
+
+* **FEC-12691:** shaka Text Track Displayer does not work unless useNativeTextTrack set to true ([fda98b4](https://github.com/kaltura/playkit-js-dash/commit/fda98b4))
+
+
+
 ### [1.31.2](https://github.com/kaltura/playkit-js-dash/compare/v1.31.1...v1.31.2) (2022-10-06)
 
 
