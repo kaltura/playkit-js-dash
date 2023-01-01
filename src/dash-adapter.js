@@ -256,6 +256,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (typeof streaming.trackEmsgEvents === 'boolean') {
         adapterConfig.trackEmsgEvents = streaming.trackEmsgEvents;
       }
+      if (typeof streaming.switchDynamicToStatic === 'boolean') {
+        adapterConfig.switchDynamicToStatic = streaming.switchDynamicToStatic;
+      }
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
@@ -774,7 +777,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
           setTimeout(() => {
             this._isLive = this._isLive || this._shaka?.isLive();
-            if (this._isLive && !this._shaka?.isLive() && !this._isStaticLive) {
+            if (this._isLive && !this._shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
               this._sourceObj.url = response.uri;
               this._switchFromDynamicToStatic();
             }
