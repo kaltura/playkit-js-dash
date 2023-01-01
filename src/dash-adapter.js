@@ -801,16 +801,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   _switchFromDynamicToStatic(): void {
     DashAdapter._logger.debug('Switch from dynamic manifest to static');
-
-    // const videoFullDuration = this._getLiveEdge() - this._seekRangeStart;
-    // const distanceFromLive = videoFullDuration - (this._getLiveEdge() - this._videoElement.currentTime);
-
-    // console.log('>>> current time', this._videoElement.currentTime);
-    // console.log('>>> seek range start', this._shaka.seekRange().start);
-    // console.log('>>> seek range end', this._shaka.seekRange().end);
-    // console.log('>>> seek range duration', videoFullDuration);
-    // console.log('>>> video duration', this._videoElement.duration);
-
+    const videoFullDuration = this._getLiveEdge() - this._seekRangeStart;
+    const distanceFromLive = videoFullDuration - (this._getLiveEdge() - this._videoElement.currentTime);
     this._dispatchNativeEvent(EventType.WAITING);
     const isAdaptiveBitrateEnabled = this.isAdaptiveBitrateEnabled();
     const paused = this._videoElement.paused;
@@ -819,7 +811,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       this._isLive = true;
       this.attachMediaSource();
       this.load().then(() => {
-        this._videoElement.currentTime = this._videoElement.currentTime - this._seekRangeStart;
+        this._videoElement.currentTime = distanceFromLive;
         !paused && this._videoElement.play();
         if (isAdaptiveBitrateEnabled) {
           this._onAdaptation();
