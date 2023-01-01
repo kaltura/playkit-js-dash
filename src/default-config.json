@@ -12,5 +12,5 @@
   },
   "forceRedirectExternalStreams": false,
   "trackEmsgEvents": true,
-  "switchDynamicToStatic": true
+  "switchDynamicToStatic": false
 }
