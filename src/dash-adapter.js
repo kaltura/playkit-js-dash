@@ -256,6 +256,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (typeof streaming.trackEmsgEvents === 'boolean') {
         adapterConfig.trackEmsgEvents = streaming.trackEmsgEvents;
       }
+      if (typeof streaming.switchDynamicToStatic === 'boolean') {
+        adapterConfig.switchDynamicToStatic = streaming.switchDynamicToStatic;
+      }
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
       const options = config.sources.options;
@@ -774,7 +777,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
           setTimeout(() => {
             this._isLive = this._isLive || this._shaka?.isLive();
-            if (this._isLive && !this._shaka?.isLive() && !this._isStaticLive) {
+            if (this._isLive && !this._shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
               this._sourceObj.url = response.uri;
               this._switchFromDynamicToStatic();
             }
@@ -811,22 +814,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._dispatchNativeEvent(EventType.WAITING);
     const isAdaptiveBitrateEnabled = this.isAdaptiveBitrateEnabled();
     const paused = this._videoElement.paused;
-    // const {maxHeight} = this._shaka.getConfiguration().abr.restrictions;
     this.detachMediaSource().then(() => {
       this._isStaticLive = true;
       this._isLive = true;
       this.attachMediaSource();
-      // if (isAdaptiveBitrateEnabled) {
-      //   this._shaka.configure({abr: {restrictions: {maxHeight: 0}}});
-      // }
       this.load().then(() => {
         this._videoElement.currentTime = this._videoElement.currentTime - this._seekRangeStart;
         !paused && this._videoElement.play();
         if (isAdaptiveBitrateEnabled) {
           this._onAdaptation();
-          // this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
-          //   this._shaka.configure({abr: {restrictions: {maxHeight}}});
-          // });
         } else if (this._selectedVideoTrack) {
           DashAdapter._logger.debug('Select the selected video track');
           this.selectVideoTrack(this._selectedVideoTrack);
