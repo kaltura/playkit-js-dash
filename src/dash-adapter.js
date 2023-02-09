@@ -801,8 +801,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   _switchFromDynamicToStatic(): void {
     DashAdapter._logger.debug('Switch from dynamic manifest to static');
-    const videoFullDuration = this._getLiveEdge() - this._seekRangeStart;
-    const distanceFromLive = videoFullDuration - (this._getLiveEdge() - this._videoElement.currentTime);
+    const distanceFromLive = this._videoElement.currentTime - this._seekRangeStart;
     this._dispatchNativeEvent(EventType.WAITING);
     const isAdaptiveBitrateEnabled = this.isAdaptiveBitrateEnabled();
     const paused = this._videoElement.paused;
