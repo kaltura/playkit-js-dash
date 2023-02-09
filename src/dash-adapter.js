@@ -1091,6 +1091,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         id: textTrack.id,
         kind: kind,
         active: false,
+        default: textTrack.primary,
         label: textTrack.label,
         language: textTrack.language
       };
