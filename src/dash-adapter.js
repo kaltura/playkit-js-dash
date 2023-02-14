@@ -799,27 +799,32 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }, (segmentDuration + 1) * 1000);
   }
 
-  _switchFromDynamicToStatic(): void {
-    DashAdapter._logger.debug('Switch from dynamic manifest to static');
-    const distanceFromLive = this._videoElement.currentTime - this._seekRangeStart;
+  async _switchFromDynamicToStatic() {
+    DashAdapter._logger.info('Switching from dynamic manifest to static');
     this._dispatchNativeEvent(EventType.WAITING);
+
+    const newCurrentTime = this._videoElement.currentTime - this._seekRangeStart;
     const isAdaptiveBitrateEnabled = this.isAdaptiveBitrateEnabled();
-    const paused = this._videoElement.paused;
-    this.detachMediaSource().then(() => {
-      this._isStaticLive = true;
-      this._isLive = true;
-      this.attachMediaSource();
-      this.load().then(() => {
-        this._videoElement.currentTime = distanceFromLive;
-        !paused && this._videoElement.play();
-        if (isAdaptiveBitrateEnabled) {
-          this._onAdaptation();
-        } else if (this._selectedVideoTrack) {
-          DashAdapter._logger.debug('Select the selected video track');
-          this.selectVideoTrack(this._selectedVideoTrack);
-        }
-      });
-    });
+    const isPaused = this._videoElement.paused;
+
+    await this.detachMediaSource();
+
+    this._isStaticLive = true;
+    this._isLive = true;
+    this.attachMediaSource();
+
+    await this.load();
+
+    this._videoElement.currentTime = newCurrentTime;
+    if (!isPaused) {
+      this._videoElement.play();
+    }
+
+    if (isAdaptiveBitrateEnabled) {
+      this._onAdaptation();
+    } else if (this._selectedVideoTrack) {
+      this.selectVideoTrack(this._selectedVideoTrack);
+    }
   }
 
   _setLowLatencyMode() {
