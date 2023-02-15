@@ -223,6 +223,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   _isStartOver: boolean = true;
   _seekRangeStart: number = 0;
   _startOverTimeout: TimeoutID;
+  _isLive: boolean = false;
+  _isStaticLive: boolean = false;
+  _selectedVideoTrack: ?VideoTrack = null;
 
   /**
    * Factory method to create media source adapter.
@@ -252,6 +255,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
       if (typeof streaming.trackEmsgEvents === 'boolean') {
         adapterConfig.trackEmsgEvents = streaming.trackEmsgEvents;
+      }
+      if (typeof streaming.switchDynamicToStatic === 'boolean') {
+        adapterConfig.switchDynamicToStatic = streaming.switchDynamicToStatic;
       }
     }
     if (Utils.Object.hasPropertyPath(config, 'sources.options')) {
@@ -671,9 +677,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * detach media - will remove the media source from handling the video
    * @public
-   * @returns {void}
+   * @returns {Promise<void>} - detach promise
    */
-  detachMediaSource(): void {
+  detachMediaSource(): Promise<void> {
     if (this._shaka) {
       // 1 second different between duration and current time will signal as end - will enable replay button
       if (Math.floor(this.duration - this.currentTime) === 0) {
@@ -681,10 +687,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       } else if (this.currentTime > 0) {
         this._lastTimeDetach = this.currentTime;
       }
-      this._reset().then(() => {
+      return this._reset().then(() => {
         this._shaka = null;
         this._loadPromise = null;
       });
+    } else {
+      return Promise.resolve();
     }
   }
 
@@ -767,6 +775,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this._parseManifest(response.data);
           this._playbackActualUri = response.uri;
           this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
+          setTimeout(() => {
+            this._isLive = this._isLive || this._shaka?.isLive();
+            if (this._isLive && !this._shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
+              this._sourceObj.url = response.uri;
+              this._switchFromDynamicToStatic();
+            }
+          });
           break;
       }
     });
@@ -782,6 +797,34 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._isStartOver = false;
       }
     }, (segmentDuration + 1) * 1000);
+  }
+
+  async _switchFromDynamicToStatic() {
+    DashAdapter._logger.info('Switching from dynamic manifest to static');
+    this._dispatchNativeEvent(EventType.WAITING);
+
+    const newCurrentTime = this._videoElement.currentTime - this._seekRangeStart;
+    const isAdaptiveBitrateEnabled = this.isAdaptiveBitrateEnabled();
+    const isPaused = this._videoElement.paused;
+
+    await this.detachMediaSource();
+
+    this._isStaticLive = true;
+    this._isLive = true;
+    this.attachMediaSource();
+
+    await this.load();
+
+    this._videoElement.currentTime = newCurrentTime;
+    if (!isPaused) {
+      this._videoElement.play();
+    }
+
+    if (isAdaptiveBitrateEnabled) {
+      this._onAdaptation();
+    } else if (this._selectedVideoTrack) {
+      this.selectVideoTrack(this._selectedVideoTrack);
+    }
   }
 
   _setLowLatencyMode() {
@@ -890,6 +933,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._buffering = false;
     this._waitingSent = false;
     this._playingSent = false;
+    this._isLive = false;
+    this._isStaticLive = false;
     this._requestFilterError = false;
     this._responseFilterError = false;
     this._manifestParser = null;
@@ -1093,6 +1138,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
             this._trigger(EventType.ABR_MODE_CHANGED, {mode: 'manual'});
           }
           if (!selectedVideoTrack.active) {
+            this._selectedVideoTrack = videoTrack;
             this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
             this._onTrackChanged(videoTrack);
           }
@@ -1226,10 +1272,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   isLive(): boolean {
-    if (this._shaka) {
-      return this._shaka.isLive();
-    }
-    return false;
+    return this._shaka?.isLive() || this._isLive;
   }
 
   /**
