@@ -51,14 +51,14 @@ const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
  * @type {number}
  * @const
  */
-const STALL_DETECTION_INTERVAL = 500;
+const STALL_DETECTION_INTERVAL = 500 / 2;
 
 /**
  * the threshold for stall detection in seconds
  * @type {number}
  * @const
  */
-const STALL_DETECTION_THRESHOLD = 3;
+const STALL_DETECTION_THRESHOLD = 3 / 2;
 
 /**
  * the threshold needed to break the stall
