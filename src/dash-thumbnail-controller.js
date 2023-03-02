@@ -37,8 +37,8 @@ class DashThumbnailController {
     return new ThumbnailInfo({
       width: Math.floor(sliceWidth),
       height: Math.floor(sliceHeight),
-      x: Math.floor(thumbIndex % rows) * sliceWidth,
-      y: Math.floor(thumbIndex / rows) * sliceHeight,
+      x: Math.floor(thumbIndex % cols) * sliceWidth,
+      y: Math.floor(thumbIndex / cols) * sliceHeight,
       url: this._buildUrlFromTemplate(activeTrack, page)
     });
   }
@@ -77,8 +77,8 @@ class DashThumbnailController {
       cols = 1;
     if (value.includes('x')) {
       const values = value.split('x');
-      rows = parseInt(values[0]);
-      cols = parseInt(values[1]);
+      cols = parseInt(values[0]);
+      rows = parseInt(values[1]);
     }
     return [rows, cols];
   };
