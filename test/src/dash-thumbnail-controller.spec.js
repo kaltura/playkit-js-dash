@@ -21,8 +21,8 @@ describe('DashThumbnailController', () => {
     imageTrack.index.should.equal(0);
     imageTrack.id.should.equal('thumbnails_320x180');
     imageTrack.duration.should.equal(100);
-    imageTrack.cols.should.equal(1);
-    imageTrack.rows.should.equal(10);
+    imageTrack.cols.should.equal(10);
+    imageTrack.rows.should.equal(1);
     imageTrack.height.should.equal(180);
     imageTrack.width.should.equal(3200);
     imageTrack.url.should.equal('my/stream/thumbnails_320x180/tile_$Number$.jpg');
@@ -48,8 +48,8 @@ describe('DashThumbnailController', () => {
     imageTrack1.index.should.equal(0);
     imageTrack1.id.should.equal('thumbnails_102x58');
     imageTrack1.duration.should.equal(634.566);
-    imageTrack1.cols.should.equal(20);
-    imageTrack1.rows.should.equal(10);
+    imageTrack1.cols.should.equal(10);
+    imageTrack1.rows.should.equal(20);
     imageTrack1.height.should.equal(1152);
     imageTrack1.width.should.equal(1024);
     imageTrack1.url.should.equal('my/stream/thumbnails_102x58/tile_$Number$.jpg');
