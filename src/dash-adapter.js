@@ -1326,9 +1326,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         error = error.data[0];
         this._requestFilterError ? (this._requestFilterError = false) : (this._responseFilterError = false);
       }
-      this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
+      const severity = error.code === shaka.util.Error.Code.HTTP_ERROR ? Error.Severity.CRITICAL : error.severity;
+      this._trigger(EventType.ERROR, new Error(severity, error.category, error.code, error.data));
       DashAdapter._logger.error(error);
-      if (error.severity === Error.Severity.CRITICAL) {
+      if (severity === Error.Severity.CRITICAL) {
         this.destroy();
       }
     }
