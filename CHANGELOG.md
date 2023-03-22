@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.33.1](https://github.com/kaltura/playkit-js-dash/compare/v1.33.0...v1.33.1) (2023-03-22)
+
+
+### Bug Fixes
+
+* **FEC-12988:** fix image tracks row/cols values got mixed ([#235](https://github.com/kaltura/playkit-js-dash/issues/235)) ([0ba01cd](https://github.com/kaltura/playkit-js-dash/commit/0ba01cd))
+
+
+
 ## [1.33.0](https://github.com/kaltura/playkit-js-dash/compare/v1.32.0...v1.33.0) (2023-02-22)
 
 
