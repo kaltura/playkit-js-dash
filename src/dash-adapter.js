@@ -265,6 +265,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       adapterConfig.forceRedirectExternalStreams = options.forceRedirectExternalStreams;
       adapterConfig.redirectExternalStreamsHandler = options.redirectExternalStreamsHandler;
       adapterConfig.redirectExternalStreamsTimeout = options.redirectExternalStreamsTimeout;
+
+      if (options.isStartOverType) {
+        adapterConfig.isStartOverType = true;
+      }
     }
     if (Utils.Object.hasPropertyPath(config, 'abr')) {
       const abr = config.abr;
@@ -795,8 +799,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (this._shaka.seekRange().start - this._seekRangeStart >= segmentDuration) {
         // in start over the seekRange().start should be permanent
         this._isStartOver = false;
-      } else {
-        this._isStartOver = true;
       }
     }, (segmentDuration + 1) * 1000);
   }
@@ -936,8 +938,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._waitingSent = false;
     this._playingSent = false;
     this._isLive = false;
-    this._isStartOver = true;
     this._isStaticLive = false;
+    this._isStartOver = true;
     this._requestFilterError = false;
     this._responseFilterError = false;
     this._manifestParser = null;
@@ -1279,6 +1281,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
+   * Checking if the current playback is a start over media.
+   * @function isLive
+   * @returns {boolean} - Whether playback is live.
+   * @public
+   */
+  isStartOver(): boolean {
+    return this._config.isStartOverType || this._isStartOver;
+  }
+
+  /**
    * Gets the segment duration of the stream
    * @return {number} - Segment duration in seconds
    */
@@ -1438,7 +1450,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   getStartTimeOfDvrWindow(): number {
     if (this.isLive() && this._shaka) {
-      return (this._isStartOver ? this._seekRangeStart : this._shaka.seekRange().start) + this._shaka.getConfiguration().streaming.safeSeekOffset;
+      return (this.isStartOver() ? this._seekRangeStart : this._shaka.seekRange().start) + this._shaka.getConfiguration().streaming.safeSeekOffset;
     }
     return 0;
   }

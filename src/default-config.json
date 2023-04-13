@@ -12,5 +12,6 @@
   },
   "forceRedirectExternalStreams": false,
   "trackEmsgEvents": true,
-  "switchDynamicToStatic": false
+  "switchDynamicToStatic": false,
+  "isStartOverType": false
 }
