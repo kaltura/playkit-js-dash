@@ -795,6 +795,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (this._shaka.seekRange().start - this._seekRangeStart >= segmentDuration) {
         // in start over the seekRange().start should be permanent
         this._isStartOver = false;
+      } else {
+        this._isStartOver = true;
       }
     }, (segmentDuration + 1) * 1000);
   }
@@ -934,6 +936,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._waitingSent = false;
     this._playingSent = false;
     this._isLive = false;
+    this._isStartOver = true;
     this._isStaticLive = false;
     this._requestFilterError = false;
     this._responseFilterError = false;
