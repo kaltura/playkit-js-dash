@@ -1,6 +1,6 @@
 // Create custom launcher in case running with Travis
 const launchers = {
-  Chrome_travis_ci: {
+  Chrome_browser: {
     base: 'ChromeHeadless',
     flags: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required']
   }
@@ -9,7 +9,7 @@ const launchers = {
 module.exports = function (config) {
   let karmaConf = {
     logLevel: config.LOG_INFO,
-    browsers: ['Chrome', 'Firefox'],
+    browsers: [],
     concurrency: 1,
     singleRun: true,
     colors: true,
