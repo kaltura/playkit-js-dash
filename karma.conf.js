@@ -1,7 +1,7 @@
 // Create custom launcher in case running with Travis
 const launchers = {
   Chrome_browser: {
-    base: 'ChromeHeadless',
+    base: 'Chrome',
     flags: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required']
   }
 };
