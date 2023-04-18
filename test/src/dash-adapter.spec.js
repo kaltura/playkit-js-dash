@@ -17,7 +17,7 @@ const vodSource = {
 
 const liveSource = {
   mimetype: 'application/dash+xml',
-  url: 'http://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvtime.mpd'
+  url: 'https://akamaibroadcasteruseast.akamaized.net/cmaf/live/657078/akasource/out.mpd'
 };
 
 const dvrSource = {
