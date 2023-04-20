@@ -45,7 +45,7 @@ describe('Widevine', function () {
 
     it('sets the correct shaka drm config for widevine data', function () {
       Widevine.setDrmPlayback(config, wwDrmData);
-      if (BROWSER === 'Chrome') {
+      if (BROWSER === 'Chrome' || BROWSER === 'Chrome_browser' || BROWSER === 'ChromeHeadless') {
         expectedConfig.drm.advanced = {
           [DrmScheme.WIDEVINE]: {
             videoRobustness: 'SW_SECURE_CRYPTO',
