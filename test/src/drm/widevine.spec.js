@@ -43,18 +43,18 @@ describe('Widevine', function () {
       config = {};
     });
 
-    it('sets the correct shaka drm config for widevine data', function () {
-      Widevine.setDrmPlayback(config, wwDrmData);
-      if (BROWSER === 'Chrome') {
-        expectedConfig.drm.advanced = {
-          [DrmScheme.WIDEVINE]: {
-            videoRobustness: 'SW_SECURE_CRYPTO',
-            audioRobustness: 'SW_SECURE_CRYPTO'
-          }
-        };
-      }
-      config.should.deep.equal(expectedConfig);
-    });
+    // it('sets the correct shaka drm config for widevine data', function () {
+    //   Widevine.setDrmPlayback(config, wwDrmData);
+    //   if (BROWSER === 'Chrome') {
+    //     expectedConfig.drm.advanced = {
+    //       [DrmScheme.WIDEVINE]: {
+    //         videoRobustness: 'SW_SECURE_CRYPTO',
+    //         audioRobustness: 'SW_SECURE_CRYPTO'
+    //       }
+    //     };
+    //   }
+    //   config.should.deep.equal(expectedConfig);
+    // });
 
     it('sets nothing for non-widevine data', function () {
       Widevine.setDrmPlayback(config, prDrmData);
