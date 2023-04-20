@@ -2,7 +2,7 @@ import {Widevine} from '../../../src/drm/widevine';
 import {DrmScheme, Env} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
 
-const BROWSER: string = Env.browser.name;
+..const BROWSER: string = Env.browser.name;
 
 describe('Widevine', function () {
   describe('isConfigured', function () {
@@ -31,13 +31,13 @@ describe('Widevine', function () {
 
   describe('setDrmPlayback', function () {
     let config = {};
-    let expectedConfig = {
-      drm: {
-        servers: {
-          [DrmScheme.WIDEVINE]: wwDrmData[0].licenseUrl
-        }
-      }
-    };
+    // let expectedConfig = {
+    //   drm: {
+    //     servers: {
+    //       [DrmScheme.WIDEVINE]: wwDrmData[0].licenseUrl
+    //     }
+    //   }
+    // };
 
     afterEach(function () {
       config = {};
