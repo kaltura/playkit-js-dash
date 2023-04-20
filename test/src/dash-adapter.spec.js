@@ -11,7 +11,8 @@ const targetId = 'player-placeholder_dash-adapter.spec';
 
 const vodSource = {
   mimetype: 'application/dash+xml',
-  url: 'https://cfvod.kaltura.com/dasha/p/1740481/sp/174048100/serveFlavor/entryId/1_ez6mf1n8/v/,1/ev/3/flavorId/1_fwvuvqym,1/ev/3/flavorId/1_5zyuykzo,1/ev/3/flavorId/1_4xul4cg0,1/ev/3/flavorId/1_5jovgwnt,1/ev/3/flavorId/1_dt7bjb0q,2/ev/3/flavorId/0_og64h1z3,2/ev/3/flavorId/0_mgociiko,2/ev/3/flavorId/0_dxxbalt0,/forceproxy/true/name/a.mp4.urlset/manifest.mpd'
+  url:
+    'https://cfvod.kaltura.com/dasha/p/1740481/sp/174048100/serveFlavor/entryId/1_ez6mf1n8/v/,1/ev/3/flavorId/1_fwvuvqym,1/ev/3/flavorId/1_5zyuykzo,1/ev/3/flavorId/1_4xul4cg0,1/ev/3/flavorId/1_5jovgwnt,1/ev/3/flavorId/1_dt7bjb0q,2/ev/3/flavorId/0_og64h1z3,2/ev/3/flavorId/0_mgociiko,2/ev/3/flavorId/0_dxxbalt0,/forceproxy/true/name/a.mp4.urlset/manifest.mpd'
 };
 
 const liveSource = {
