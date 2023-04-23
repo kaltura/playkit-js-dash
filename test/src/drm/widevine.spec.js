@@ -1,8 +1,8 @@
 import {Widevine} from '../../../src/drm/widevine';
-import {DrmScheme} from '@playkit-js/playkit-js';
+import {DrmScheme, Env} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
 
-//const BROWSER: string = Env.browser.name;
+const BROWSER: string = Env.browser.name;
 
 describe('Widevine', function () {
   describe('isConfigured', function () {
@@ -31,30 +31,41 @@ describe('Widevine', function () {
 
   describe('setDrmPlayback', function () {
     let config = {};
-    // let expectedConfig = {
-    //   drm: {
-    //     servers: {
-    //       [DrmScheme.WIDEVINE]: wwDrmData[0].licenseUrl
-    //     }
-    //   }
-    // };
+    let sandbox;
+    let expectedConfig = {
+      drm: {
+        servers: {
+          [DrmScheme.WIDEVINE]: wwDrmData[0].licenseUrl
+        }
+      }
+    };
+
+    beforeEach(function () {
+      sandbox = sinon.createSandbox();
+    });
 
     afterEach(function () {
       config = {};
+      sandbox.restore();
     });
 
-    // it('sets the correct shaka drm config for widevine data', function () {
-    //   Widevine.setDrmPlayback(config, wwDrmData);
-    //   if (BROWSER === 'Chrome') {
-    //     expectedConfig.drm.advanced = {
-    //       [DrmScheme.WIDEVINE]: {
-    //         videoRobustness: 'SW_SECURE_CRYPTO',
-    //         audioRobustness: 'SW_SECURE_CRYPTO'
-    //       }
-    //     };
-    //   }
-    //   config.should.deep.equal(expectedConfig);
-    // });
+    it('sets the correct shaka drm config for widevine data', function () {
+      if (BROWSER === 'Chrome' || BROWSER === 'Chrome Headless') {
+        sandbox.stub(Env, 'browser').get(() => ({name: 'Chrome'}));
+      }
+
+      Widevine.setDrmPlayback(config, wwDrmData);
+
+      if (BROWSER === 'Chrome' || BROWSER === 'Chrome Headless') {
+        expectedConfig.drm.advanced = {
+          [DrmScheme.WIDEVINE]: {
+            videoRobustness: 'SW_SECURE_CRYPTO',
+            audioRobustness: 'SW_SECURE_CRYPTO'
+          }
+        };
+      }
+      config.should.deep.equal(expectedConfig);
+    });
 
     it('sets nothing for non-widevine data', function () {
       Widevine.setDrmPlayback(config, prDrmData);
