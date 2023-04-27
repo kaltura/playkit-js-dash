@@ -5,7 +5,7 @@ run-name: Canary Full Flow
 on:
   push:
     branches:
-      - devops-deployment
+      - master
 
 jobs:
   canary-full-flow:
@@ -21,7 +21,7 @@ jobs:
       PLAYER_MSTEAMS_WEBHOOK: ${{ secrets.PLAYER_MSTEAMS_WEBHOOK }}
       PLAYER_GITHUB_BOT_TOKEN: ${{ secrets.PLAYER_GITHUB_BOT_TOKEN }}
     with:
-      type: "plugin"
+      type: "dependency"
       stage: "canary"
       schema-type: "playerV3Versions"
       tests-yarn-run-to-execute: 'eslint flow test'
