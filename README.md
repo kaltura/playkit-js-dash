@@ -1,6 +1,6 @@
 # PlayKit JS DASH - [Shaka Player] Adapter for the [PlayKit JS Player]
 
-[![Build Status](https://travis-ci.org/kaltura/playkit-js-dash.svg?branch=master)](https://travis-ci.org/kaltura/playkit-js-dash)
+[![Build Status](https://github.com/kaltura/playkit-js-dash/actions/workflows/run_canary_full_flow.yaml/badge.svg)](https://github.com/kaltura/playkit-js-dash/actions/workflows/run_canary_full_flow.yaml)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![](https://img.shields.io/npm/v/@playkit-js/playkit-js-dash/latest.svg)](https://www.npmjs.com/package/@playkit-js/playkit-js-dash)
 [![](https://img.shields.io/npm/v/@playkit-js/playkit-js-dash/canary.svg)](https://www.npmjs.com/package/@playkit-js/playkit-js-dash/v/canary)
