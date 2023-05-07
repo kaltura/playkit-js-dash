@@ -31,6 +31,7 @@ describe('Widevine', function () {
 
   describe('setDrmPlayback', function () {
     let config = {};
+    let sandbox;
     let expectedConfig = {
       drm: {
         servers: {
@@ -39,13 +40,23 @@ describe('Widevine', function () {
       }
     };
 
+    beforeEach(function () {
+      sandbox = sinon.createSandbox();
+    });
+
     afterEach(function () {
       config = {};
+      sandbox.restore();
     });
 
     it('sets the correct shaka drm config for widevine data', function () {
+      if (BROWSER === 'Chrome' || BROWSER === 'Chrome Headless') {
+        sandbox.stub(Env, 'browser').get(() => ({name: 'Chrome'}));
+      }
+
       Widevine.setDrmPlayback(config, wwDrmData);
-      if (BROWSER === 'Chrome') {
+
+      if (BROWSER === 'Chrome' || BROWSER === 'Chrome Headless') {
         expectedConfig.drm.advanced = {
           [DrmScheme.WIDEVINE]: {
             videoRobustness: 'SW_SECURE_CRYPTO',
