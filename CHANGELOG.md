@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.34.1 (2023-05-08)
+
+
+### Bug Fixes
+
+* **FEC-13123:** replace travis with github actions ([#243](https://github.com/kaltura/playkit-js-dash/issues/243)) ([9422826](https://github.com/kaltura/playkit-js-dash/commit/9422826))
+
+
+
 ## [1.34.0](https://github.com/kaltura/playkit-js-dash/compare/v1.33.1...v1.34.0) (2023-04-19)
 
 
