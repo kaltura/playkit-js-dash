@@ -924,7 +924,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * reset shaka instance and its bindings
+   * Reset shaka instance and its bindings
    * @function _reset
    * @private
    * @returns {Promise<*>} - The destroy promise.
