@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.34.3 (2023-06-07)
+
+
+### Bug Fixes
+
+* **FEC-13108:** Start time can't be set to 0 in loadMedia for live with dvr ([d041ba8](https://github.com/kaltura/playkit-js-dash/commit/d041ba8))
+
+
+
 ### 1.34.2 (2023-05-17)
 
 
