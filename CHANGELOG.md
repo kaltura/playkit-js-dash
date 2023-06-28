@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.35.0 (2023-06-28)
+
+
+### Features
+
+* **13213:** upgrade shaka player v4.3.7 ([#247](https://github.com/kaltura/playkit-js-dash/issues/247)) ([799d1b8](https://github.com/kaltura/playkit-js-dash/commit/799d1b8))
+
+
+
 ### 1.34.3 (2023-06-07)
 
 
