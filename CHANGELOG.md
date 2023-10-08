@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.35.1 (2023-10-08)
+
+
+### Bug Fixes
+
+* **FEC-13390:** use canary workflow from common master ([#250](https://github.com/kaltura/playkit-js-dash/issues/250)) ([24c5f50](https://github.com/kaltura/playkit-js-dash/commit/24c5f50))
+
+
+
 ## 1.35.0 (2023-06-28)
 
 
