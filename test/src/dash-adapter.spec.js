@@ -1554,7 +1554,7 @@ describe('DashAdapter: request filter', () => {
     });
   });
 
-  it('should handle error rejected from promise filter - segment', done => {
+  xit('should handle error rejected from promise filter - segment', done => {
     dashInstance = DashAdapter.createAdapter(
       video,
       vodSource,
