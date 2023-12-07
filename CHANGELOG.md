@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.35.3 (2023-12-07)
+
+
+### Bug Fixes
+
+* **FEC-13522:** upd shaka player ([#253](https://github.com/kaltura/playkit-js-dash/issues/253)) ([22b412e](https://github.com/kaltura/playkit-js-dash/commit/22b412e))
+
+
+
 ### 1.35.2 (2023-11-26)
 
 
