@@ -1,86 +1,96 @@
-'use strict';
-
 const webpack = require('webpack');
 const path = require('path');
 const packageData = require('./package.json');
+const TerserPlugin = require('terser-webpack-plugin');
 
-let plugins = [
-  new webpack.DefinePlugin({
-    __VERSION__: JSON.stringify(packageData.version),
-    __NAME__: JSON.stringify(packageData.name)
-  })
-];
-
-module.exports = {
-  context: __dirname + '/src',
-  entry: {'playkit-dash': 'index.js'},
-  output: {
-    path: __dirname + '/dist',
-    filename: '[name].js',
-    library: ['playkit', 'dash'],
-    libraryTarget: 'umd',
-    umdNamedDefine: true,
-    devtoolModuleFilenameTemplate: './dash/[resource-path]'
-  },
-  devtool: 'source-map',
-  plugins: plugins,
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        use: [
-          {
-            loader: 'babel-loader'
-          }
-        ],
-        exclude: [/node_modules/]
-      },
-      {
-        test: /\.js$/,
-        exclude: [/node_modules/],
-        enforce: 'pre',
-        use: [
-          {
-            loader: 'eslint-loader',
-            options: {
-              rules: {
-                semi: 0
-              }
+module.exports = (env, { mode }) => {
+  return {
+    entry:  './src/index.ts',
+    optimization: {
+      minimize: mode !== 'development',
+      minimizer: [
+        new TerserPlugin({
+          extractComments: false,
+          terserOptions: {
+            format: {
+              comments: false
             }
           }
-        ]
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: 'style-loader'
-          },
-          {
-            loader: 'css-loader'
-          }
-        ]
-      }
-    ]
-  },
-  devServer: {
-    contentBase: __dirname + '/src'
-  },
-  resolve: {
-    modules: [path.resolve(__dirname, 'src'), 'node_modules']
-  },
-  externals: {
-    '@playkit-js/playkit-js': {
-      commonjs: '@playkit-js/playkit-js',
-      commonjs2: '@playkit-js/playkit-js',
-      amd: 'playkit-js',
-      root: ['playkit', 'core']
+        })
+      ]
     },
-    'shaka-player': {
-      commonjs: 'shaka-player',
-      commonjs2: 'shaka-player',
-      amd: 'shaka-player',
-      root: 'shaka'
-    }
+    // devtool: 'source-map',
+    devtool: mode === 'development' ? 'eval-source-map' : 'source-map',
+    module: {
+      rules: [
+        {
+          test: /\.(ts|js)$/,
+          // test: /\.ts$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [['@babel/preset-env', {
+                loose: true,
+                bugfixes: true,
+                targets: "defaults"
+                // targets: {
+                //   "browsers": ["chrome >= 47", "firefox >= 51", "ie >= 11", "safari >= 8", "ios >= 8", "android >= 4"]
+                // }
+              }], '@babel/preset-typescript'],
+              plugins: [['@babel/plugin-transform-runtime']]
+            }
+          }
+        },
+        {
+          test: /\.css$/,
+          use: [
+            {
+              loader: 'style-loader'
+            },
+            {
+              loader: 'css-loader'
+            }
+          ]
+        }
+      ]
+    },
+    resolve: {
+      extensions: ['.ts', '.js'],
+    },
+    output: {
+      filename: 'playkit-dash.js',
+      path: path.resolve(__dirname, 'dist'),
+      library: {
+        umdNamedDefine: true,
+        name: ['playkit', 'dash'],
+        type: 'umd',
+      },
+      clean: true
+      // devtoolModuleFilenameTemplate: './hls/[resource-path]'
+    },
+    externals: {
+      'shaka-player': {
+        commonjs: 'shaka-player',
+        commonjs2: 'shaka-player',
+        amd: 'shaka-player',
+        root: ['shaka']
+      },
+      '@playkit-js/@playkit-js': {root: ['playkit', 'core']}
+    },
+    devServer: {
+      static: {
+        directory: path.join(__dirname, 'dist')
+      },
+      client: {
+        progress: true
+      }
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        __VERSION__: JSON.stringify(packageData.version),
+        __NAME__: JSON.stringify(packageData.name)
+      })
+    ]
   }
 };

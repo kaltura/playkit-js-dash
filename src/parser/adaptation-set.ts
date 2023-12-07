@@ -1,4 +1,3 @@
-// @flow
 import {SegmentTemplate} from './segment-template';
 import {Representation} from './representation';
 import {MpdUtils, XmlUtils} from './parser-utils';
@@ -15,15 +14,15 @@ class AdaptationSet {
   _id: string;
   _mimeType: string;
   _contentType: string;
-  _segmentTemplate: SegmentTemplate;
-  _essentialProperty: ?EssentialProperty;
+  _segmentTemplate: SegmentTemplate | undefined;
+  _essentialProperty: EssentialProperty | undefined;
   _representations: Array<Representation>;
 
-  constructor(elem: HTMLElement) {
+  constructor(elem: Element) {
     this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.ID);
     this._mimeType = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.MIME_TYPE);
     this._contentType = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.CONTENT_TYPE);
-    this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagTypes.REPRESENTATION)).map(repElem => new Representation(repElem));
+    this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagTypes.REPRESENTATION)).map(repElem => new Representation(repElem as HTMLElement));
     const segTempElem = XmlUtils.findChild(elem, MpdUtils.TagTypes.SEGMENT_TEMPLATE);
     if (segTempElem) {
       this._segmentTemplate = new SegmentTemplate(segTempElem);
@@ -46,11 +45,11 @@ class AdaptationSet {
     return this._contentType;
   }
 
-  get segmentTemplate(): SegmentTemplate {
+  get segmentTemplate(): SegmentTemplate | undefined {
     return this._segmentTemplate;
   }
 
-  get essentialProperty(): ?EssentialProperty {
+  get essentialProperty(): EssentialProperty | undefined {
     return this._essentialProperty;
   }
 

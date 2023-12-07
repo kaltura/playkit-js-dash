@@ -1,4 +1,3 @@
-// @flow
 import {SegmentTemplate} from './segment-template';
 
 const UrlUtils = {
@@ -30,14 +29,14 @@ const UrlUtils = {
 };
 
 const ParserUtils = {
-  BufferToStr: (buffer: ArrayBuffer): ?string => {
+  BufferToStr: (buffer: ArrayBuffer): string | null => {
     if (TextDecoder) {
       const textDecoder = new TextDecoder();
       return textDecoder.decode(new Uint8Array(buffer));
     }
     return null;
   },
-  StrToBuffer: (str: string): ?Uint8Array => {
+  StrToBuffer: (str: string): Uint8Array | null => {
     if (TextEncoder) {
       const textEncoder = new TextEncoder();
       return textEncoder.encode(str);
@@ -78,7 +77,7 @@ const XmlUtils = {
     const domParser = new DOMParser();
     return domParser.parseFromString(text, 'text/xml');
   },
-  parseAttr: (elem: HTMLElement, name: string, parseFunction?: Function, defaultValue: any): any => {
+  parseAttr: (elem: Element, name: string, parseFunction?: Function, defaultValue?: any): any => {
     let parsedValue = null;
     const value = elem.getAttribute(name);
     if (value !== null) {
@@ -86,30 +85,30 @@ const XmlUtils = {
     }
     return parsedValue == null ? defaultValue : parsedValue;
   },
-  findElements: (node: HTMLElement, name: string): HTMLCollection<HTMLElement> => {
+  findElements: (node: Document, name: string): HTMLCollectionOf<Element> => {
     return node.getElementsByTagName(name);
   },
-  findChild(elem: HTMLElement, name: string): ?HTMLElement {
+  findChild(elem: Element, name: string): HTMLElement | null {
     const children = this.findChildren(elem, name);
     if (children.length !== 1) {
       return null;
     }
     return children[0];
   },
-  findChildren: (elem: HTMLElement, name: string): Array<HTMLElement> => {
+  findChildren: (elem: Element, name: string): ChildNode[] => {
     return Array.from(elem.childNodes).filter(child => {
       return child instanceof Element && child.tagName === name;
     });
   },
-  parseInt: (intString: string): ?number => {
+  parseInt: (intString: string): number | null => {
     const n = Number(intString);
     return n % 1 === 0 ? n : null;
   },
-  parsePositiveInt: (intString: string): ?number => {
+  parsePositiveInt: (intString: string): number | null => {
     const n = Number(intString);
     return n % 1 === 0 && n > 0 ? n : null;
   },
-  parseFloat: (floatString: string): ?number => {
+  parseFloat: (floatString: string): number | null => {
     const n = Number(floatString);
     return !isNaN(n) ? n : null;
   }

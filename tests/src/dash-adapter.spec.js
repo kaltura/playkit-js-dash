@@ -5,7 +5,7 @@ import {Widevine} from '../../src/drm/widevine';
 import {PlayReady} from '../../src/drm/playready';
 import {wwDrmData, prDrmData} from './drm/fake-drm-data';
 import shaka from 'shaka-player';
-import {ImageTrack, ThumbnailInfo} from '@playkit-js/playkit-js/dist/playkit';
+import {ImageTrack, ThumbnailInfo} from '@playkit-js/playkit-js';
 
 const targetId = 'player-placeholder_dash-adapter.spec';
 

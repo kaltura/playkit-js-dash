@@ -1,19 +1,18 @@
-// @flow
 import {MpdUtils, ParserUtils, XmlUtils} from './parser-utils';
 import {AdaptationSet} from './adaptation-set';
 import {getLogger} from '@playkit-js/playkit-js';
 
 class DashManifestParser {
   _logger: any = getLogger('DashManifestParser');
-  _xmlDoc: Document;
+  _xmlDoc!: Document;
   _adaptationSets: Array<AdaptationSet>;
-  _baseURL: ?string;
+  _baseURL!: string | null;
 
   static isValid(): boolean {
-    return window.TextEncoder && window.TextDecoder;
+    return Boolean(window.TextEncoder && window.TextDecoder);
   }
 
-  constructor(manifest: ArrayBuffer | string) {
+  constructor(manifest: ArrayBuffer | ArrayBufferView | string) {
     this._logger.debug('Initialize manifest parser');
     this._adaptationSets = [];
     let xmlStr;
@@ -43,7 +42,7 @@ class DashManifestParser {
     return this._baseURL || '';
   }
 
-  getImageSet(): ?AdaptationSet {
+  getImageSet(): AdaptationSet | undefined {
     return this._adaptationSets.find((adaptationSet: AdaptationSet) => adaptationSet.contentType === AdaptationSet.ContentType.IMAGE);
   }
 

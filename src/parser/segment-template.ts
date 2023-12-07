@@ -1,4 +1,3 @@
-// @flow
 import {MpdUtils, XmlUtils} from './parser-utils';
 
 class SegmentTemplate {

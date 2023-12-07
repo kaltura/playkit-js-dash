@@ -1,4 +1,3 @@
-// @flow
 import {AdaptationSet} from './parser/adaptation-set';
 import {Representation} from './parser/representation';
 import {UrlUtils} from './parser/parser-utils';
@@ -25,7 +24,7 @@ class DashThumbnailController {
   }
 
   getActiveTrack(): ImageTrack {
-    return this._tracks.find((t: ImageTrack) => t.active);
+    return this._tracks.find((t: ImageTrack) => t.active)!;
   }
 
   getThumbnail(time: number): ThumbnailInfo {
@@ -47,7 +46,7 @@ class DashThumbnailController {
     const {representations, segmentTemplate, essentialProperty} = set;
     representations.forEach((representation: Representation, index: number) => {
       const {id, bandwidth, width, height} = representation;
-      const {startNumber, duration, media, timescale, presentationTimeOffset} = segmentTemplate;
+      const {startNumber, duration, media, timescale, presentationTimeOffset} = segmentTemplate!;
       const value = this._getEssentialValue(essentialProperty, representation);
       const [rows, cols] = this._getDimensions(value);
       this._tracks.push(
@@ -83,12 +82,12 @@ class DashThumbnailController {
     return [rows, cols];
   };
 
-  _getEssentialValue = (essentialProperty: ?EssentialProperty, representation: Representation): string => {
+  _getEssentialValue = (essentialProperty: EssentialProperty | undefined, representation: Representation): string => {
     return essentialProperty ? essentialProperty.value : representation.essentialProperty ? representation.essentialProperty.value : '';
   };
 
   _buildTemplateUrl = (mediaTemplate: string, id: string, url: string, mediaTemplatePrefix: string): string => {
-    const last = url.split('/').pop();
+    const last = url.split('/').pop()!;
     const baseUrl = url.replace(last, '');
     const regex = /^\.\/|^\./;
     mediaTemplatePrefix = mediaTemplatePrefix.replace(regex, '');
