@@ -22,6 +22,11 @@
   },
   "license": "AGPL-3.0",
   "main": "dist/playkit-dash.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
   "scripts": {
     "serve": "yarn run build:dev && webpack serve --open --mode development",
     "watch": "webpack --watch --mode development",

@@ -4,19 +4,19 @@ import {MpdUtils, XmlUtils} from './parser-utils';
 import {EssentialProperty} from './essential-property';
 
 class AdaptationSet {
-  static ContentType: {[type: string]: string} = {
+  public static ContentType: {[type: string]: string} = {
     VIDEO: 'video',
     AUDIO: 'audio',
     TEXT: 'text',
     IMAGE: 'image'
   };
 
-  _id: string;
-  _mimeType: string;
-  _contentType: string;
-  _segmentTemplate: SegmentTemplate | undefined;
-  _essentialProperty: EssentialProperty | undefined;
-  _representations: Array<Representation>;
+  private _id: string;
+  private _mimeType: string;
+  private _contentType: string;
+  private _segmentTemplate: SegmentTemplate | undefined;
+  private _essentialProperty: EssentialProperty | undefined;
+  private _representations: Array<Representation>;
 
   constructor(elem: Element) {
     this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.ID);
@@ -33,27 +33,27 @@ class AdaptationSet {
     }
   }
 
-  get id(): string {
+  public get id(): string {
     return this._id;
   }
 
-  get mimeType(): string {
+  public get mimeType(): string {
     return this._mimeType;
   }
 
-  get contentType(): string {
+  public get contentType(): string {
     return this._contentType;
   }
 
-  get segmentTemplate(): SegmentTemplate | undefined {
+  public get segmentTemplate(): SegmentTemplate | undefined {
     return this._segmentTemplate;
   }
 
-  get essentialProperty(): EssentialProperty | undefined {
+  public get essentialProperty(): EssentialProperty | undefined {
     return this._essentialProperty;
   }
 
-  get representations(): Array<Representation> {
+  public get representations(): Array<Representation> {
     return this._representations;
   }
 }

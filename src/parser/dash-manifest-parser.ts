@@ -3,12 +3,12 @@ import {AdaptationSet} from './adaptation-set';
 import {getLogger} from '@playkit-js/playkit-js';
 
 class DashManifestParser {
-  _logger: any = getLogger('DashManifestParser');
-  _xmlDoc!: Document;
-  _adaptationSets: Array<AdaptationSet>;
-  _baseURL!: string | null;
+  private _logger: any = getLogger('DashManifestParser');
+  private _xmlDoc!: Document;
+  private _adaptationSets: Array<AdaptationSet>;
+  private _baseURL!: string | null;
 
-  static isValid(): boolean {
+  public static isValid(): boolean {
     return Boolean(window.TextEncoder && window.TextDecoder);
   }
 
@@ -26,7 +26,7 @@ class DashManifestParser {
     }
   }
 
-  parseManifest() {
+  public parseManifest(): void {
     try {
       this._logger.debug('Start parsing dash manifest');
       // For now parse only adaptation sets
@@ -38,23 +38,23 @@ class DashManifestParser {
   }
 
   // return the manifest BaseURL tag textvalue
-  getBaseUrl(): string {
+  public getBaseUrl(): string {
     return this._baseURL || '';
   }
 
-  getImageSet(): AdaptationSet | undefined {
+  public getImageSet(): AdaptationSet | undefined {
     return this._adaptationSets.find((adaptationSet: AdaptationSet) => adaptationSet.contentType === AdaptationSet.ContentType.IMAGE);
   }
 
-  hasImageSet(): boolean {
+  public hasImageSet(): boolean {
     return !!this.getImageSet();
   }
 
-  get adaptationSets(): Array<AdaptationSet> {
+  public get adaptationSets(): Array<AdaptationSet> {
     return this._adaptationSets;
   }
 
-  _parseAdaptionSets = () => {
+  private _parseAdaptionSets = (): void => {
     const baseURL = XmlUtils.findElements(this._xmlDoc, MpdUtils.TagTypes.BASE_URL);
     if (baseURL && baseURL.length > 0) {
       if (baseURL[0].innerHTML) {

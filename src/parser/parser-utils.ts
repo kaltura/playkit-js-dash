@@ -5,22 +5,22 @@ const UrlUtils = {
     const {id, index, bitrate, time} = data;
     const regExp = /\$([a-zA-Z]+)\$/g;
     const expressions = url.match(regExp);
-    const replaceTokens = (url: string, exp: string, token: any) => (token ? url.replace(exp, token) : url);
+    const replaceTokens = (url: string, exp: string, token: any): string => (token ? url.replace(exp, token) : url);
     if (expressions) {
       expressions.forEach((exp: string) => {
         switch (exp) {
-          case SegmentTemplate.MediaTemplateType.REPRESENTATION:
-            url = replaceTokens(url, exp, id);
-            break;
-          case SegmentTemplate.MediaTemplateType.NUMBER:
-            url = replaceTokens(url, exp, index);
-            break;
-          case SegmentTemplate.MediaTemplateType.BANDWIDTH:
-            url = replaceTokens(url, exp, bitrate);
-            break;
-          case SegmentTemplate.MediaTemplateType.TIME:
-            url = replaceTokens(url, exp, time);
-            break;
+        case SegmentTemplate.MediaTemplateType.REPRESENTATION:
+          url = replaceTokens(url, exp, id);
+          break;
+        case SegmentTemplate.MediaTemplateType.NUMBER:
+          url = replaceTokens(url, exp, index);
+          break;
+        case SegmentTemplate.MediaTemplateType.BANDWIDTH:
+          url = replaceTokens(url, exp, bitrate);
+          break;
+        case SegmentTemplate.MediaTemplateType.TIME:
+          url = replaceTokens(url, exp, time);
+          break;
         }
       });
     }
@@ -83,7 +83,7 @@ const XmlUtils = {
     if (value !== null) {
       parsedValue = parseFunction ? parseFunction(value) : value;
     }
-    return parsedValue == null ? defaultValue : parsedValue;
+    return parsedValue === null ? defaultValue : parsedValue;
   },
   findElements: (node: Document, name: string): HTMLCollectionOf<Element> => {
     return node.getElementsByTagName(name);
