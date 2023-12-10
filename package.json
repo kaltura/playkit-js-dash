@@ -1,6 +1,6 @@
 {
   "name": "@playkit-js/playkit-js-dash",
-  "version": "1.35.0",
+  "version": "1.35.3",
   "description": "",
   "keywords": [
     "kaltura",
@@ -84,13 +84,12 @@
     "prettier": "^3.0.3",
     "eslint": "^8.54.0",
     "@playkit-js/playkit-js": "canary",
-    "hls.js": "1.4.11",
     "standard-version": "^6.0.1",
-    "shaka-player": "4.4.2"
+    "shaka-player": "4.7.0"
   },
   "peerDependencies": {
     "@playkit-js/playkit-js": "canary",
-    "shaka-player": "4.4.2"
+    "shaka-player": "4.7.0"
   },
   "publishConfig": {
     "access": "public"
