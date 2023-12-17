@@ -54,11 +54,11 @@ const ABR_RESTRICTION_UPDATE_INTERVAL = 1000;
 const STALL_DETECTION_INTERVAL = 500;
 
 /**
- * the threshold for stall detection in seconds
+ * the minimal threshold for stall detection in seconds
  * @type {number}
  * @const
  */
-const STALL_DETECTION_THRESHOLD = 3;
+const MIN_STALL_DETECTION_THRESHOLD = 2;
 
 /**
  * the threshold needed to break the stall
@@ -250,6 +250,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (typeof streaming.forceBreakStall === 'boolean') {
         adapterConfig.forceBreakStall = streaming.forceBreakStall;
       }
+      if (typeof streaming.stallDetectionThreshold === 'number') {
+        adapterConfig.stallDetectionThreshold = Math.max(MIN_STALL_DETECTION_THRESHOLD, streaming.stallDetectionThreshold);
+      }
+
       if (typeof streaming.lowLatencyMode === 'boolean') {
         adapterConfig.lowLatencyMode = streaming.lowLatencyMode;
       }
@@ -444,7 +448,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._stallInterval = setInterval(() => {
       const stallSeconds = getCurrentTimeInSeconds() - lastUpdateTime;
       //waiting for 3 sec until checking stalling
-      if (stallSeconds > STALL_DETECTION_THRESHOLD && !this._videoElement.paused) {
+      if (stallSeconds > this._config.stallDetectionThreshold && !this._videoElement.paused) {
         if (lastCurrentTime === this._videoElement.currentTime) {
           DashAdapter._logger.debug('stall found, break the stall');
           this._videoElement.currentTime = parseFloat(this._videoElement.currentTime.toFixed(1)) + STALL_BREAK_THRESHOLD;
