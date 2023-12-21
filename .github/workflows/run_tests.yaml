@@ -8,35 +8,32 @@ on:
       - "*"
 
 jobs:
-  build:
-    uses: kaltura/ovp-pipelines-pub/.github/workflows/player_tests.yaml@master
-    with:
-      node-version: '20.x'
-      yarn-run-to-execute: 'build'
-  test:
-    uses: kaltura/ovp-pipelines-pub/.github/workflows/player_tests.yaml@master
-    with:
-      node-version: '20.x'
-      yarn-run-to-execute: 'test'
-  type-check:
-    uses: kaltura/ovp-pipelines-pub/.github/workflows/player_tests.yaml@master
-    with:
-      node-version: '20.x'
-      yarn-run-to-execute: 'type-check'
-  build-types:
-    uses: kaltura/ovp-pipelines-pub/.github/workflows/player_tests.yaml@master
-    with:
-      node-version: '20.x'
-      yarn-run-to-execute: 'build:types'
-  lint:
-    uses: kaltura/ovp-pipelines-pub/.github/workflows/player_tests.yaml@master
-    with:
-      node-version: '20.x'
-      yarn-run-to-execute: 'lint'
+  task-runner:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - task: "build"
+            yarn-run-to-execute: "build"
+          - task: "test"
+            yarn-run-to-execute: "test"
+          - task: "type-check"
+            yarn-run-to-execute: "type-check"
+          # Add more tasks as needed
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run ${{ matrix.task }}
+        uses: kaltura/ovp-pipelines-pub/.github/workflows/player_tests.yaml@master
+        with:
+          node-version: '20.x'
+          yarn-run-to-execute: ${{ matrix.yarn-run-to-execute }}
+
   notification:
     if: always()
     uses: kaltura/ovp-pipelines-pub/.github/workflows/notification.yaml@master
-    needs: [build, test, type-check, lint]
+    needs: [task-runner]
     secrets:
       PLAYER_MSTEAMS_WEBHOOK: ${{ secrets.PLAYER_MSTEAMS_WEBHOOK }}
     with:
