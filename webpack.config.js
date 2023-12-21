@@ -19,24 +19,17 @@ module.exports = (env, { mode }) => {
         })
       ]
     },
-    // devtool: 'source-map',
-    devtool: mode === 'development' ? 'eval-source-map' : 'source-map',
+    devtool: 'source-map',
     module: {
       rules: [
         {
           test: /\.(ts|js)$/,
-          // test: /\.ts$/,
           exclude: /node_modules/,
           use: {
             loader: 'babel-loader',
             options: {
               presets: [['@babel/preset-env', {
-                loose: true,
                 bugfixes: true,
-                targets: "defaults"
-                // targets: {
-                //   "browsers": ["chrome >= 47", "firefox >= 51", "ie >= 11", "safari >= 8", "ios >= 8", "android >= 4"]
-                // }
               }], '@babel/preset-typescript'],
               plugins: [['@babel/plugin-transform-runtime']]
             }
@@ -67,7 +60,6 @@ module.exports = (env, { mode }) => {
         type: 'umd',
       },
       clean: true
-      // devtoolModuleFilenameTemplate: './hls/[resource-path]'
     },
     externals: {
       'shaka-player': {
@@ -76,7 +68,12 @@ module.exports = (env, { mode }) => {
         amd: 'shaka-player',
         root: ['shaka']
       },
-      '@playkit-js/@playkit-js': {root: ['playkit', 'core']}
+      '@playkit-js/playkit-js': {
+        commonjs: '@playkit-js/playkit-js',
+        commonjs2: '@playkit-js/playkit-js',
+        amd: 'playkit-js',
+        root: ['playkit', 'core']
+      },
     },
     devServer: {
       static: {
