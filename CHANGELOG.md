@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.36.0 (2023-12-21)
+
+
+### Features
+
+* **FEC-13574:** Add support in stallDetectionThreshold min value is 2 ([#255](https://github.com/kaltura/playkit-js-dash/issues/255)) ([af64aac](https://github.com/kaltura/playkit-js-dash/commit/af64aac))
+
+
+
 ### 1.35.3 (2023-12-07)
 
 
