@@ -9,7 +9,7 @@ class DashManifestParser {
   private _baseURL!: string | null;
 
   public static isValid(): boolean {
-    return Boolean(window.TextEncoder && window.TextDecoder);
+    return !!(window.TextEncoder && window.TextDecoder);
   }
 
   constructor(manifest: ArrayBuffer | ArrayBufferView | string) {
