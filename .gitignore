@@ -46,3 +46,4 @@ dist/
 lib
 api-extractor/report/
 api-extractor/report-temp/
+api-extractor/playkit-js-dash.api.json
