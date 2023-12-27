@@ -1176,12 +1176,12 @@
   integrity sha512-aEx7S4nW1XakhTtx01Use7viuuZ61ho6FeL6iHtZMpclsjEPYf0N8jQt9e3aDBKhaZZ8pKl5250hI4pjWWBfAA==
 
 "@playkit-js/playkit-js@canary":
-  version "0.84.1-canary.0-005b774"
-  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.84.1-canary.0-005b774.tgz#ecaba0c1b032dfbcf727a3e1b7a54eaaef6cd44d"
-  integrity sha512-eB+E6B606tfLCjXDotpB1gQWPwf1GGPTX53sn8cRFwVqrKUFsotbFHImnKhLdWlVNKRr1dnwMAvJh2fupLtyoA==
+  version "0.84.2-canary.0-cceb0c7"
+  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.84.2-canary.0-cceb0c7.tgz#a3b47545b2710acaf55811f48115bb75b8ff7972"
+  integrity sha512-pa2JDuNA1MD5cxYLT65GXVw8SLgL1QuTyklT88cxHa4Ir7XMbWJBV+1lp9RS363jNX1+pgMQT5lCWthEb8pqXg==
   dependencies:
     js-logger "^1.6.0"
-    ua-parser-js "1.0.2"
+    ua-parser-js "^1.0.36"
 
 "@rushstack/node-core-library@3.61.0":
   version "3.61.0"
@@ -6119,15 +6119,15 @@ typescript@~5.0.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
   integrity sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==
 
-ua-parser-js@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-1.0.2.tgz#e2976c34dbfb30b15d2c300b2a53eac87c57a775"
-  integrity sha512-00y/AXhx0/SsnI51fTc0rLRmafiGOM4/O+ny10Ps7f+j/b8p/ZY11ytMgznXkOVo4GQ+KwQG5UQLkLGirsACRg==
-
 ua-parser-js@^0.7.30:
   version "0.7.37"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.37.tgz#e464e66dac2d33a7a1251d7d7a99d6157ec27832"
   integrity sha512-xV8kqRKM+jhMvcHWUKthV9fNebIzrNy//2O9ZwWcfiBFR5f25XVZPLlEajk/sf3Ra15V92isyQqnIEXRDaZWEA==
+
+ua-parser-js@^1.0.36:
+  version "1.0.37"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-1.0.37.tgz#b5dc7b163a5c1f0c510b08446aed4da92c46373f"
+  integrity sha512-bhTyI94tZofjo+Dn8SN6Zv8nBDvyXTymAdM3LDI/0IboIUwTu1rEhW7v2TfiVsoYWgkQ4kOVqnI8APUFbIQIFQ==
 
 uglify-js@^3.1.4:
   version "3.17.4"
