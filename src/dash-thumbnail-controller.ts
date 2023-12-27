@@ -1,4 +1,3 @@
-// @flow
 import {AdaptationSet} from './parser/adaptation-set';
 import {Representation} from './parser/representation';
 import {UrlUtils} from './parser/parser-utils';
@@ -6,7 +5,7 @@ import {ImageTrack, ThumbnailInfo} from '@playkit-js/playkit-js';
 import {EssentialProperty} from './parser/essential-property';
 
 class DashThumbnailController {
-  _tracks: Array<ImageTrack> = [];
+  private _tracks: Array<ImageTrack> = [];
 
   constructor(set: AdaptationSet, playerUrl: string, mediaTemplatePrefix: string) {
     this._parseTracks(set, playerUrl, mediaTemplatePrefix);
@@ -16,19 +15,19 @@ class DashThumbnailController {
     }
   }
 
-  selectTrack(track: ImageTrack): void {
+  public selectTrack(track: ImageTrack): void {
     this._tracks.forEach((t: ImageTrack) => (t.index === track.index ? (t.active = true) : (t.active = false)));
   }
 
-  getTracks(): Array<ImageTrack> {
+  public getTracks(): Array<ImageTrack> {
     return this._tracks;
   }
 
-  getActiveTrack(): ImageTrack {
-    return this._tracks.find((t: ImageTrack) => t.active);
+  public getActiveTrack(): ImageTrack {
+    return this._tracks.find((t: ImageTrack) => t.active)!;
   }
 
-  getThumbnail(time: number): ThumbnailInfo {
+  public getThumbnail(time: number): ThumbnailInfo {
     const activeTrack = this.getActiveTrack();
     const {duration, rows, cols, sliceWidth, sliceHeight, customData} = activeTrack;
     const page = Math.floor(time / duration) + customData.startNumber;
@@ -43,11 +42,11 @@ class DashThumbnailController {
     });
   }
 
-  _parseTracks = (set: AdaptationSet, playerUrl: string, mediaTemplatePrefix: string): void => {
+  private _parseTracks = (set: AdaptationSet, playerUrl: string, mediaTemplatePrefix: string): void => {
     const {representations, segmentTemplate, essentialProperty} = set;
     representations.forEach((representation: Representation, index: number) => {
       const {id, bandwidth, width, height} = representation;
-      const {startNumber, duration, media, timescale, presentationTimeOffset} = segmentTemplate;
+      const {startNumber, duration, media, timescale, presentationTimeOffset} = segmentTemplate!;
       const value = this._getEssentialValue(essentialProperty, representation);
       const [rows, cols] = this._getDimensions(value);
       this._tracks.push(
@@ -72,7 +71,7 @@ class DashThumbnailController {
     });
   };
 
-  _getDimensions = (value: string): Array<number> => {
+  private _getDimensions = (value: string): Array<number> => {
     let rows = 1,
       cols = 1;
     if (value.includes('x')) {
@@ -83,12 +82,12 @@ class DashThumbnailController {
     return [rows, cols];
   };
 
-  _getEssentialValue = (essentialProperty: ?EssentialProperty, representation: Representation): string => {
+  private _getEssentialValue = (essentialProperty: EssentialProperty | undefined, representation: Representation): string => {
     return essentialProperty ? essentialProperty.value : representation.essentialProperty ? representation.essentialProperty.value : '';
   };
 
-  _buildTemplateUrl = (mediaTemplate: string, id: string, url: string, mediaTemplatePrefix: string): string => {
-    const last = url.split('/').pop();
+  private _buildTemplateUrl = (mediaTemplate: string, id: string, url: string, mediaTemplatePrefix: string): string => {
+    const last = url.split('/').pop()!;
     const baseUrl = url.replace(last, '');
     const regex = /^\.\/|^\./;
     mediaTemplatePrefix = mediaTemplatePrefix.replace(regex, '');
@@ -99,7 +98,7 @@ class DashThumbnailController {
     return UrlUtils.resolve(urlTemplate, {id});
   };
 
-  _buildUrlFromTemplate = (track: ImageTrack, index: number): string => {
+  private _buildUrlFromTemplate = (track: ImageTrack, index: number): string => {
     return UrlUtils.resolve(track.url, {
       index,
       time: (index - 1) * track.duration * track.customData.timescale,

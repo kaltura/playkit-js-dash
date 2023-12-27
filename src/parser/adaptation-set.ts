@@ -1,29 +1,28 @@
-// @flow
 import {SegmentTemplate} from './segment-template';
 import {Representation} from './representation';
 import {MpdUtils, XmlUtils} from './parser-utils';
 import {EssentialProperty} from './essential-property';
 
 class AdaptationSet {
-  static ContentType: {[type: string]: string} = {
+  public static ContentType: {[type: string]: string} = {
     VIDEO: 'video',
     AUDIO: 'audio',
     TEXT: 'text',
     IMAGE: 'image'
   };
 
-  _id: string;
-  _mimeType: string;
-  _contentType: string;
-  _segmentTemplate: SegmentTemplate;
-  _essentialProperty: ?EssentialProperty;
-  _representations: Array<Representation>;
+  private _id: string;
+  private _mimeType: string;
+  private _contentType: string;
+  private _segmentTemplate: SegmentTemplate | undefined;
+  private _essentialProperty: EssentialProperty | undefined;
+  private _representations: Array<Representation>;
 
-  constructor(elem: HTMLElement) {
+  constructor(elem: Element) {
     this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.ID);
     this._mimeType = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.MIME_TYPE);
     this._contentType = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.CONTENT_TYPE);
-    this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagTypes.REPRESENTATION)).map(repElem => new Representation(repElem));
+    this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagTypes.REPRESENTATION)).map(repElem => new Representation(repElem as HTMLElement));
     const segTempElem = XmlUtils.findChild(elem, MpdUtils.TagTypes.SEGMENT_TEMPLATE);
     if (segTempElem) {
       this._segmentTemplate = new SegmentTemplate(segTempElem);
@@ -34,27 +33,27 @@ class AdaptationSet {
     }
   }
 
-  get id(): string {
+  public get id(): string {
     return this._id;
   }
 
-  get mimeType(): string {
+  public get mimeType(): string {
     return this._mimeType;
   }
 
-  get contentType(): string {
+  public get contentType(): string {
     return this._contentType;
   }
 
-  get segmentTemplate(): SegmentTemplate {
+  public get segmentTemplate(): SegmentTemplate | undefined {
     return this._segmentTemplate;
   }
 
-  get essentialProperty(): ?EssentialProperty {
+  public get essentialProperty(): EssentialProperty | undefined {
     return this._essentialProperty;
   }
 
-  get representations(): Array<Representation> {
+  public get representations(): Array<Representation> {
     return this._representations;
   }
 }

@@ -1,13 +1,12 @@
-// @flow
 import {EssentialProperty} from './essential-property';
 import {MpdUtils, XmlUtils} from './parser-utils';
 
 class Representation {
-  _id: string;
-  _bandwidth: number;
-  _width: number;
-  _height: number;
-  _essentialProperty: ?EssentialProperty;
+  private _id: string;
+  private _bandwidth: number;
+  private _width: number;
+  private _height: number;
+  private _essentialProperty: EssentialProperty | undefined;
 
   constructor(elem: HTMLElement) {
     this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.ID);
@@ -20,23 +19,23 @@ class Representation {
     }
   }
 
-  get bandwidth(): number {
+  public get bandwidth(): number {
     return this._bandwidth;
   }
 
-  get id(): string {
+  public get id(): string {
     return this._id;
   }
 
-  get width(): number {
+  public get width(): number {
     return this._width;
   }
 
-  get height(): number {
+  public get height(): number {
     return this._height;
   }
 
-  get essentialProperty(): ?EssentialProperty {
+  public get essentialProperty(): EssentialProperty | undefined {
     return this._essentialProperty;
   }
 }

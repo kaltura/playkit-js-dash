@@ -1,0 +1,1576 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.38.4",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@betaDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@internalRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@preapproved",
+          "syntaxKind": "modifier"
+        }
+      ],
+      "supportForTags": {
+        "@alpha": true,
+        "@beta": true,
+        "@defaultValue": true,
+        "@decorator": true,
+        "@deprecated": true,
+        "@eventProperty": true,
+        "@example": true,
+        "@experimental": true,
+        "@inheritDoc": true,
+        "@internal": true,
+        "@label": true,
+        "@link": true,
+        "@override": true,
+        "@packageDocumentation": true,
+        "@param": true,
+        "@privateRemarks": true,
+        "@public": true,
+        "@readonly": true,
+        "@remarks": true,
+        "@returns": true,
+        "@sealed": true,
+        "@see": true,
+        "@throws": true,
+        "@typeParam": true,
+        "@virtual": true,
+        "@betaDocumentation": true,
+        "@internalRemarks": true,
+        "@preapproved": true
+      },
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@playkit-js/playkit-js-dash!",
+  "docComment": "",
+  "name": "@playkit-js/playkit-js-dash",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@playkit-js/playkit-js-dash!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Class",
+          "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter:class",
+          "docComment": "/**\n * Adapter of shaka lib for dash content  @classdesc\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export default class DashAdapter extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseMediaSourceAdapter",
+              "canonicalReference": "@playkit-js/playkit-js!BaseMediaSourceAdapter:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/dash-adapter.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "DashAdapter",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#_getLiveEdge:member(1)",
+              "docComment": "/**\n * Returns the live edge\n *\n * @returns {number} - live edge  @private\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "protected _getLiveEdge(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": true,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "_getLiveEdge"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter._logger:member",
+              "docComment": "/**\n * The adapter logger  @member {any} _logger  @private  @static\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "protected static _logger: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "import(\"js-logger\")."
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ILogger",
+                  "canonicalReference": "js-logger!ILogger:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "_logger",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isStatic": true,
+              "isProtected": true,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#_removeMediaKeys:member(1)",
+              "docComment": "/**\n * Remove mediaKeys from the video element. mediaKeys are set if an encrypted media was previously played, and must be removed before a new encrypted media can be played. If mediaKeys are not null it means that shaka reset wasn't called or that it failed to remove them.\n *\n * @returns {Promise<void>} Promise that resolves when the operation finishes.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "_removeMediaKeys(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "_removeMediaKeys"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#_switchFromDynamicToStatic:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "_switchFromDynamicToStatic(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "_switchFromDynamicToStatic"
+            },
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter:constructor(1)",
+              "docComment": "/**\n * @constructor Constructs a new instance of the `DashAdapter` class\n *\n * @param videoElement - The video element which bind to the dash adapter\n *\n * @param source - The source object\n *\n * @param config - The media source adapter configuration\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(videoElement: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "HTMLVideoElement",
+                  "canonicalReference": "!HTMLVideoElement:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", source: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PKMediaSourceObject",
+                  "canonicalReference": "@playkit-js/playkit-js!PKMediaSourceObject:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", config?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "videoElement",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "source",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "config",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": true
+                }
+              ]
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#applyABRRestriction:member(1)",
+              "docComment": "/**\n * Apply ABR restriction.  @function applyABRRestriction\n *\n * @param restrictions - abr restrictions config\n *\n * @returns {void}\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "applyABRRestriction(restrictions: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PKABRRestrictionObject",
+                  "canonicalReference": "@playkit-js/playkit-js!PKABRRestrictionObject:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "restrictions",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "applyABRRestriction"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#attachMediaSource:member(1)",
+              "docComment": "/**\n * attach media - return the media source to handle the video tag\n *\n * @returns {void}\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "attachMediaSource(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "attachMediaSource"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter.canPlayDrm:member(1)",
+              "docComment": "/**\n * Checks if dash adapter can play a given drm data.\n *\n * @param drmData - The drm data to check.\n *\n * @param drmConfig - The drm config.\n *\n * @returns {boolean} - Whether the dash adapter can play a specific drm data.  @static\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static canPlayDrm(drmData: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Array",
+                  "canonicalReference": "!Array:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PKDrmDataObject",
+                  "canonicalReference": "@playkit-js/playkit-js!PKDrmDataObject:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", drmConfig: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PKDrmConfigObject",
+                  "canonicalReference": "@playkit-js/playkit-js!PKDrmConfigObject:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": true,
+              "returnTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 9
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "drmData",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 5
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "drmConfig",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 6,
+                    "endIndex": 7
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "canPlayDrm"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter.canPlayType:member(1)",
+              "docComment": "/**\n * Checks if dash adapter can play a given mime type  @function canPlayType\n *\n * @param mimeType - The mime type to check\n *\n * @returns {boolean} - Whether the dash adapter can play a specific mime type  @static\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static canPlayType(mimeType: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": true,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "mimeType",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "canPlayType"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter.createAdapter:member(1)",
+              "docComment": "/**\n * Factory method to create media source adapter.  @function createAdapter\n *\n * @param videoElement - The video element that the media source adapter work with.\n *\n * @param source - The source Object.\n *\n * @param config - The player configuration.\n *\n * @returns {IMediaSourceAdapter} - New instance of the run time media source adapter.  @static\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static createAdapter(videoElement: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "HTMLVideoElement",
+                  "canonicalReference": "!HTMLVideoElement:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", source: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PKMediaSourceObject",
+                  "canonicalReference": "@playkit-js/playkit-js!PKMediaSourceObject:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", config: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "any"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "IMediaSourceAdapter",
+                  "canonicalReference": "@playkit-js/playkit-js!IMediaSourceAdapter:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": true,
+              "returnTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 8
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "videoElement",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "source",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "config",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "createAdapter"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#destroy:member(1)",
+              "docComment": "/**\n * Destroys the dash adapter  @function destroy\n *\n * @returns {Promise<*>} - The destroy promise.\n *\n * @override\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "destroy(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "destroy"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#detachMediaSource:member(1)",
+              "docComment": "/**\n * detach media - will remove the media source from handling the video\n *\n * @returns {Promise<void>} - detach promise\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "detachMediaSource(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "detachMediaSource"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#enableAdaptiveBitrate:member(1)",
+              "docComment": "/**\n * Enables adaptive bitrate switching  @function enableAdaptiveBitrate\n *\n * @returns {void}\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "enableAdaptiveBitrate(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "enableAdaptiveBitrate"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#getDrmInfo:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getDrmInfo(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PKDrmDataObject",
+                  "canonicalReference": "@playkit-js/playkit-js!PKDrmDataObject:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "getDrmInfo"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#getSegmentDuration:member(1)",
+              "docComment": "/**\n * Gets the live duration  @return {number} - live duration\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getSegmentDuration(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "getSegmentDuration"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#getStartTimeOfDvrWindow:member(1)",
+              "docComment": "/**\n * Get the start time of DVR window in live playback in seconds.\n *\n * @returns {Number} - start time of DVR window.\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getStartTimeOfDvrWindow(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "getStartTimeOfDvrWindow"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#getThumbnail:member(1)",
+              "docComment": "/**\n * Returns in-stream thumbnail for a chosen time.\n *\n * @param time - playback time.\n *\n * @return {?ThumbnailInfo} - Thumbnail info\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getThumbnail(time: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ThumbnailInfo",
+                  "canonicalReference": "@playkit-js/playkit-js!ThumbnailInfo:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "time",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "getThumbnail"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#hideTextTrack:member(1)",
+              "docComment": "/**\n * Hide the text track  @function hideTextTrack\n *\n * @returns {void}\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "hideTextTrack(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "hideTextTrack"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter.id:member",
+              "docComment": "/**\n * The id of Adapter  @member {string} id  @static\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static id: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "id",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": true,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#isAdaptiveBitrateEnabled:member(1)",
+              "docComment": "/**\n * Checking if adaptive bitrate switching is enabled.  @function isAdaptiveBitrateEnabled\n *\n * @returns {boolean} - Whether adaptive bitrate is enabled.\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "isAdaptiveBitrateEnabled(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "isAdaptiveBitrateEnabled"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#isLive:member(1)",
+              "docComment": "/**\n * Checking if the current playback is live.  @function isLive\n *\n * @returns {boolean} - Whether playback is live.\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "isLive(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "isLive"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter.isSupported:member(1)",
+              "docComment": "/**\n * Checks if the dash adapter is supported  @function isSupported\n *\n * @returns {boolean} - Whether dash is supported.  @static\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static isSupported(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": true,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "isSupported"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#liveDuration:member",
+              "docComment": "/**\n * Gets the segment duration of the stream  @return {number} - Segment duration in seconds\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "get liveDuration(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "liveDuration",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#load:member(1)",
+              "docComment": "/**\n * Load the video source\n *\n * @param startTime - Optional time to start the video from.  @function load\n *\n * @override\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "load(startTime?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<any>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "startTime",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "load"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#seekToLiveEdge:member(1)",
+              "docComment": "/**\n * Seeking to live edge.  @function seekToLiveEdge\n *\n * @returns {void}\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "seekToLiveEdge(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "seekToLiveEdge"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#selectAudioTrack:member(1)",
+              "docComment": "/**\n * Select an audio track  @function selectAudioTrack\n *\n * @param audioTrack - the audio track to select\n *\n * @returns {void}\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "selectAudioTrack(audioTrack: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AudioTrack",
+                  "canonicalReference": "@playkit-js/playkit-js!AudioTrack:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "audioTrack",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "selectAudioTrack"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#selectImageTrack:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "selectImageTrack(imageTrack: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ImageTrack",
+                  "canonicalReference": "@playkit-js/playkit-js!ImageTrack:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "imageTrack",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "selectImageTrack"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#selectTextTrack:member(1)",
+              "docComment": "/**\n * Select a text track  @function selectTextTrack\n *\n * @param textTrack - the track to select\n *\n * @returns {void}\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "selectTextTrack(textTrack: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PKTextTrack",
+                  "canonicalReference": "@playkit-js/playkit-js!TextTrack_2:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "textTrack",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "selectTextTrack"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#selectVideoTrack:member(1)",
+              "docComment": "/**\n * Select a video track  @function selectVideoTrack\n *\n * @param videoTrack - the video track to select\n *\n * @returns {void}\n *\n * @public\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "selectVideoTrack(videoTrack: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "VideoTrack",
+                  "canonicalReference": "@playkit-js/playkit-js!VideoTrack:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "videoTrack",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "selectVideoTrack"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#setMaxBitrate:member(1)",
+              "docComment": "/**\n * set 'bitrate' the max bandwidth (if possible)\n *\n * @param bitrate - the max bitrate allowed\n *\n * @returns {void}\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "setMaxBitrate(bitrate: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "bitrate",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "setMaxBitrate"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#targetBuffer:member",
+              "docComment": "/**\n * gets the target buffer of the player\n *\n * @returns {number} - buffer length target in seconds\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "get targetBuffer(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "targetBuffer",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@playkit-js/playkit-js-dash!DashAdapter#VIDEO_ERROR_CODE:member",
+              "docComment": "/**\n * 3016 is the number of the video error at shaka, we already listens to it in the html5 class  @member {number} - VIDEO_ERROR_CODE  @type {number}  @private\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "VIDEO_ERROR_CODE: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "VIDEO_ERROR_CODE",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@playkit-js/playkit-js-dash!NAME:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "NAME: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "src/index.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "NAME",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@playkit-js/playkit-js-dash!VERSION:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "VERSION: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "src/index.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "VERSION",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "baseUrl": ".",
+    "sourceMap": true,
+    "moduleResolution": "Node",
+    "strict": false,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "lib": [
+      "dom",
+      "ESNext"
+    ],
+    "outDir": "./lib/",
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": ["src/**/*"]
+}

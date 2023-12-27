@@ -2,7 +2,7 @@ import {Widevine} from '../../../src/drm/widevine';
 import {DrmScheme, Env} from '@playkit-js/playkit-js';
 import {wwDrmData, prDrmData} from './fake-drm-data';
 
-const BROWSER: string = Env.browser.name;
+const BROWSER = Env.browser.name;
 
 describe('Widevine', function () {
   describe('isConfigured', function () {
