@@ -1,19 +1,19 @@
-import {PlayReady} from '../../../src/drm/playready';
-import {wwDrmData, prDrmData} from './fake-drm-data';
-import {DrmScheme} from '@playkit-js/playkit-js';
+import { PlayReady } from '../../../src/drm/playready';
+import { wwDrmData, prDrmData } from './fake-drm-data';
+import { DrmScheme } from '@playkit-js/playkit-js';
 
 describe('PlayReady', function () {
   describe('isConfigured', function () {
     it('should return true for playready data if configured', function () {
-      PlayReady.isConfigured(prDrmData, {keySystem: DrmScheme.PLAYREADY}).should.be.true;
+      PlayReady.isConfigured(prDrmData, { keySystem: DrmScheme.PLAYREADY }).should.be.true;
     });
 
     it('should return false for playready data if not configured', function () {
-      PlayReady.isConfigured(prDrmData, {keySystem: DrmScheme.WIDEVINE}).should.be.false;
+      PlayReady.isConfigured(prDrmData, { keySystem: DrmScheme.WIDEVINE }).should.be.false;
     });
 
     it('should return false for non-playready data even configured', function () {
-      PlayReady.isConfigured(wwDrmData, {keySystem: DrmScheme.PLAYREADY}).should.be.false;
+      PlayReady.isConfigured(wwDrmData, { keySystem: DrmScheme.PLAYREADY }).should.be.false;
     });
   });
 

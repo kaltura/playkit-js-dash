@@ -1,7 +1,7 @@
-import {MpdUtils, XmlUtils} from './parser-utils';
+import { MpdUtils, XmlUtils } from './parser-utils';
 
 class SegmentTemplate {
-  public static MediaTemplateType: {[key: string]: string} = {
+  public static MediaTemplateType: { [key: string]: string } = {
     REPRESENTATION: '$RepresentationID$',
     NUMBER: '$Number$',
     BANDWIDTH: '$Bandwidth$',
@@ -50,4 +50,4 @@ class SegmentTemplate {
   }
 }
 
-export {SegmentTemplate};
+export { SegmentTemplate };

@@ -117,4 +117,4 @@ function createTextTrackButtons(player, textTracks) {
   }
 }
 
-export {removeVideoElementsFromTestPage, createElement, removeElement, createVideoTrackButtons, createAudioTrackButtons, createTextTrackButtons};
+export { removeVideoElementsFromTestPage, createElement, removeElement, createVideoTrackButtons, createAudioTrackButtons, createTextTrackButtons };

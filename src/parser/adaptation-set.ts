@@ -1,10 +1,10 @@
-import {SegmentTemplate} from './segment-template';
-import {Representation} from './representation';
-import {MpdUtils, XmlUtils} from './parser-utils';
-import {EssentialProperty} from './essential-property';
+import { SegmentTemplate } from './segment-template';
+import { Representation } from './representation';
+import { MpdUtils, XmlUtils } from './parser-utils';
+import { EssentialProperty } from './essential-property';
 
 class AdaptationSet {
-  public static ContentType: {[type: string]: string} = {
+  public static ContentType: { [type: string]: string } = {
     VIDEO: 'video',
     AUDIO: 'audio',
     TEXT: 'text',
@@ -22,7 +22,9 @@ class AdaptationSet {
     this._id = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.ID);
     this._mimeType = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.MIME_TYPE);
     this._contentType = XmlUtils.parseAttr(elem, MpdUtils.AttributeTypes.CONTENT_TYPE);
-    this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagTypes.REPRESENTATION)).map(repElem => new Representation(repElem as HTMLElement));
+    this._representations = Array.from(XmlUtils.findChildren(elem, MpdUtils.TagTypes.REPRESENTATION)).map(
+      (repElem) => new Representation(repElem as HTMLElement)
+    );
     const segTempElem = XmlUtils.findChild(elem, MpdUtils.TagTypes.SEGMENT_TEMPLATE);
     if (segTempElem) {
       this._segmentTemplate = new SegmentTemplate(segTempElem);
@@ -58,4 +60,4 @@ class AdaptationSet {
   }
 }
 
-export {AdaptationSet};
+export { AdaptationSet };

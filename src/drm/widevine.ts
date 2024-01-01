@@ -10,7 +10,7 @@ const Widevine: IDrmProtocol = class Widevine {
    * @return {boolean} - Whether Widevine is the configure key system.
    */
   public static isConfigured(drmData: Array<any>, drmConfig: PKDrmConfigObject): boolean {
-    return DrmScheme.WIDEVINE === drmConfig.keySystem && !!drmData.find(drmEntry => drmEntry.scheme === drmConfig.keySystem);
+    return DrmScheme.WIDEVINE === drmConfig.keySystem && !!drmData.find((drmEntry) => drmEntry.scheme === drmConfig.keySystem);
   }
 
   /**
@@ -22,7 +22,7 @@ const Widevine: IDrmProtocol = class Widevine {
    */
   public static canPlayDrm(drmData: Array<any>): boolean {
     Widevine._logger.debug('Can play DRM scheme of: ' + DrmScheme.WIDEVINE);
-    return !!drmData.find(drmEntry => drmEntry.scheme === DrmScheme.WIDEVINE);
+    return !!drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.WIDEVINE);
   }
 
   /**
@@ -34,7 +34,7 @@ const Widevine: IDrmProtocol = class Widevine {
   public static setDrmPlayback(config: any, drmData: Array<any>): void {
     Widevine._logger.debug('Sets drm playback');
     const browser = Env.browser.name;
-    const wwDrmEntry = drmData.find(drmEntry => drmEntry.scheme === DrmScheme.WIDEVINE);
+    const wwDrmEntry = drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.WIDEVINE);
     if (wwDrmEntry) {
       config.drm = {
         servers: {
@@ -54,4 +54,4 @@ const Widevine: IDrmProtocol = class Widevine {
   }
 };
 
-export {Widevine};
+export { Widevine };

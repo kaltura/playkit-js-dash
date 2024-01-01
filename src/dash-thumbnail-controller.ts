@@ -1,8 +1,8 @@
-import {AdaptationSet} from './parser/adaptation-set';
-import {Representation} from './parser/representation';
-import {UrlUtils} from './parser/parser-utils';
-import {ImageTrack, ThumbnailInfo} from '@playkit-js/playkit-js';
-import {EssentialProperty} from './parser/essential-property';
+import { AdaptationSet } from './parser/adaptation-set';
+import { Representation } from './parser/representation';
+import { UrlUtils } from './parser/parser-utils';
+import { ImageTrack, ThumbnailInfo } from '@playkit-js/playkit-js';
+import { EssentialProperty } from './parser/essential-property';
 
 class DashThumbnailController {
   private _tracks: Array<ImageTrack> = [];
@@ -29,7 +29,7 @@ class DashThumbnailController {
 
   public getThumbnail(time: number): ThumbnailInfo {
     const activeTrack = this.getActiveTrack();
-    const {duration, rows, cols, sliceWidth, sliceHeight, customData} = activeTrack;
+    const { duration, rows, cols, sliceWidth, sliceHeight, customData } = activeTrack;
     const page = Math.floor(time / duration) + customData.startNumber;
     const offset = time % duration;
     const thumbIndex = Math.floor((offset * rows * cols) / duration);
@@ -43,10 +43,10 @@ class DashThumbnailController {
   }
 
   private _parseTracks = (set: AdaptationSet, playerUrl: string, mediaTemplatePrefix: string): void => {
-    const {representations, segmentTemplate, essentialProperty} = set;
+    const { representations, segmentTemplate, essentialProperty } = set;
     representations.forEach((representation: Representation, index: number) => {
-      const {id, bandwidth, width, height} = representation;
-      const {startNumber, duration, media, timescale, presentationTimeOffset} = segmentTemplate!;
+      const { id, bandwidth, width, height } = representation;
+      const { startNumber, duration, media, timescale, presentationTimeOffset } = segmentTemplate!;
       const value = this._getEssentialValue(essentialProperty, representation);
       const [rows, cols] = this._getDimensions(value);
       this._tracks.push(
@@ -95,7 +95,7 @@ class DashThumbnailController {
       mediaTemplatePrefix += '/';
     }
     const urlTemplate = `${baseUrl}${mediaTemplatePrefix}${mediaTemplate}`;
-    return UrlUtils.resolve(urlTemplate, {id});
+    return UrlUtils.resolve(urlTemplate, { id });
   };
 
   private _buildUrlFromTemplate = (track: ImageTrack, index: number): string => {
@@ -107,4 +107,4 @@ class DashThumbnailController {
   };
 }
 
-export {DashThumbnailController};
+export { DashThumbnailController };

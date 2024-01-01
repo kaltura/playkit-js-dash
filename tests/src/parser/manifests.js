@@ -106,4 +106,4 @@ const ImageAdaptationWithEssentialUnderAdaptation = `
 </MPD>
 `;
 
-export {ImageAdaptationSetWithOneRepresentation, ImageAdaptationSetWithMultipleRepresentations, ImageAdaptationWithEssentialUnderAdaptation};
+export { ImageAdaptationSetWithOneRepresentation, ImageAdaptationSetWithMultipleRepresentations, ImageAdaptationWithEssentialUnderAdaptation };

@@ -1,7 +1,7 @@
-import {DashManifestParser} from '../../../src/parser/dash-manifest-parser';
-import {AdaptationSet} from '../../../src/parser/adaptation-set';
-import {SegmentTemplate} from '../../../src/parser/segment-template';
-import {EssentialProperty} from '../../../src/parser/essential-property';
+import { DashManifestParser } from '../../../src/parser/dash-manifest-parser';
+import { AdaptationSet } from '../../../src/parser/adaptation-set';
+import { SegmentTemplate } from '../../../src/parser/segment-template';
+import { EssentialProperty } from '../../../src/parser/essential-property';
 import {
   ImageAdaptationSetWithMultipleRepresentations,
   ImageAdaptationSetWithOneRepresentation,
@@ -23,13 +23,13 @@ describe('DashManifestParser', () => {
     imageSet.contentType.should.equal(AdaptationSet.ContentType.IMAGE);
     imageSet.mimeType.should.equal('image/jpeg');
 
-    const {segmentTemplate} = imageSet;
+    const { segmentTemplate } = imageSet;
     segmentTemplate.should.be.an.instanceof(SegmentTemplate);
     segmentTemplate.media.should.equal('$RepresentationID$/tile_$Number$.jpg');
     segmentTemplate.duration.should.equal(100);
     segmentTemplate.startNumber.should.equal(1);
 
-    const {representations} = imageSet;
+    const { representations } = imageSet;
     representations.should.have.lengthOf(1);
 
     const representation = representations[0];
@@ -38,7 +38,7 @@ describe('DashManifestParser', () => {
     representation.width.should.equal(3200);
     representation.height.should.equal(180);
 
-    const {essentialProperty} = representation;
+    const { essentialProperty } = representation;
     essentialProperty.should.be.exist;
     essentialProperty.should.be.an.instanceof(EssentialProperty);
     essentialProperty.schemeIdUri.should.equal('http://dashif.org/thumbnail_tile');
@@ -57,13 +57,13 @@ describe('DashManifestParser', () => {
     imageSet.contentType.should.equal(AdaptationSet.ContentType.IMAGE);
     imageSet.mimeType.should.equal('image/jpeg');
 
-    const {segmentTemplate} = imageSet;
+    const { segmentTemplate } = imageSet;
     segmentTemplate.should.be.an.instanceof(SegmentTemplate);
     segmentTemplate.media.should.equal('$RepresentationID$/tile_$Number$.jpg');
     segmentTemplate.duration.should.equal(634.566);
     segmentTemplate.startNumber.should.equal(1);
 
-    const {representations} = imageSet;
+    const { representations } = imageSet;
     representations.should.have.lengthOf(2);
 
     const representation1 = representations[0];
@@ -102,20 +102,20 @@ describe('DashManifestParser', () => {
     imageSet.contentType.should.equal(AdaptationSet.ContentType.IMAGE);
     imageSet.mimeType.should.equal('image/jpeg');
 
-    const {essentialProperty} = imageSet;
+    const { essentialProperty } = imageSet;
     essentialProperty.should.be.exist;
     essentialProperty.should.be.an.instanceof(EssentialProperty);
     essentialProperty.schemeIdUri.should.equal('http://dashif.org/guidelines/thumbnails');
     essentialProperty.value.should.equal('10');
 
-    const {segmentTemplate} = imageSet;
+    const { segmentTemplate } = imageSet;
     segmentTemplate.should.be.an.instanceof(SegmentTemplate);
     segmentTemplate.media.should.equal('$RepresentationID$/thumb$Number$.jpg');
     segmentTemplate.duration.should.equal(5);
     segmentTemplate.startNumber.should.equal(1);
     segmentTemplate.timescale.should.equal(1);
 
-    const {representations} = imageSet;
+    const { representations } = imageSet;
     representations.should.have.lengthOf(1);
 
     const representation = representations[0];
