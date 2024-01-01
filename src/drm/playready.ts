@@ -10,7 +10,7 @@ const PlayReady: IDrmProtocol = class PlayReady {
    * @return {boolean} - Whether PLAYREADY is the configure key system.
    */
   public static isConfigured(drmData: Array<any>, drmConfig: PKDrmConfigObject): boolean {
-    return DrmScheme.PLAYREADY === drmConfig.keySystem && !!drmData.find(drmEntry => drmEntry.scheme === drmConfig.keySystem);
+    return DrmScheme.PLAYREADY === drmConfig.keySystem && !!drmData.find((drmEntry) => drmEntry.scheme === drmConfig.keySystem);
   }
 
   /**
@@ -22,7 +22,7 @@ const PlayReady: IDrmProtocol = class PlayReady {
    */
   public static canPlayDrm(drmData: Array<any>): boolean {
     PlayReady._logger.debug('Can play DRM scheme of: ' + DrmScheme.PLAYREADY);
-    return !!drmData.find(drmEntry => drmEntry.scheme === DrmScheme.PLAYREADY);
+    return !!drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.PLAYREADY);
   }
 
   /**
@@ -33,7 +33,7 @@ const PlayReady: IDrmProtocol = class PlayReady {
    */
   public static setDrmPlayback(config: any, drmData: Array<any>): void {
     PlayReady._logger.debug('Sets drm playback');
-    const prDrmEntry = drmData.find(drmEntry => drmEntry.scheme === DrmScheme.PLAYREADY);
+    const prDrmEntry = drmData.find((drmEntry) => drmEntry.scheme === DrmScheme.PLAYREADY);
     if (prDrmEntry) {
       config.drm = {
         servers: {
@@ -44,4 +44,4 @@ const PlayReady: IDrmProtocol = class PlayReady {
   }
 };
 
-export {PlayReady};
+export { PlayReady };

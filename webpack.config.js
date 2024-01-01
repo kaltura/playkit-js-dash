@@ -5,7 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = (env, { mode }) => {
   return {
-    entry:  './src/index.ts',
+    entry: './src/index.ts',
     optimization: {
       minimize: mode !== 'development',
       minimizer: [
@@ -28,9 +28,15 @@ module.exports = (env, { mode }) => {
           use: {
             loader: 'babel-loader',
             options: {
-              presets: [['@babel/preset-env', {
-                bugfixes: true,
-              }], '@babel/preset-typescript'],
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    bugfixes: true
+                  }
+                ],
+                '@babel/preset-typescript'
+              ],
               plugins: [['@babel/plugin-transform-runtime']]
             }
           }
@@ -49,7 +55,7 @@ module.exports = (env, { mode }) => {
       ]
     },
     resolve: {
-      extensions: ['.ts', '.js'],
+      extensions: ['.ts', '.js']
     },
     output: {
       filename: 'playkit-dash.js',
@@ -57,7 +63,7 @@ module.exports = (env, { mode }) => {
       library: {
         umdNamedDefine: true,
         name: ['playkit', 'dash'],
-        type: 'umd',
+        type: 'umd'
       },
       clean: true
     },
@@ -73,7 +79,7 @@ module.exports = (env, { mode }) => {
         commonjs2: '@playkit-js/playkit-js',
         amd: 'playkit-js',
         root: ['playkit', 'core']
-      },
+      }
     },
     devServer: {
       static: {
@@ -89,5 +95,5 @@ module.exports = (env, { mode }) => {
         __NAME__: JSON.stringify(packageData.name)
       })
     ]
-  }
+  };
 };

@@ -1,4 +1,4 @@
-import {MpdUtils, XmlUtils} from './parser-utils';
+import { MpdUtils, XmlUtils } from './parser-utils';
 
 class EssentialProperty {
   private _schemeIdUri: string;
@@ -18,4 +18,4 @@ class EssentialProperty {
   }
 }
 
-export {EssentialProperty};
+export { EssentialProperty };

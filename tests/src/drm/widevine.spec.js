@@ -1,21 +1,21 @@
-import {Widevine} from '../../../src/drm/widevine';
-import {DrmScheme, Env} from '@playkit-js/playkit-js';
-import {wwDrmData, prDrmData} from './fake-drm-data';
+import { Widevine } from '../../../src/drm/widevine';
+import { DrmScheme, Env } from '@playkit-js/playkit-js';
+import { wwDrmData, prDrmData } from './fake-drm-data';
 
 const BROWSER = Env.browser.name;
 
 describe('Widevine', function () {
   describe('isConfigured', function () {
     it('should return true for widevine data if configured', function () {
-      Widevine.isConfigured(wwDrmData, {keySystem: DrmScheme.WIDEVINE}).should.be.true;
+      Widevine.isConfigured(wwDrmData, { keySystem: DrmScheme.WIDEVINE }).should.be.true;
     });
 
     it('should return false for widevine data if not configured', function () {
-      Widevine.isConfigured(wwDrmData, {keySystem: DrmScheme.PLAYREADY}).should.be.false;
+      Widevine.isConfigured(wwDrmData, { keySystem: DrmScheme.PLAYREADY }).should.be.false;
     });
 
     it('should return false for non-widevine data even configured', function () {
-      Widevine.isConfigured(prDrmData, {keySystem: DrmScheme.WIDEVINE}).should.be.false;
+      Widevine.isConfigured(prDrmData, { keySystem: DrmScheme.WIDEVINE }).should.be.false;
     });
   });
 
@@ -51,7 +51,7 @@ describe('Widevine', function () {
 
     it('sets the correct shaka drm config for widevine data', function () {
       if (BROWSER === 'Chrome' || BROWSER === 'Chrome Headless') {
-        sandbox.stub(Env, 'browser').get(() => ({name: 'Chrome'}));
+        sandbox.stub(Env, 'browser').get(() => ({ name: 'Chrome' }));
       }
 
       Widevine.setDrmPlayback(config, wwDrmData);

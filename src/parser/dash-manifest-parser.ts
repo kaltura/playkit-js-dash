@@ -1,6 +1,6 @@
-import {MpdUtils, ParserUtils, XmlUtils} from './parser-utils';
-import {AdaptationSet} from './adaptation-set';
-import {getLogger} from '@playkit-js/playkit-js';
+import { MpdUtils, ParserUtils, XmlUtils } from './parser-utils';
+import { AdaptationSet } from './adaptation-set';
+import { getLogger } from '@playkit-js/playkit-js';
 
 class DashManifestParser {
   private _logger: any = getLogger('DashManifestParser');
@@ -64,10 +64,10 @@ class DashManifestParser {
     const adaptationNodes = XmlUtils.findElements(this._xmlDoc, MpdUtils.TagTypes.ADAPTATION_SET);
     // For now parse only image adaptation sets
     const imageAdaptationsNodes = Array.from(adaptationNodes).filter(
-      adaptation => XmlUtils.parseAttr(adaptation, MpdUtils.AttributeTypes.CONTENT_TYPE) === AdaptationSet.ContentType.IMAGE
+      (adaptation) => XmlUtils.parseAttr(adaptation, MpdUtils.AttributeTypes.CONTENT_TYPE) === AdaptationSet.ContentType.IMAGE
     );
     if (imageAdaptationsNodes.length > 0) {
-      this._adaptationSets = imageAdaptationsNodes.map(adaptation => new AdaptationSet(adaptation));
+      this._adaptationSets = imageAdaptationsNodes.map((adaptation) => new AdaptationSet(adaptation));
       this._logger.debug('Found image adaptation set', this._adaptationSets);
     } else {
       this._logger.debug('No image adaptations were found in manifest');
@@ -75,4 +75,4 @@ class DashManifestParser {
   };
 }
 
-export {DashManifestParser};
+export { DashManifestParser };

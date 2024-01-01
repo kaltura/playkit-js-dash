@@ -1,5 +1,5 @@
-import {EssentialProperty} from './essential-property';
-import {MpdUtils, XmlUtils} from './parser-utils';
+import { EssentialProperty } from './essential-property';
+import { MpdUtils, XmlUtils } from './parser-utils';
 
 class Representation {
   private _id: string;
@@ -40,4 +40,4 @@ class Representation {
   }
 }
 
-export {Representation};
+export { Representation };
