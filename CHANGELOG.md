@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.36.1 (2024-01-07)
+
+
+### Bug Fixes
+
+* **FEC-13611:** Revert babal targets ([#258](https://github.com/kaltura/playkit-js-dash/issues/258)) ([9f58c2a](https://github.com/kaltura/playkit-js-dash/commit/9f58c2a))
+
+
+
 ## 1.36.0 (2023-12-21)
 
 
