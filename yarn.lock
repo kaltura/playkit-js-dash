@@ -1170,10 +1170,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@playkit-js/browserslist-config@^1.0.8-canary.0-f5791c1":
-  version "1.0.8-canary.0-f5791c1"
-  resolved "https://registry.yarnpkg.com/@playkit-js/browserslist-config/-/browserslist-config-1.0.8-canary.0-f5791c1.tgz#1bfea3cc970b6bc4b6d1696209f2bde72aeb3518"
-  integrity sha512-k3MsLvGuuf1Kben5GwkPx5weXEgYCgRPnt6ApMJ3y80paY/obU3DC+lmfeert/I2IEzQBlPWMVvtZKQH8KG9/w==
+"@playkit-js/browserslist-config@1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@playkit-js/browserslist-config/-/browserslist-config-1.0.8.tgz#735256ba560063d397d4b8776acb865e8697a287"
+  integrity sha512-BeiDM72c6GP8dZ6b2qScEpxT4sGECIJzjVGsanaTvXeFOkw3MoplAyz6HPKdrcLmidcinSl4yna5Yc9/ObwZow==
 
 "@playkit-js/playkit-js@canary":
   version "0.84.2-canary.0-cceb0c7"
