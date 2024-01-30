@@ -38,6 +38,9 @@ const ShakaEvent: ShakaEventType = {
   EMSG: 'emsg'
 };
 
+type ErrorEventsType = {[errorCode: string]: {'timeStamp': number, 'count': number}};
+
+
 /**
  * the interval in which to sample player size changes
  * @type {number}
@@ -208,12 +211,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   private _manifestParser: DashManifestParser | null | undefined;
 
   /**
-   * handel error 1002
-   * @type number
+   * error counter to change severity
+   * @type ErrorEventsType
    * @private
    */
-  private _errorFirstOccuredTime = 0;
-  private _error1002Counter = 0;
+  private _errorCounter: ErrorEventsType= {}
   /**
    * Dash thumbnail controller.
    * @type {DashThumbnailController}
@@ -933,6 +935,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
+    this._errorCounter = {};
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
     clearTimeout(this._startOverTimeout);
@@ -1320,9 +1323,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         error = error.data[0];
         this._requestFilterError ? (this._requestFilterError = false) : (this._responseFilterError = false);
       }
-      if (error.code === 1002) {
-        error.severity = this._onError1002ChangeSeverity() ? Error.Severity.CRITICAL : error.severity;
-      }
+
+      error.severity = this._shouldErrorChangeSeverity(error.code) ? Error.Severity.CRITICAL : error.severity;
       this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
       DashAdapter._logger.error(error);
 
@@ -1331,25 +1333,34 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
     }
   }
-  private _onError1002ChangeSeverity() {
-    const secondsErrorRepeat = 15
+
+  private _shouldErrorChangeSeverity(errorCode): boolean {
+    const secondsErrorRepeat = 30
     const errorsCounterToChangeSeverity = 3;
     const getCurrentTimeInSeconds = (): number => {
       return Date.now() / 1000;
     };
-    const interval = getCurrentTimeInSeconds() - this._errorFirstOccuredTime
-    this._error1002Counter += 1;
-    if ((interval > secondsErrorRepeat) && (this._error1002Counter > errorsCounterToChangeSeverity)) {
-      this._errorFirstOccuredTime = 0
-      this._error1002Counter = 0;
+    if(!(errorCode in this._errorCounter)){
+      this._errorCounter[errorCode] = {
+        count: 1,
+        timeStamp: getCurrentTimeInSeconds()
+      }
+      return false;
+    }
+
+    this._errorCounter[errorCode].count += 1;
+    if (this._errorCounter[errorCode].count > errorsCounterToChangeSeverity) {
+      delete this._errorCounter[errorCode];
       return true;
     }
 
+    const interval = getCurrentTimeInSeconds() - this._errorCounter[errorCode].timeStamp;
     if (interval > secondsErrorRepeat) {
-      this._errorFirstOccuredTime = getCurrentTimeInSeconds();
-      this._error1002Counter = 1;
-      return false
+      this._errorCounter[errorCode].timeStamp = getCurrentTimeInSeconds();
+      this._errorCounter[errorCode].count = 1;
+      return false;
     }
+    return false;
   }
 
   /**
