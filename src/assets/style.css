@@ -7,6 +7,7 @@
   pointer-events: none;
   width: 100%;
   min-width: 48px;
+  padding: 0px 16px;
   transition: bottom cubic-bezier(0.4, 0, 0.6, 1) 0.1s;
   transition-delay: 0s;
   font-size: 20px;
