@@ -88,6 +88,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @static
    */
   protected static _logger = BaseMediaSourceAdapter.getLogger(DashAdapter.id);
+
+  public static textContainerClass = "shaka-text-container";
+
   /**
    * The supported mime type by the dash adapter
    * @member {string} _dashMimeType
@@ -229,6 +232,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   private _isStaticLive: boolean = false;
   private _selectedVideoTrack: VideoTrack | undefined | null = null;
   private _playbackActualUri: string | undefined;
+
+  public applyTextTrackStyles(sheet: CSSStyleSheet, styles: any, containerId: string): void {
+    const flexAlignment = {
+      left: 'flex-start',
+      center: 'center',
+      right: 'flex-end',
+    }
+    sheet.insertRule(`#${containerId} .${DashAdapter.textContainerClass} { align-items: ${flexAlignment[styles.textAlign]}!important; }`, 0);
+    sheet.insertRule(`#${containerId} .${DashAdapter.textContainerClass} > * { ${styles.toCSS()} }`, 0);
+  }
 
   /**
    * Factory method to create media source adapter.
