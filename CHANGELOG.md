@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.37.0 (2024-03-31)
+
+
+### Features
+
+* **FEC-13664:** add applyTextTrackStyles method ([#261](https://github.com/kaltura/playkit-js-dash/issues/261)) ([f849d47](https://github.com/kaltura/playkit-js-dash/commit/f849d47))
+
+
+
 ### 1.36.3 (2024-02-25)
 
 
