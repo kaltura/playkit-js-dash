@@ -78,7 +78,7 @@
     "karma-webpack": "^5.0.0",
     "mocha": "^10.0.0",
     "prettier": "^3.0.3",
-    "shaka-player": "4.7.0",
+    "shaka-player": "4.8.4",
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
     "standard-version": "^6.0.1",
