@@ -6,6 +6,7 @@ import {PlayReady} from '../../src/drm/playready';
 import {wwDrmData, prDrmData} from './drm/fake-drm-data';
 import shaka from 'shaka-player';
 import {ImageTrack, ThumbnailInfo} from '@playkit-js/playkit-js';
+import { expect } from 'chai';
 
 const targetId = 'player-placeholder_dash-adapter.spec';
 
@@ -1950,4 +1951,91 @@ describe('DashAdapter: on emsg', () => {
       type
     });
   });
+});
+
+describe.only('DashAdapter: cachedUrls', () => {
+  // TODO stub shaka
+
+  let video, dashInstance, config, sandbox, assetCache;
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+  });
+
+  afterEach(() => {
+    dashInstance.destroy();
+    dashInstance = null;
+    sandbox.restore();
+
+    DashAdapter._assetCache.reset();
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  describe('setting value of cachedUrls', () => {
+    describe('on initial call', () => {
+      let addAsset; 
+
+      beforeEach(() => {
+        addAsset = sandbox.spy(DashAdapter._assetCache, "add");
+      });
+  
+      it('should not cache asset url on empty call', () => {
+        dashInstance.cachedUrls = [];
+        addAsset.should.not.have.been.called;
+      });
+
+      it('should not add loaders on non-array call', () => {
+        dashInstance.cachedUrls = "abc";
+        addAsset.should.not.have.been.called;
+      });
+
+      it('should cache aseet url on array call', () => {
+        dashInstance.cachedUrls = ["entry_id"];
+        addAsset.should.have.been.calledOnceWith("entry_id");        
+      })
+    });
+
+    describe("on consecutive calls", () => {
+
+      let addAsset, removeAsset;
+
+      beforeEach(() => {
+        addAsset = sandbox.spy(DashAdapter._assetCache, "add");
+        removeAsset = sandbox.stub(DashAdapter._assetCache, "remove");
+      });
+
+      it("should not add a url the same url twice on conscutive calls", () => {
+        dashInstance.cachedUrls = ["entry_id"];
+        dashInstance.cachedUrls = ["entry_id"];
+        addAsset.should.have.been.calledOnceWith("entry_id");   
+      });
+
+      it("should add new urls on consecutive calls", () => {
+        dashInstance.cachedUrls = ["entry_id"];
+        addAsset.should.have.been.calledWith("entry_id");  
+        dashInstance.cachedUrls = ["entry_id", "entry_id_2"];
+        addAsset.should.have.been.calledWith("entry_id_2");  
+      });
+
+      it("should remove asset urls that were initially added and are missing on consecutive calls", () => {
+        dashInstance.cachedUrls = ["entry_id"];
+        dashInstance.cachedUrls = ["entry_id_2"];
+        removeAsset.should.have.been.calledOnceWith("entry_id");  
+      });
+    });
+  });
+
+  // xdescribe('using value of cachedUrls', () => {
+  //   it('should do stuff', () => {
+  //     expect(false).to.equal(true);
+  //   });
+  // });
 });
