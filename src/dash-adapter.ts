@@ -897,13 +897,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this._lastTimeDetach = NaN;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(async url => {
-              debugger;
               const assetPromise = DashAdapter._assetCache.get(url);
               if (!assetPromise) {
                 return this._shaka.load(url, shakaStartTime);
               } else {
                 DashAdapter._assetCache.remove(url);
-                return this._shaka.load(await assetPromise, shakaStartTime);
+                const preloadMgr = await assetPromise;
+                return this._shaka.load(preloadMgr, shakaStartTime);
               }
             })
             .then(() => {

@@ -1956,22 +1956,16 @@ describe('DashAdapter: on emsg', () => {
 describe.only('DashAdapter: cachedUrls', () => {
   // TODO stub shaka
 
-  let video, dashInstance, config, sandbox, assetCache;
+  let video, config, sandbox;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-
     video = document.createElement('video');
     config = {playback: {options: {html5: {dash: {}}}}};
-
-    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
   afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
     sandbox.restore();
-
     DashAdapter._assetCache.reset();
   });
 
@@ -1979,7 +1973,15 @@ describe.only('DashAdapter: cachedUrls', () => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  describe('setting value of cachedUrls', () => {
+  describe('cachedUrls setting', () => {
+    let dashInstance;
+
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();  
+      video = document.createElement('video');
+      dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    });
+
     describe('on initial call', () => {
       let addAsset; 
 
@@ -2004,7 +2006,6 @@ describe.only('DashAdapter: cachedUrls', () => {
     });
 
     describe("on consecutive calls", () => {
-
       let addAsset, removeAsset;
 
       beforeEach(() => {
@@ -2033,9 +2034,33 @@ describe.only('DashAdapter: cachedUrls', () => {
     });
   });
 
-  // xdescribe('using value of cachedUrls', () => {
-  //   it('should do stuff', () => {
-  //     expect(false).to.equal(true);
-  //   });
-  // });
+  describe.only('cachedUrls usage', () => {
+    it('should initialize assetCache', () => {
+      const init = sandbox.spy(DashAdapter._assetCache, "init");
+      const dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+
+      init.should.have.been.calledOnceWith(dashInstance._shaka);
+    });
+
+    it("should check if url is cached", done => {
+      const get = sandbox.spy(DashAdapter._assetCache, "get");
+      const dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+      
+      dashInstance.load().then(() => {
+        get.should.have.been.calledOnceWith(vodSource.url);
+        done();
+      })
+    });
+
+    it('should use cached url if url is cached', () => {
+      const dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
+      const load = sandbox.spy(dashInstance._shaka, "load");
+      sandbox.stub(DashAdapter._assetCache, "get").resolves(vodSource.url);
+      
+      dashInstance.load().then(() => {
+        load.should.have.been.calledWith(vodSource.url, undefined);
+        done();
+      })
+    });
+  });
 });
