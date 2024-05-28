@@ -1,50 +1,52 @@
 class AssetCache {
   private shakaInstance: shaka.Player | null = null;
 
-  private preloadQueue: string[] = [];
-  private preloadPromiseMap = new Map<string, any>();
+  private cacheQueue = new Set<string>();
+  private cache = new Map<string, any>();
 
   public init(shakaInstance: shaka.Player) {
+    // TODO when to reset shaka ? when video element is destroyed ?
     this.reset();
     this.shakaInstance = shakaInstance;
     this.preloadAssets();
   }
 
   public add(assetUrl: string) {
-    // TODO dont add the same url twice
+    console.log('>>> asset cache add', assetUrl);
+    if (this.cache.has(assetUrl)) return;
 
-    this.preloadQueue.push(assetUrl);
+    this.cacheQueue.add(assetUrl);
     this.preloadAssets();
   }
 
   public get(assetUrl: string): Promise<any> | null {
-    return this.preloadPromiseMap.get(assetUrl) || null;
+    console.log('>>> asset cache get', assetUrl);
+
+    return this.cache.get(assetUrl) || null;
   }
 
   public list(): string[] {
-    if (this.preloadQueue.length) {
-      return this.preloadQueue;
+    if (this.cacheQueue.size) {
+      return [...this.cacheQueue];
     }
-    return [...this.preloadPromiseMap.keys()];
+    return [...this.cache.keys()];
   }
 
   public remove(assetUrl: string, destroy: boolean = false) {
-    const index = this.preloadQueue.findIndex(item => item === assetUrl);
-    if (index !== -1) {
-      this.preloadQueue.splice(index, 1);
-    } else if (this.preloadPromiseMap.has(assetUrl)) {
-      const assetPromise = this.preloadPromiseMap.get(assetUrl);
-      // TODO
-      if (!destroy) {
+    if (this.cacheQueue.has(assetUrl)) {
+      this.cacheQueue.delete(assetUrl);
+    } else if (this.cache.has(assetUrl)) {
+      const assetPromise = this.cache.get(assetUrl);
+      if (destroy) {
         assetPromise.then(loader => loader.destroy());
       }
-      this.preloadPromiseMap.delete(assetUrl);
+      this.cache.delete(assetUrl);
     }
   }
 
   public removeAll() {
-    this.preloadQueue = [];
-    const assetUrls = this.preloadPromiseMap.keys();
+    this.cacheQueue.clear();
+    const assetUrls = this.cache.keys();
     for (const assetUrl of assetUrls) {
       this.remove(assetUrl, true);
     }
@@ -58,9 +60,10 @@ class AssetCache {
   private preloadAssets() {
     if (!this.shakaInstance) return;
 
-    while (this.preloadQueue.length) {
-      const assetUrl = this.preloadQueue.pop() as string;
-      this.preloadPromiseMap.set(assetUrl, this.shakaInstance.preload(assetUrl));
+    // TODO test this
+    for (const assetUrl of this.cacheQueue) {
+      this.cache.set(assetUrl, this.shakaInstance.preload(assetUrl));
+      this.cacheQueue.delete(assetUrl);
     }
   }
 }
