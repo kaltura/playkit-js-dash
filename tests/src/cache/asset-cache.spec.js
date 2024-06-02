@@ -1,8 +1,9 @@
+import { assert } from "chai";
 import { AssetCache } from "../../../src/cache/asset-cache";
 
 describe.only('AssetCache', () => {
     let assetCache, shakaInstance;
-
+    
     beforeEach(() => {
         assetCache = new AssetCache();
         shakaInstance = {
@@ -14,7 +15,7 @@ describe.only('AssetCache', () => {
         assetCache = null;
         sinon.restore();
     });
-
+    
     describe('get', () => {
         let get;
         beforeEach(() => {
@@ -27,44 +28,130 @@ describe.only('AssetCache', () => {
             assetCache.add("abc");
             expect(assetCache.get("abc")).to.equal(null);
         });
-        it('should return the asset promise if asset was added and shaka is set', done => {
-            sinon.stub(shakaInstance, "preload").resolves("def");
+        it('should return the asset promise if shaka was set first, and then asset was added', done => {
+            const preload = sinon.stub(shakaInstance, "preload").resolves("def");
             assetCache.init(shakaInstance);
             assetCache.add("abc");
             assetCache.get("abc").then(result => {
+                expect(preload).to.have.been.calledOnceWith("abc");
                 expect(result).to.equal("def");
                 done();
             });
-        })
+        });
+        it('should return the asset promise if asset was added first, and then shaka was set', done => {
+            const preload = sinon.stub(shakaInstance, "preload").resolves("def");
+            assetCache.add("abc");
+            expect(assetCache.get("abc")).to.equal(null);
+            assetCache.init(shakaInstance);
+            assetCache.get("abc").then(result => {
+                expect(preload).to.have.been.calledOnceWith("abc");
+                expect(result).to.equal("def");
+                done();
+            });
+        });
     });
-
+    
     describe('list', () => {
-        it('should list all queued assets, without duplicates, if shaka is not set', () => {
+        it('should not list queued assets', () => {
             assetCache.add("abc");
             assetCache.add("abc");
             assetCache.add("def");
-
-            const listResult = assetCache.list();
-            expect(listResult.length).to.equal(2);
-            expect(listResult.findIndex(i => i === "abc")).to.not.equal(-1);
-            expect(listResult.findIndex(i => i === "def")).to.not.equal(-1);
+            
+            expect(assetCache.list().length).to.equal(0);
         });
-        it('should list all cached assets, without duplicates, if shaka is set', () => {
+        it('should list all cached assets, without duplicates', () => {
             sinon.stub(shakaInstance, "preload").resolves({});
             assetCache.init(shakaInstance);
-
+            
             assetCache.add("abc");
             assetCache.add("abc");
             assetCache.add("def");
-
+            
             const listResult = assetCache.list();
             expect(listResult.length).to.equal(2);
             expect(listResult.findIndex(i => i === "abc")).to.not.equal(-1);
             expect(listResult.findIndex(i => i === "def")).to.not.equal(-1);
         });
     })
+    
+    describe('remove', () => {
+        it('should remove queued assets, so they will not become cached when shaka is set', () => {
+            assetCache.add("abc");
+            expect(assetCache.get("abc")).to.equal(null);
+            assetCache.remove("abc");
+            assetCache.init(shakaInstance);
+            expect(assetCache.get("abc")).to.equal(null);
+        });
+        it('should remove cached assets, if they were added before shaka was set', () => {
+            sinon.stub(shakaInstance, "preload").resolves({});
 
-    // describe('remove');
-    // describe('removeAll');
-    // describe('reset');
+            assetCache.add("abc");
+            expect(assetCache.get("abc")).to.equal(null);
+            assetCache.init(shakaInstance);
+            expect(assetCache.get("abc")).to.not.equal(null);
+            assetCache.remove("abc");
+            expect(assetCache.get("abc")).to.equal(null);
+        });
+        it('should remove assets while they are cached, if they were added after shaka was set', () => {
+            sinon.stub(shakaInstance, "preload").resolves({});
+
+            assetCache.init(shakaInstance);
+            assetCache.add("abc");
+            expect(assetCache.get("abc")).to.not.equal(null);
+            assetCache.remove("abc");
+            expect(assetCache.get("abc")).to.equal(null);
+        });
+        it('should not destroy cached asset by default', done => {
+            const preloadResult = { destroy: () => {} };
+            const destroy = sinon.spy(preloadResult, "destroy");
+            const preload = sinon.stub(shakaInstance, "preload").resolves(preloadResult);
+            
+            assetCache.init(shakaInstance);
+            assetCache.add("abc");
+            expect(assetCache.get("abc")).to.not.equal(null);
+
+            assetCache.remove("abc");
+            expect(assetCache.get("abc")).to.equal(null);
+
+            setTimeout(() => {
+                expect(destroy).not.to.have.been.calledOnce;
+                done();
+            });
+        });
+        it('should not destroy cached asset if called with destroy = false', done => {
+            const preloadResult = { destroy: () => {} };
+            const destroy = sinon.spy(preloadResult, "destroy");
+            const preload = sinon.stub(shakaInstance, "preload").resolves(preloadResult);
+            
+            assetCache.init(shakaInstance);
+            assetCache.add("abc");
+            expect(assetCache.get("abc")).to.not.equal(null);
+
+            assetCache.remove("abc", false);
+            expect(assetCache.get("abc")).to.equal(null);
+
+            setTimeout(() => {
+                expect(destroy).not.to.have.been.calledOnce;
+                done();
+            });
+        });
+        it('should destroy cached asset if called with destroy = true', done => {
+            const preloadResult = { destroy: () => {} };
+            const destroy = sinon.spy(preloadResult, "destroy");
+            const preload = sinon.stub(shakaInstance, "preload").resolves(preloadResult);
+            
+            assetCache.init(shakaInstance);
+            assetCache.add("abc");
+            expect(assetCache.get("abc")).to.not.equal(null);
+
+            assetCache.remove("abc", true);
+            expect(assetCache.get("abc")).to.equal(null);
+
+            setTimeout(() => {
+                expect(destroy).to.have.been.calledOnce;
+                done();
+            });
+        });
+    });
+    // describe('init');
 });

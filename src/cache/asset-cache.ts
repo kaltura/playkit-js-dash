@@ -6,7 +6,8 @@ class AssetCache {
 
   public init(shakaInstance: shaka.Player) {
     // TODO when to reset shaka ? when video element is destroyed ?
-    this.reset();
+    this.shakaInstance = null;
+    this.clearCache();
     this.shakaInstance = shakaInstance;
     this.preloadAssets();
   }
@@ -26,9 +27,9 @@ class AssetCache {
   }
 
   public list(): string[] {
-    if (this.cacheQueue.size) {
-      return [...this.cacheQueue];
-    }
+    // if (this.cacheQueue.size) {
+    //   return [...this.cacheQueue];
+    // }
     return [...this.cache.keys()];
   }
 
@@ -38,23 +39,17 @@ class AssetCache {
     } else if (this.cache.has(assetUrl)) {
       const assetPromise = this.cache.get(assetUrl);
       if (destroy) {
-        assetPromise.then(loader => loader.destroy());
+        assetPromise.then(preloadMgr => preloadMgr.destroy());
       }
       this.cache.delete(assetUrl);
     }
   }
 
-  public removeAll() {
-    this.cacheQueue.clear();
+  private clearCache() {
     const assetUrls = this.cache.keys();
     for (const assetUrl of assetUrls) {
       this.remove(assetUrl, true);
     }
-  }
-
-  public reset() {
-    this.removeAll();
-    this.shakaInstance = null;
   }
 
   private preloadAssets() {
