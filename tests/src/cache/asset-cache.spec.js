@@ -153,5 +153,23 @@ describe.only('AssetCache', () => {
             });
         });
     });
-    // describe('init');
+    describe.only('init', () => {
+        it('should add queued items to cache', () => {
+            const preload = sinon.stub(shakaInstance, "preload").resolves({});
+            assetCache.add("abc");
+            assetCache.add("def");
+            expect(assetCache.list().length).to.equal(0);
+            assetCache.init(shakaInstance);
+            expect(assetCache.list().length).to.equal(2);
+        });
+        it('should remove all items from cache', () => {
+            const preload = sinon.stub(shakaInstance, "preload").resolves({});
+            assetCache.init(shakaInstance);
+            assetCache.add("abc");
+            assetCache.add("def");
+            expect(assetCache.list().length).to.equal(2);
+            assetCache.init(shakaInstance);
+            expect(assetCache.list().length).to.equal(0);
+        });
+    });
 });
