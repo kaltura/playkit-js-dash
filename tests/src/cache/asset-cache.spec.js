@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { AssetCache } from "../../../src/cache/asset-cache";
 
-describe.only('AssetCache', () => {
+describe('AssetCache', () => {
     let assetCache, shakaInstance;
     
     beforeEach(() => {
@@ -153,7 +153,7 @@ describe.only('AssetCache', () => {
             });
         });
     });
-    describe.only('init', () => {
+    describe('init', () => {
         it('should add queued items to cache', () => {
             const preload = sinon.stub(shakaInstance, "preload").resolves({});
             assetCache.add("abc");

@@ -1953,112 +1953,105 @@ describe('DashAdapter: on emsg', () => {
   });
 });
 
-describe.only('DashAdapter: cachedUrls', () => {
-  // TODO stub shaka
-
-  let video, config, sandbox;
+describe('DashAdapter: setCachedUrls', () => {
+  let video, config, sandbox, dashInstance;
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();  
+    
     video = document.createElement('video');
+    video.id = `test_id_${Date.now()}`;
+    
     config = {playback: {options: {html5: {dash: {}}}}};
+
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    sandbox.stub(dashInstance.shaka, "preload").resolves("def");
   });
 
   afterEach(() => {
     sandbox.restore();
-    DashAdapter._assetCache.reset();
   });
 
   after(() => {
     TestUtils.removeVideoElementsFromTestPage();
   });
 
-  describe('cachedUrls setting', () => {
-    let dashInstance;
-
-    beforeEach(() => {
-      sandbox = sinon.createSandbox();  
-      video = document.createElement('video');
-      dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-    });
+  describe('setCachedUrls setting', () => {
 
     describe('on initial call', () => {
-      let addAsset; 
+      let add; 
 
       beforeEach(() => {
-        addAsset = sandbox.spy(DashAdapter._assetCache, "add");
+        add = sandbox.spy(dashInstance.assetCache, "add");
       });
   
       it('should not cache asset url on empty call', () => {
-        dashInstance.cachedUrls = [];
-        addAsset.should.not.have.been.called;
+        dashInstance.setCachedUrls([]);
+        add.should.not.have.been.called;
       });
 
       it('should not add loaders on non-array call', () => {
-        dashInstance.cachedUrls = "abc";
-        addAsset.should.not.have.been.called;
+        dashInstance.setCachedUrls("abc");
+        add.should.not.have.been.called;
       });
 
-      it('should cache aseet url on array call', () => {
-        dashInstance.cachedUrls = ["entry_id"];
-        addAsset.should.have.been.calledOnceWith("entry_id");        
+      it('should cache asset url on array call', () => {
+        dashInstance.setCachedUrls(["abc"]);
+        add.should.have.been.calledOnceWith("abc");        
       })
     });
 
     describe("on consecutive calls", () => {
-      let addAsset, removeAsset;
+      let add, remove;
 
       beforeEach(() => {
-        addAsset = sandbox.spy(DashAdapter._assetCache, "add");
-        removeAsset = sandbox.stub(DashAdapter._assetCache, "remove");
+        add = sandbox.spy(dashInstance.assetCache, "add");
+        remove = sandbox.stub(dashInstance.assetCache, "remove");
       });
 
-      it("should not add a url the same url twice on conscutive calls", () => {
-        dashInstance.cachedUrls = ["entry_id"];
-        dashInstance.cachedUrls = ["entry_id"];
-        addAsset.should.have.been.calledOnceWith("entry_id");   
+      it("should not add the same url twice on consecutive calls", () => {
+        dashInstance.setCachedUrls(["abc"]);
+        dashInstance.setCachedUrls(["abc"]);
+        add.should.have.been.calledOnceWith("abc");   
       });
 
       it("should add new urls on consecutive calls", () => {
-        dashInstance.cachedUrls = ["entry_id"];
-        addAsset.should.have.been.calledWith("entry_id");  
-        dashInstance.cachedUrls = ["entry_id", "entry_id_2"];
-        addAsset.should.have.been.calledWith("entry_id_2");  
+        dashInstance.setCachedUrls(["abc"]);
+        add.should.have.been.calledWith("abc");  
+        dashInstance.setCachedUrls(["abc", "def"]);
+        add.should.have.been.calledWith("def");  
       });
 
       it("should remove asset urls that were initially added and are missing on consecutive calls", () => {
-        dashInstance.cachedUrls = ["entry_id"];
-        dashInstance.cachedUrls = ["entry_id_2"];
-        removeAsset.should.have.been.calledOnceWith("entry_id");  
+        dashInstance.setCachedUrls(["abc"]);
+        add.should.have.been.calledWith("abc");  
+        dashInstance.setCachedUrls(["def"]);
+        remove.should.have.been.calledWith("abc");  
       });
     });
   });
 
-  describe.only('cachedUrls usage', () => {
-    it('should initialize assetCache', () => {
-      const init = sandbox.spy(DashAdapter._assetCache, "init");
-      const dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+  describe('setCachedUrls usage', () => {
+    let get, load;
 
-      init.should.have.been.calledOnceWith(dashInstance._shaka);
+    beforeEach(() => {
+      get = sandbox.stub(dashInstance.assetCache, "get");
+      load = sandbox.stub(dashInstance.shaka, "load").resolves({});
     });
 
     it("should check if url is cached", done => {
-      const get = sandbox.spy(DashAdapter._assetCache, "get");
-      const dashInstance = DashAdapter.createAdapter(video, vodSource, config);
-      
       dashInstance.load().then(() => {
         get.should.have.been.calledOnceWith(vodSource.url);
+        load.should.have.been.calledOnceWith(vodSource.url, undefined);
         done();
       })
     });
 
-    it('should use cached url if url is cached', () => {
-      const dashInstance = DashAdapter.createAdapter(video, dvrSource, config);
-      const load = sandbox.spy(dashInstance._shaka, "load");
-      sandbox.stub(DashAdapter._assetCache, "get").resolves(vodSource.url);
-      
+    it('should use cached url if url is cached', done => {
+      get.resolves("abc");
+      dashInstance.setCachedUrls([vodSource.url]);
       dashInstance.load().then(() => {
-        load.should.have.been.calledWith(vodSource.url, undefined);
+        load.should.have.been.calledWith("abc", undefined);
         done();
       })
     });
