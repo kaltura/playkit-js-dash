@@ -498,6 +498,22 @@ describe('DashAdapter: destroy', () => {
         done(e);
       });
   });
+
+  it('should destroy shaka instance if there are no cached urls', done => {
+    const destroy = sinon.spy(dashInstance.shaka, "destroy");
+    dashInstance.destroy().then(() => {
+      destroy.should.have.been.calledOnce;
+      done();
+    });
+  });
+  it('should not destroy shaka instance if there are cached urls', done => {
+    const destroy = sinon.spy(dashInstance.shaka, "destroy");
+    dashInstance.setCachedUrls(["abc"]);
+    dashInstance.destroy().then(() => {
+      destroy.should.not.have.been.called;
+      done();
+    })
+  });
 });
 
 describe('DashAdapter: _getParsedTracks', () => {
