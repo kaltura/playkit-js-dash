@@ -200,7 +200,7 @@ describe('DashAdapter: load', () => {
       .load()
       .then(() => {
         try {
-          dashInstance._shaka.should.exist;
+          dashInstance.shaka.should.exist;
           dashInstance._config.should.exist;
           dashInstance._videoElement.should.exist;
           dashInstance._sourceObj.should.exist;
@@ -218,7 +218,7 @@ describe('DashAdapter: load', () => {
     try {
       dashInstance = DashAdapter.createAdapter(video, vodSource, config);
       video.addEventListener(EventType.LOADED_DATA, () => {
-        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(false);
+        dashInstance.shaka.getConfiguration().streaming.lowLatencyMode.should.equal(false);
         done();
       });
 
@@ -234,7 +234,7 @@ describe('DashAdapter: load', () => {
     try {
       dashInstance = DashAdapter.createAdapter(video, liveSource, config);
       video.addEventListener(EventType.LOADED_DATA, () => {
-        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
+        dashInstance.shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
         done();
       });
 
@@ -251,7 +251,7 @@ describe('DashAdapter: load', () => {
       const playerConfig = {...config, streaming: {lowLatencyMode: true}};
       dashInstance = DashAdapter.createAdapter(video, vodSource, playerConfig);
       video.addEventListener(EventType.LOADED_DATA, () => {
-        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
+        dashInstance.shaka.getConfiguration().streaming.lowLatencyMode.should.equal(true);
         done();
       });
 
@@ -268,7 +268,7 @@ describe('DashAdapter: load', () => {
       const playerConfig = {...config, streaming: {lowLatencyMode: false}};
       dashInstance = DashAdapter.createAdapter(video, vodSource, playerConfig);
       video.addEventListener(EventType.LOADED_DATA, () => {
-        dashInstance._shaka.getConfiguration().streaming.lowLatencyMode.should.equal(false);
+        dashInstance.shaka.getConfiguration().streaming.lowLatencyMode.should.equal(false);
         done();
       });
 
@@ -369,8 +369,8 @@ describe('DashAdapter: targetBuffer', () => {
       dashInstance = DashAdapter.createAdapter(video, vodSource, config);
       video.addEventListener(EventType.PLAYING, () => {
         const targetBufferVal =
-          dashInstance._shaka.getConfiguration().streaming.bufferingGoal +
-          dashInstance._shaka.getManifest().presentationTimeline.getMaxSegmentDuration();
+          dashInstance.shaka.getConfiguration().streaming.bufferingGoal +
+          dashInstance.shaka.getManifest().presentationTimeline.getMaxSegmentDuration();
         Math.round(dashInstance.targetBuffer - targetBufferVal).should.equal(0);
 
         done();
@@ -531,7 +531,7 @@ describe('DashAdapter: _getParsedTracks', () => {
       .then(data => {
         let videoTracks = dashInstance._getVideoTracks();
         let audioTracks = dashInstance._getAudioTracks();
-        let textTracks = dashInstance._shaka.getTextTracks();
+        let textTracks = dashInstance.shaka.getTextTracks();
         let totalTracksLength = videoTracks.length + audioTracks.length + textTracks.length;
         try {
           data.tracks.length.should.be.equal(totalTracksLength);
@@ -922,7 +922,7 @@ describe('DashAdapter: selectTextTrack', () => {
         return !track.active;
       })[0];
       dashInstance.selectTextTrack(inactiveTrack);
-      let activeTrack = dashInstance._shaka.getTextTracks().filter(track => {
+      let activeTrack = dashInstance.shaka.getTextTracks().filter(track => {
         return track.active;
       })[0];
       activeTrack.language.should.be.equal(inactiveTrack.language);
@@ -940,7 +940,7 @@ describe('DashAdapter: selectTextTrack', () => {
       dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(activeTrack);
       activeTrack.language.should.be.equal(
-        dashInstance._shaka.getTextTracks().filter(track => {
+        dashInstance.shaka.getTextTracks().filter(track => {
           return track.active;
         })[0].language
       );
@@ -962,7 +962,7 @@ describe('DashAdapter: selectTextTrack', () => {
       dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(new VideoTrack({index: 0}));
       activeTrack.language.should.be.equal(
-        dashInstance._shaka.getTextTracks().filter(track => {
+        dashInstance.shaka.getTextTracks().filter(track => {
           return track.active;
         })[0].language
       );
@@ -984,7 +984,7 @@ describe('DashAdapter: selectTextTrack', () => {
       dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack();
       activeTrack.language.should.be.equal(
-        dashInstance._shaka.getTextTracks().filter(track => {
+        dashInstance.shaka.getTextTracks().filter(track => {
           return track.active;
         })[0].language
       );
@@ -1006,7 +1006,7 @@ describe('DashAdapter: selectTextTrack', () => {
       dashInstance.selectTextTrack(activeTrack);
       dashInstance.selectTextTrack(new TextTrack({kind: 'metadata'}));
       activeTrack.language.should.be.equal(
-        dashInstance._shaka.getTextTracks().filter(track => {
+        dashInstance.shaka.getTextTracks().filter(track => {
           return track.active;
         })[0].language
       );
@@ -1042,9 +1042,9 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
     dashInstance
       .load()
       .then(() => {
-        dashInstance._shaka.getConfiguration().abr.enabled.should.be.false;
+        dashInstance.shaka.getConfiguration().abr.enabled.should.be.false;
         dashInstance.enableAdaptiveBitrate();
-        dashInstance._shaka.getConfiguration().abr.enabled.should.be.true;
+        dashInstance.shaka.getConfiguration().abr.enabled.should.be.true;
         dashInstance.isAdaptiveBitrateEnabled().should.be.true;
         done();
       })
@@ -1176,7 +1176,7 @@ describe('DashAdapter: _getLiveEdge', () => {
       .load()
       .then(() => {
         try {
-          Math.floor(Math.abs(dashInstance._getLiveEdge() - dashInstance._shaka.seekRange().end)).should.equal(0);
+          Math.floor(Math.abs(dashInstance._getLiveEdge() - dashInstance.shaka.seekRange().end)).should.equal(0);
           done();
         } catch (e) {
           done(e);
@@ -1214,10 +1214,10 @@ describe('DashAdapter: seekToLiveEdge', () => {
       .then(() => {
         try {
           video.play().then(() => {
-            video.currentTime = dashInstance._shaka.seekRange().start;
-            const initialTimeShift = dashInstance._shaka.seekRange().end - video.currentTime;
+            video.currentTime = dashInstance.shaka.seekRange().start;
+            const initialTimeShift = dashInstance.shaka.seekRange().end - video.currentTime;
             dashInstance.seekToLiveEdge();
-            const timeShift = dashInstance._shaka.seekRange().end - video.currentTime;
+            const timeShift = dashInstance.shaka.seekRange().end - video.currentTime;
             timeShift.should.be.lessThan(3);
             timeShift.should.be.lessThan(initialTimeShift);
             done();
@@ -1237,10 +1237,10 @@ describe('DashAdapter: seekToLiveEdge', () => {
       .load()
       .then(() => {
         try {
-          video.currentTime = dashInstance._shaka.seekRange().start;
-          (dashInstance._shaka.seekRange().end - video.currentTime > 30).should.be.true;
+          video.currentTime = dashInstance.shaka.seekRange().start;
+          (dashInstance.shaka.seekRange().end - video.currentTime > 30).should.be.true;
           dashInstance.seekToLiveEdge();
-          (dashInstance._shaka.seekRange().end - video.currentTime < 1).should.be.true;
+          (dashInstance.shaka.seekRange().end - video.currentTime < 1).should.be.true;
           done();
         } catch (e) {
           done(e);
@@ -1422,7 +1422,7 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
       setTimeout(() => {
         try {
           Math.floor(dashInstance.getStartTimeOfDvrWindow()).should.equal(
-            Math.floor(dashInstance._shaka.seekRange().start + dashInstance._shaka.getConfiguration().streaming.safeSeekOffset)
+            Math.floor(dashInstance.shaka.seekRange().start + dashInstance.shaka.getConfiguration().streaming.safeSeekOffset)
           );
           done();
         } catch (e) {
@@ -1852,7 +1852,7 @@ describe('DashAdapter: in-stream thumbnails', () => {
       .load()
       .then(result => {
         try {
-          dashInstance._shaka.should.exist;
+          dashInstance.shaka.should.exist;
           dashInstance._config.should.exist;
           dashInstance._videoElement.should.exist;
           dashInstance._sourceObj.should.exist;
@@ -1878,7 +1878,7 @@ describe('DashAdapter: in-stream thumbnails', () => {
       .load()
       .then(result => {
         try {
-          dashInstance._shaka.should.exist;
+          dashInstance.shaka.should.exist;
           dashInstance._config.should.exist;
           dashInstance._videoElement.should.exist;
           dashInstance._sourceObj.should.exist;
