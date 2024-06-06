@@ -790,28 +790,28 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     // called when a resource is downloaded
     this.shaka!.getNetworkingEngine()?.registerResponseFilter((type, response) => {
       switch (type) {
-        case shaka.net.NetworkingEngine.RequestType.SEGMENT:
-          this._trigger(EventType.FRAG_LOADED, {
-            miliSeconds: response.timeMs,
-            bytes: response.data.byteLength,
-            url: response.uri
-          });
-          if (this.isLive()) {
-            this._dispatchNativeEvent(EventType.DURATION_CHANGE);
-          }
-          break;
-        case shaka.net.NetworkingEngine.RequestType.MANIFEST:
-          this._parseManifest(response.data);
-          this._playbackActualUri = response.uri;
-          this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
-          setTimeout(() => {
-            this._isLive = this._isLive || (this.shaka?.isLive() as boolean);
-            if (this._isLive && !this.shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
+      case shaka.net.NetworkingEngine.RequestType.SEGMENT:
+        this._trigger(EventType.FRAG_LOADED, {
+          miliSeconds: response.timeMs,
+          bytes: response.data.byteLength,
+          url: response.uri
+        });
+        if (this.isLive()) {
+          this._dispatchNativeEvent(EventType.DURATION_CHANGE);
+        }
+        break;
+      case shaka.net.NetworkingEngine.RequestType.MANIFEST:
+        this._parseManifest(response.data);
+        this._playbackActualUri = response.uri;
+        this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
+        setTimeout(() => {
+          this._isLive = this._isLive || (this.shaka?.isLive() as boolean);
+          if (this._isLive && !this.shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
               this._sourceObj!.url = response.uri;
               this._switchFromDynamicToStatic();
-            }
-          });
-          break;
+          }
+        });
+        break;
       }
     });
   }
