@@ -7,6 +7,7 @@ import {wwDrmData, prDrmData} from './drm/fake-drm-data';
 import shaka from 'shaka-player';
 import {ImageTrack, ThumbnailInfo} from '@playkit-js/playkit-js';
 import { expect } from 'chai';
+import sinonChai from 'sinon-chai';
 
 const targetId = 'player-placeholder_dash-adapter.spec';
 
@@ -2025,25 +2026,36 @@ describe('DashAdapter: setCachedUrls', () => {
         remove = sandbox.stub(dashInstance.assetCache, "remove");
       });
 
-      it("should not add the same url twice on consecutive calls", () => {
+      it("should not add the same url twice on a consecutive call", () => {
         dashInstance.setCachedUrls(["abc"]);
         dashInstance.setCachedUrls(["abc"]);
         add.should.have.been.calledOnceWith("abc");   
       });
 
-      it("should add new urls on consecutive calls", () => {
+      it("should add new urls on a consecutive call", () => {
         dashInstance.setCachedUrls(["abc"]);
         add.should.have.been.calledWith("abc");  
         dashInstance.setCachedUrls(["abc", "def"]);
         add.should.have.been.calledWith("def");  
       });
 
-      it("should remove asset urls that were initially added and are missing on consecutive calls", () => {
+      it("should remove asset urls that were initially added and are missing on a consecutive call", () => {
         dashInstance.setCachedUrls(["abc"]);
         add.should.have.been.calledWith("abc");  
         dashInstance.setCachedUrls(["def"]);
         remove.should.have.been.calledWith("abc");  
       });
+
+      it("should remove all asset urls when receiving an empty array on a consecutive call", () => {
+        dashInstance.assetCache.list().length.should.equal(0);
+        dashInstance.setCachedUrls(["abc"]);
+        add.should.have.been.calledWith("abc");
+        dashInstance.setCachedUrls(["def"]);
+        add.should.have.been.calledWith("def");
+        dashInstance.setCachedUrls([]);
+        remove.should.have.been.calledWith("abc");
+        remove.should.have.been.calledWith("def");
+      }); 
     });
   });
 
