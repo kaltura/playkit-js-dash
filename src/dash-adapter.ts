@@ -1562,7 +1562,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 
-  public setCachedUrls(cachedUrls: string[]) {
+  public setCachedUrls(cachedUrls: string[]): void {
     if (!Array.isArray(cachedUrls)) return;
     const newUrls = new Set(cachedUrls);
     const existingUrls = new Set(this.assetCache?.list());
@@ -1578,7 +1578,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
   }
 
-  private get assetCache() {
+  private get assetCache(): AssetCache | null {
     const assetCache = DashAdapter._assetCacheMap.get(this._videoElement.id);
     if (!assetCache) {
       DashAdapter._logger.warn('Failed to fetch asset cache for video element ', this._videoElement.id);
@@ -1587,7 +1587,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     return assetCache;
   }
 
-  private get shaka() {
+  private get shaka(): shaka.Player | null {
     const shakaInstance = DashAdapter._shakaInstanceMap.get(this._videoElement.id);
     if (!shakaInstance) {
       DashAdapter._logger.warn('Failed to fetch shaka instance for video element ', this._videoElement.id);
