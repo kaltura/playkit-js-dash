@@ -1563,17 +1563,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   public setCachedUrls(cachedUrls: string[]): void {
-    if (!Array.isArray(cachedUrls)) return;
-    const newUrls = new Set(cachedUrls);
-    const existingUrls = new Set(this.assetCache?.list());
-    for (const url of newUrls) {
-      if (!existingUrls.has(url)) {
-        this.assetCache?.add(url);
+    if (!Array.isArray(cachedUrls) || !this.assetCache) return;
+
+    const existingUrls = this.assetCache.list();
+
+    for (const url of cachedUrls) {
+      if (!existingUrls.includes(url)) {
+        this.assetCache.add(url);
       }
     }
     for (const url of existingUrls) {
-      if (!newUrls.has(url)) {
-        this.assetCache?.remove(url, true);
+      if (!cachedUrls.includes(url)) {
+        this.assetCache.remove(url, true);
       }
     }
   }
