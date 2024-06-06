@@ -4,13 +4,13 @@ class AssetCache {
   private cacheQueue = new Set<string>();
   private cache = new Map<string, any>();
 
-  public init(shakaInstance: shaka.Player) {
+  public init(shakaInstance: shaka.Player): void {
     this.clearCache();
     this.shakaInstance = shakaInstance;
     this.preloadAssets();
   }
 
-  public add(assetUrl: string) {
+  public add(assetUrl: string): void {
     if (this.cache.has(assetUrl)) return;
 
     this.cacheQueue.add(assetUrl);
@@ -25,7 +25,7 @@ class AssetCache {
     return [...this.cache.keys()];
   }
 
-  public remove(assetUrl: string, destroy: boolean = false) {
+  public remove(assetUrl: string, destroy: boolean = false): void {
     if (this.cacheQueue.has(assetUrl)) {
       this.cacheQueue.delete(assetUrl);
     } else if (this.cache.has(assetUrl)) {
@@ -37,14 +37,14 @@ class AssetCache {
     }
   }
 
-  private clearCache() {
+  private clearCache(): void {
     const assetUrls = this.cache.keys();
     for (const assetUrl of assetUrls) {
       this.remove(assetUrl, true);
     }
   }
 
-  private preloadAssets() {
+  private preloadAssets(): void {
     if (!this.shakaInstance) return;
 
     for (const assetUrl of this.cacheQueue) {
