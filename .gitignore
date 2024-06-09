@@ -42,7 +42,6 @@ jspm_packages
 
 .idea
 
-dist/
 lib
 api-extractor/report/
 api-extractor/report-temp/
