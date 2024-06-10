@@ -940,11 +940,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._isDestroyInProgress = true;
 
     let shakaInstanceToDestroy;
-    if (this.shaka && !this.assetCache?.list().length) {
-      shakaInstanceToDestroy = this.shaka;
+    if (this.shaka) {
+      this.shaka.unload();
 
-      DashAdapter._shakaInstanceMap.delete(this._videoElement.id);
-      DashAdapter._assetCacheMap.delete(this._videoElement.id);
+      if (!this.assetCache?.list().length) {
+        shakaInstanceToDestroy = this.shaka;
+
+        DashAdapter._shakaInstanceMap.delete(this._videoElement.id);
+        DashAdapter._assetCacheMap.delete(this._videoElement.id);
+      }
     }
 
     return new Promise((resolve, reject) => {
