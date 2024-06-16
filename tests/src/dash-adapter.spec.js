@@ -6,8 +6,6 @@ import {PlayReady} from '../../src/drm/playready';
 import {wwDrmData, prDrmData} from './drm/fake-drm-data';
 import shaka from 'shaka-player';
 import {ImageTrack, ThumbnailInfo} from '@playkit-js/playkit-js';
-import { expect } from 'chai';
-import sinonChai from 'sinon-chai';
 
 const targetId = 'player-placeholder_dash-adapter.spec';
 
@@ -36,6 +34,10 @@ const dvrInStreamThumbnailSource = {
   mimetype: 'application/dash+xml',
   url: 'http://pf5.broadpeak-vcdn.com/bpk-tv/tvr/default/index.mpd'
 };
+
+function createVideoElement() {
+  return TestUtils.createElement('video', 'test_id_1');
+}
 
 describe.skip('DashAdapter [debugging and testing manually]', () => {
   let player, tracks, videoTracks, textTracks, audioTracks;
@@ -180,7 +182,7 @@ describe('DashAdapter: load', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -353,7 +355,7 @@ describe('DashAdapter: targetBuffer', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -447,20 +449,17 @@ describe('DashAdapter: targetBuffer', () => {
 });
 
 describe('DashAdapter: destroy', () => {
-  let video, dashInstance, config;
+  let video, dashInstance, config, sandbox;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    sandbox = sinon.createSandbox();
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
 
-  afterEach(done => {
-    dashInstance.setCachedUrls([]);
-    dashInstance.destroy().then(() => {
-      dashInstance = null;
-      done();
-    })
+  afterEach(() => {
+    sandbox.restore();
   });
 
   after(() => {
@@ -505,27 +504,36 @@ describe('DashAdapter: destroy', () => {
   });
 
   it('should destroy shaka instance if there are no cached urls', done => {
-    const destroy = sinon.spy(dashInstance.shaka, 'destroy');
+    const destroy = sandbox.spy(dashInstance.shaka, 'destroy');
+
+    dashInstance.setCachedUrls([]);
     dashInstance.destroy().then(() => {
-      destroy.should.have.been.calledOnce;
+      destroy.should.have.been.called;
       done();
     });
   });
-  it('should not destroy shaka instance if there are cached urls', done => {
-    const destroy = sinon.spy(dashInstance.shaka, 'destroy');
-    dashInstance.setCachedUrls(['abc']);
+
+  it('should detach shaka instance if there are cached urls', done => {
+    const destroy = sandbox.spy(dashInstance.shaka, 'destroy');
+    const detach = sandbox.spy(dashInstance.shaka, 'detach');
+
+    dashInstance.setCachedUrls(['https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths/dash.mpd']);
     dashInstance.destroy().then(() => {
       destroy.should.not.have.been.called;
+      detach.should.have.been.called;
       done();
     })
   });
+
+  // Note - we don't call setCachedUrls([]) here on purpose,
+  // to verify that on the following tests, working with cached entries does not break the adapter behavior
 });
 
 describe('DashAdapter: _getParsedTracks', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
@@ -598,7 +606,7 @@ describe('DashAdapter: check config overriding', () => {
   };
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
   });
 
   afterEach(done => {
@@ -625,7 +633,7 @@ describe('DashAdapter: selectVideoTrack', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {abr: {enabled: false}}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
@@ -772,7 +780,7 @@ describe('DashAdapter: selectAudioTrack', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
@@ -917,7 +925,7 @@ describe('DashAdapter: selectTextTrack', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
@@ -1043,7 +1051,7 @@ describe('DashAdapter: enableAdaptiveBitrate', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {abr: {enabled: false}}}}}};
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
   });
@@ -1107,7 +1115,7 @@ describe('DashAdapter: isLive', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -1171,7 +1179,7 @@ describe('DashAdapter: _getLiveEdge', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -1213,7 +1221,7 @@ describe('DashAdapter: seekToLiveEdge', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -1277,14 +1285,16 @@ describe('DashAdapter: _onBuffering', () => {
   let video, dashInstance, config, sandbox;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
     sandbox = sinon.createSandbox();
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach(done => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
     sandbox.restore();
   });
 
@@ -1368,13 +1378,15 @@ describe('DashAdapter: _onPlaying', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach(done => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -1402,10 +1414,11 @@ describe('DashAdapter: _onPlaying', () => {
 });
 
 describe('DashAdapter: getStartTimeOfDvrWindow', () => {
-  let video, dashInstance, config;
+  let video, dashInstance, config, sandbox;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    sandbox = sinon.createSandbox();
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -1414,6 +1427,7 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
       dashInstance = null;
       done();
     });
+    sandbox.restore();
   });
 
   after(() => {
@@ -1438,7 +1452,9 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
   });
 
   it('should return the start time of Dvr window for live', done => {
-    dashInstance = DashAdapter.createAdapter(video, liveSource, config);
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance._isLive = true;
+
     video.addEventListener(EventType.LOADED_DATA, () => {
       setTimeout(() => {
         try {
@@ -1459,7 +1475,7 @@ describe('DashAdapter: request filter', () => {
   let video, dashInstance, config, sandbox;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
     sandbox = sinon.createSandbox();
   });
@@ -1672,7 +1688,7 @@ describe('DashAdapter: response filter', () => {
   let video, dashInstance, config, sandbox;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
     sandbox = sinon.createSandbox();
   });
@@ -1852,7 +1868,7 @@ describe('DashAdapter: in-stream thumbnails', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -1924,13 +1940,15 @@ describe('DashAdapter: on emsg', () => {
   let video, dashInstance, config;
 
   beforeEach(() => {
-    video = document.createElement('video');
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
-  afterEach(() => {
-    dashInstance.destroy();
-    dashInstance = null;
+  afterEach(done => {
+    dashInstance.destroy().then(() => {
+      dashInstance = null;
+      done();
+    });
   });
 
   after(() => {
@@ -1979,13 +1997,12 @@ describe('DashAdapter: setCachedUrls', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-
-    video = document.createElement('video');
-    video.id = `test_id_${Date.now()}`;
-
+    video = createVideoElement();
     config = {playback: {options: {html5: {dash: {}}}}};
 
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    dashInstance.setCachedUrls([]);
+
     sandbox.stub(dashInstance.shaka, 'preload').resolves('def');
   });
 
