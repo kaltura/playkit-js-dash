@@ -790,28 +790,28 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     // called when a resource is downloaded
     this.shaka!.getNetworkingEngine()?.registerResponseFilter((type, response) => {
       switch (type) {
-        case shaka.net.NetworkingEngine.RequestType.SEGMENT:
-          this._trigger(EventType.FRAG_LOADED, {
-            miliSeconds: response.timeMs,
-            bytes: response.data.byteLength,
-            url: response.uri
-          });
-          if (this.isLive()) {
-            this._dispatchNativeEvent(EventType.DURATION_CHANGE);
-          }
-          break;
-        case shaka.net.NetworkingEngine.RequestType.MANIFEST:
-          this._parseManifest(response.data);
-          this._playbackActualUri = response.uri;
-          this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
-          setTimeout(() => {
-            this._isLive = this._isLive || (this.shaka?.isLive() as boolean);
-            if (this._isLive && !this.shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
+      case shaka.net.NetworkingEngine.RequestType.SEGMENT:
+        this._trigger(EventType.FRAG_LOADED, {
+          miliSeconds: response.timeMs,
+          bytes: response.data.byteLength,
+          url: response.uri
+        });
+        if (this.isLive()) {
+          this._dispatchNativeEvent(EventType.DURATION_CHANGE);
+        }
+        break;
+      case shaka.net.NetworkingEngine.RequestType.MANIFEST:
+        this._parseManifest(response.data);
+        this._playbackActualUri = response.uri;
+        this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
+        setTimeout(() => {
+          this._isLive = this._isLive || (this.shaka?.isLive() as boolean);
+          if (this._isLive && !this.shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
               this._sourceObj!.url = response.uri;
               this._switchFromDynamicToStatic();
-            }
-          });
-          break;
+          }
+        });
+        break;
       }
     });
   }
@@ -939,20 +939,19 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   public destroy(): Promise<void> {
     this._isDestroyInProgress = true;
 
-    return new Promise(async (resolve, reject) => {
-      let shakaInstanceToDestroy;
+    return new Promise((resolve, reject) => {
+      let shakaInstance;
+      let cleanUpFunction;
 
       if (this.shaka) {
         // explicitly pass undefined to restore the default drm configuration
         this.shaka.configure('drm', undefined);
+        shakaInstance = this.shaka;
 
         if (this.assetCache?.list().length) {
-          if (this._videoElement.src) {
-            await this.shaka.unload();
-          }
-          await this.shaka.detach();
+          cleanUpFunction = 'detach';
         } else {
-          shakaInstanceToDestroy = this.shaka;
+          cleanUpFunction = 'destroy';
           DashAdapter._shakaInstanceMap.delete(this._videoElement.id);
           DashAdapter._assetCacheMap.delete(this._videoElement.id);
         }
@@ -962,7 +961,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         DashAdapter._logger.debug('destroy');
         this._loadPromise = undefined;
         this._adapterEventsBindings = {};
-        this._reset(shakaInstanceToDestroy)
+        this._reset(shakaInstance, cleanUpFunction)
           .then(resetResult => {
             this._isDestroyInProgress = false;
             resolve(resetResult);
@@ -994,7 +993,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    * @returns {Promise<*>} - The destroy promise.
    */
-  private _reset(shakaInstance?: shaka.Player): Promise<void> {
+  private _reset(shakaInstance?: shaka.Player, cleanUpFunctionName: string = 'destroy'): Promise<void> {
     this._buffering = false;
     this._waitingSent = false;
     this._playingSent = false;
@@ -1013,7 +1012,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
 
     if (shakaInstance) {
-      return shakaInstance.destroy();
+      return shakaInstance[cleanUpFunctionName]();
     }
     return Promise.resolve();
   }
