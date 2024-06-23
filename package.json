@@ -56,7 +56,7 @@
     "@babel/runtime": "^7.23.6",
     "@microsoft/api-extractor": "^7.38.0",
     "@playkit-js/browserslist-config": "1.0.8",
-    "@playkit-js/playkit-js": "canary",
+    "@playkit-js/playkit-js": "0.84.10-canary.0-fa40833",
     "@types/chai": "^4.3.3",
     "@types/mocha": "^9.1.1",
     "@types/sinon": "^10.0.20",
@@ -89,7 +89,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "peerDependencies": {
-    "@playkit-js/playkit-js": "canary",
+    "@playkit-js/playkit-js": "0.84.10-canary.0-fa40833",
     "shaka-player": "4.7.0"
   },
   "browserslist": [
