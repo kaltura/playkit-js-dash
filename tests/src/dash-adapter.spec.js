@@ -2081,16 +2081,18 @@ describe('DashAdapter: setCachedUrls', () => {
   });
 
   describe('setCachedUrls usage', () => {
-    let get, load;
+    let get, remove, load;
 
     beforeEach(() => {
       get = sandbox.stub(dashInstance.assetCache, 'get');
+      remove = sandbox.stub(dashInstance.assetCache, 'remove');
       load = sandbox.stub(dashInstance.shaka, 'load').resolves({});
     });
 
     it('should check if url is cached', done => {
       dashInstance.load().then(() => {
         get.should.have.been.calledOnceWith(vodSource.url);
+        remove.should.not.have.been.calledOnceWith(vodSource.url);
         load.should.have.been.calledOnceWith(vodSource.url, undefined);
         done();
       })
@@ -2100,6 +2102,7 @@ describe('DashAdapter: setCachedUrls', () => {
       get.resolves('abc');
       dashInstance.setCachedUrls([vodSource.url]);
       dashInstance.load().then(() => {
+        remove.should.have.been.calledOnceWith(vodSource.url);
         load.should.have.been.calledWith('abc', undefined);
         done();
       })

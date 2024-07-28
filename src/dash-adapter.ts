@@ -426,12 +426,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
 
-    if (!this.shaka || !this.assetCache?.list().length) {
+    if (!this.shaka) {
       const shakaInstance = new shaka.Player();
       const assetCache = new AssetCache();
-      assetCache.init(shakaInstance);
-
       DashAdapter._assetCacheMap.set(this._videoElement.id, assetCache);
+      this.assetCache!.init(shakaInstance);
       DashAdapter._shakaInstanceMap.set(this._videoElement.id, shakaInstance);
     }
 
@@ -895,7 +894,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       await this._removeMediaKeys();
 
       if (!this.shaka.getMediaElement()) {
-        this.shaka.attach(this._videoElement);
+        await this.shaka.attach(this._videoElement);
       }
 
       this._loadPromise = new Promise((resolve, reject) => {
@@ -907,13 +906,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           this._maybeGetRedirectedUrl(this._sourceObj.url)
             .then(async url => {
               const assetPromise = this.assetCache!.get(url);
-              if (!assetPromise) {
-                return this.shaka!.load(url, shakaStartTime);
-              } else {
-                this.assetCache!.remove(url);
+              this.assetCache!.remove2(url);
+              if (assetPromise) {
                 const preloadMgr = await assetPromise;
-                return this.shaka!.load(preloadMgr, shakaStartTime);
+                if (preloadMgr) {
+                  return this.shaka!.load(preloadMgr, shakaStartTime).then(() => {
+                    this.assetCache!.remove(url);
+                    return Promise.resolve();
+                  });
+                }
               }
+
+              return this.shaka!.load(url, shakaStartTime);
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
@@ -1583,7 +1587,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
     for (const url of existingUrls) {
       if (!cachedUrls.includes(url)) {
-        this.assetCache.remove(url, true);
+        this.assetCache.remove(url);
       }
     }
   }

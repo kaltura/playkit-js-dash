@@ -25,22 +25,30 @@ class AssetCache {
     return [...this.cache.keys()];
   }
 
-  public remove(assetUrl: string, destroy: boolean = false): void {
+  public remove(assetUrl: string): void {
     if (this.cacheQueue.has(assetUrl)) {
       this.cacheQueue.delete(assetUrl);
     } else if (this.cache.has(assetUrl)) {
       const assetPromise = this.cache.get(assetUrl);
-      if (destroy) {
-        assetPromise.then(preloadMgr => preloadMgr.destroy());
-      }
       this.cache.delete(assetUrl);
+
+      assetPromise?.then(preloadMgr => {
+        preloadMgr.waitForFinish().finally(() => {
+          preloadMgr.destroy();
+        });
+      });
     }
+  }
+
+  public remove2(url: string): void {
+    this.cacheQueue.delete(url);
+    this.cache.delete(url);
   }
 
   private clearCache(): void {
     const assetUrls = this.cache.keys();
     for (const assetUrl of assetUrls) {
-      this.remove(assetUrl, true);
+      this.remove(assetUrl);
     }
   }
 
