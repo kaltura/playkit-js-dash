@@ -1175,10 +1175,10 @@
   resolved "https://registry.yarnpkg.com/@playkit-js/browserslist-config/-/browserslist-config-1.0.8.tgz#735256ba560063d397d4b8776acb865e8697a287"
   integrity sha512-BeiDM72c6GP8dZ6b2qScEpxT4sGECIJzjVGsanaTvXeFOkw3MoplAyz6HPKdrcLmidcinSl4yna5Yc9/ObwZow==
 
-"@playkit-js/playkit-js@0.84.10-canary.0-fa40833":
-  version "0.84.10-canary.0-fa40833"
-  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.84.10-canary.0-fa40833.tgz#15a2e7a2927b81f62d292753250d48f3c6af1365"
-  integrity sha512-qDaZWIz363kScuBjhg9P3zc2dG0yewQ5vj/+XsJYJMtIycE1WThhPi1gX/3AG/uBf/5oABYjq2Fi2AoQbRfvSA==
+"@playkit-js/playkit-js@canary":
+  version "0.84.2-canary.0-cceb0c7"
+  resolved "https://registry.yarnpkg.com/@playkit-js/playkit-js/-/playkit-js-0.84.2-canary.0-cceb0c7.tgz#a3b47545b2710acaf55811f48115bb75b8ff7972"
+  integrity sha512-pa2JDuNA1MD5cxYLT65GXVw8SLgL1QuTyklT88cxHa4Ir7XMbWJBV+1lp9RS363jNX1+pgMQT5lCWthEb8pqXg==
   dependencies:
     js-logger "^1.6.0"
     ua-parser-js "^1.0.36"
@@ -5534,10 +5534,10 @@ setprototypeof@1.2.0:
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.2.0.tgz#66c9a24a73f9fc28cbe66b09fed3d33dcaf1b424"
   integrity sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==
 
-shaka-player@4.8.11:
-  version "4.8.11"
-  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-4.8.11.tgz#f67df889ac859875a2f53645840c39b67b568192"
-  integrity sha512-PXrizP6bWi6Gzjk5B7aSfBiU81di1kPd8LEBIzdaNvwINjZSMYL+lDzEWeLTIoyZCjb3l1WoJJTGLex8mD3dmg==
+shaka-player@4.7.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-4.7.0.tgz#5bb0a60c1b7c2a8a3c2d1ff82e632c3c000219c3"
+  integrity sha512-utR9hKMt8GiGv7EDC8/nh8F1c4KeVGa4Wd8k6h+g2Ylks0m9//kvxvXkQnYAGJRtdql/CJC9Ur8YQ/G+kTwoiQ==
   dependencies:
     eme-encryption-scheme-polyfill "^2.1.1"
 
