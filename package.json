@@ -56,7 +56,7 @@
     "@babel/runtime": "^7.23.6",
     "@microsoft/api-extractor": "^7.38.0",
     "@playkit-js/browserslist-config": "1.0.8",
-    "@playkit-js/playkit-js": "0.84.10-canary.0-fa40833",
+    "@playkit-js/playkit-js": "canary",
     "@types/chai": "^4.3.3",
     "@types/mocha": "^9.1.1",
     "@types/sinon": "^10.0.20",
@@ -78,7 +78,7 @@
     "karma-webpack": "^5.0.0",
     "mocha": "^10.0.0",
     "prettier": "^3.0.3",
-    "shaka-player": "4.8.11",
+    "shaka-player": "4.7.0",
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
     "standard-version": "^6.0.1",
@@ -89,7 +89,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "peerDependencies": {
-    "@playkit-js/playkit-js": "0.84.10-canary.0-fa40833",
+    "@playkit-js/playkit-js": "canary",
     "shaka-player": "4.7.0"
   },
   "browserslist": [
