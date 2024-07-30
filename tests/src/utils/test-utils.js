@@ -6,12 +6,12 @@
  * @returns {HTMLDivElement}
  */
 function createElement(type, id, opt_parentId) {
-  let element = document.createElement(type);
+  const element = document.createElement(type);
   element.id = id;
   if (!opt_parentId) {
     document.body.appendChild(element);
   } else {
-    let parent = document.getElementById(opt_parentId);
+    const parent = document.getElementById(opt_parentId);
     if (parent) {
       parent.appendChild(element);
     } else {
@@ -27,7 +27,7 @@ function createElement(type, id, opt_parentId) {
  * @returns {void}
  */
 function removeElement(id) {
-  let element = document.getElementById(id);
+  const element = document.getElementById(id);
   element.parentNode.removeChild(element);
 }
 
@@ -36,7 +36,7 @@ function removeElement(id) {
  * @returns {void}
  */
 function removeVideoElementsFromTestPage() {
-  let element = document.getElementsByTagName('video');
+  const element = document.getElementsByTagName('video');
   for (let i = element.length - 1; i >= 0; i--) {
     element[i].parentNode.removeChild(element[i]);
   }
@@ -48,8 +48,8 @@ function removeVideoElementsFromTestPage() {
  * @returns {void}
  */
 function createTitle(title) {
-  let header = document.createElement('header');
-  let h4 = document.createElement('h4');
+  const header = document.createElement('header');
+  const h4 = document.createElement('h4');
   h4.textContent = title;
   header.appendChild(h4);
   document.body.appendChild(header);
@@ -62,7 +62,7 @@ function createTitle(title) {
  * @returns {Element} - The track button element.
  */
 function createTrackButton(innerText, id) {
-  let element = document.createElement('BUTTON');
+  const element = document.createElement('BUTTON');
   element.innerText = innerText;
   element.id = id;
   document.body.appendChild(element);
@@ -78,7 +78,7 @@ function createTrackButton(innerText, id) {
 function createVideoTrackButtons(player, videoTracks) {
   createTitle('Video Tracks');
   for (let i = 0; i < videoTracks.length; i++) {
-    let element = createTrackButton(videoTracks[i].label || videoTracks[i].bandwidth || videoTracks[i].language, videoTracks[i].index);
+    const element = createTrackButton(videoTracks[i].label || videoTracks[i].bandwidth || videoTracks[i].language, videoTracks[i].index);
     element.onclick = function () {
       player.selectTrack(videoTracks[i]);
     };
@@ -94,7 +94,7 @@ function createVideoTrackButtons(player, videoTracks) {
 function createAudioTrackButtons(player, audioTracks) {
   createTitle('Audio Tracks');
   for (let i = 0; i < audioTracks.length; i++) {
-    let element = createTrackButton(audioTracks[i].label || audioTracks[i].language, audioTracks[i].index);
+    const element = createTrackButton(audioTracks[i].label || audioTracks[i].language, audioTracks[i].index);
     element.onclick = function () {
       player.selectTrack(audioTracks[i]);
     };
@@ -110,7 +110,7 @@ function createAudioTrackButtons(player, audioTracks) {
 function createTextTrackButtons(player, textTracks) {
   createTitle('Text Tracks');
   for (let i = 0; i < textTracks.length; i++) {
-    let element = createTrackButton(textTracks[i].label || textTracks[i].language, textTracks[i].index);
+    const element = createTrackButton(textTracks[i].label || textTracks[i].language, textTracks[i].index);
     element.onclick = function () {
       player.selectTrack(textTracks[i]);
     };
