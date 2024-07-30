@@ -14,7 +14,15 @@ import {
   ImageTrack,
   ThumbnailInfo,
   PKABRRestrictionObject,
-  filterTracksByRestriction, PKDrmDataObject, PKMediaSourceObject, IMediaSourceAdapter, FakeEvent, IDrmProtocol, PKResponseObject, PKRequestObject, PKDrmConfigObject
+  filterTracksByRestriction,
+  PKDrmDataObject,
+  PKMediaSourceObject,
+  IMediaSourceAdapter,
+  FakeEvent,
+  IDrmProtocol,
+  PKResponseObject,
+  PKRequestObject,
+  PKDrmConfigObject
 } from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
 import {PlayReady} from './drm/playready';
@@ -22,6 +30,7 @@ import DefaultConfig from './default-config.json';
 import './assets/style.css';
 import {DashManifestParser} from './parser/dash-manifest-parser';
 import {DashThumbnailController} from './dash-thumbnail-controller';
+import {AssetCache} from './cache/asset-cache';
 
 type ShakaEventType = {[event: string]: string};
 
@@ -38,8 +47,7 @@ const ShakaEvent: ShakaEventType = {
   EMSG: 'emsg'
 };
 
-type ErrorEventsType = {[errorCode: string]: {'timeStamp': number, 'count': number}};
-
+type ErrorEventsType = {[errorCode: string]: {timeStamp: number; count: number}};
 
 /**
  * the interval in which to sample player size changes
@@ -89,7 +97,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   protected static _logger = BaseMediaSourceAdapter.getLogger(DashAdapter.id);
 
-  public static textContainerClass = "shaka-text-container";
+  public static textContainerClass = 'shaka-text-container';
 
   /**
    * The supported mime type by the dash adapter
@@ -118,12 +126,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   private _shakaLib: typeof shaka = shaka;
-  /**
-   * The shaka player instance
-   * @member {any} _shaka
-   * @private
-   */
-  private _shaka!: shaka.Player;
+
   /**
    * an object containing all the events we bind and unbind to.
    * @member {Object} - _adapterEventsBindings
@@ -218,7 +221,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @type ErrorEventsType
    * @private
    */
-  private _errorCounter: ErrorEventsType= {}
+  private _errorCounter: ErrorEventsType = {};
   /**
    * Dash thumbnail controller.
    * @type {DashThumbnailController}
@@ -233,12 +236,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   private _selectedVideoTrack: VideoTrack | undefined | null = null;
   private _playbackActualUri: string | undefined;
 
+  private static _assetCacheMap = new Map<string, AssetCache>();
+  private static _shakaInstanceMap = new Map<string, shaka.Player>();
+
   public applyTextTrackStyles(sheet: CSSStyleSheet, styles: any, containerId: string): void {
     const flexAlignment = {
       left: 'flex-start',
       center: 'center',
-      right: 'flex-end',
-    }
+      right: 'flex-end'
+    };
     sheet.insertRule(`#${containerId} .${DashAdapter.textContainerClass} { align-items: ${flexAlignment[styles.textAlign]}!important; }`, 0);
     sheet.insertRule(`#${containerId} .${DashAdapter.textContainerClass} > * { ${styles.toCSS()} }`, 0);
   }
@@ -335,13 +341,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   public setMaxBitrate(bitrate: number): void {
-    if (this._hasLowerOrEqualBitrate(bitrate)) {
-      this._shaka.configure({abr: {restrictions: {maxBandwidth: bitrate}}});
+    if (this.shaka && this._hasLowerOrEqualBitrate(bitrate)) {
+      this.shaka?.configure({abr: {restrictions: {maxBandwidth: bitrate}}});
     }
   }
 
-  private _getSortedTracks(): Array<{id: number, bandwidth: number, active: boolean}> {
-    const tracks = this._shaka.getVariantTracks();
+  private _getSortedTracks(): Array<{id: number; bandwidth: number; active: boolean}> {
+    const tracks = this.shaka!.getVariantTracks();
     const sortedTracks = tracks
       .map(obj => ({
         id: obj.id,
@@ -419,15 +425,25 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   private _init(): void {
     //Need to call this again cause we are uninstalling the VTTCue polyfill to avoid collisions with other libs
     shaka.polyfill.installAll();
-    this._shaka = new shaka.Player();
+
+    if (!this.shaka) {
+      const shakaInstance = new shaka.Player();
+      const assetCache = new AssetCache();
+      DashAdapter._assetCacheMap.set(this._videoElement.id, assetCache);
+      this.assetCache!.init(shakaInstance);
+      DashAdapter._shakaInstanceMap.set(this._videoElement.id, shakaInstance);
+    }
+
     // This will force the player to use shaka UITextDisplayer plugin to render text tracks.
     if (this._config.useShakaTextTrackDisplay) {
-      this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
+      this.shaka!.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
     }
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
     this._maybeBreakStalls();
-    this._shaka.configure(this._config.shakaConfig);
+
+    this.shaka!.configure(this._config.shakaConfig);
+
     this._addBindings();
   }
 
@@ -497,9 +513,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   private _maybeSetFilters(): void {
+    this.shaka!.getNetworkingEngine()?.clearAllRequestFilters();
+    this.shaka!.getNetworkingEngine()?.clearAllResponseFilters();
+
     if (typeof Utils.Object.getPropertyPath(this._config, 'network.requestFilter') === 'function') {
       DashAdapter._logger.debug('Register request filter');
-      this._shaka.getNetworkingEngine()?.registerRequestFilter((type, request) => {
+
+      this.shaka!.getNetworkingEngine()?.registerRequestFilter((type, request) => {
         if (Object.values(RequestType).includes(type)) {
           const pkRequest: PKRequestObject = {url: request.uris[0], body: request.body, headers: request.headers};
           let requestFilterPromise;
@@ -531,9 +551,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     }
     if (typeof Utils.Object.getPropertyPath(this._config, 'network.responseFilter') === 'function') {
       DashAdapter._logger.debug('Register response filter');
-      this._shaka.getNetworkingEngine()?.registerResponseFilter((type, response) => {
+      this.shaka!.getNetworkingEngine()?.registerResponseFilter((type, response) => {
         if (Object.values(RequestType).includes(type)) {
           const {uri: url, data, headers} = response;
+
           const pkResponse: PKResponseObject = {url, originalUrl: this._sourceObj!.url, data, headers};
           let responseFilterPromise;
           try {
@@ -619,7 +640,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   private _updateRestriction(restrictions: PKABRRestrictionObject): void {
     const shakaRestrictionsConfig = this._getRestrictionShakaConfig(restrictions);
-    this._shaka.configure({
+    this.shaka?.configure({
       abr: {
         restrictions: shakaRestrictionsConfig
       }
@@ -671,7 +692,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   public attachMediaSource(): void {
-    if (!this._shaka) {
+    if (this.shaka) {
       if (this._videoElement && this._videoElement.src) {
         Utils.Dom.setAttribute(this._videoElement, 'src', '');
         Utils.Dom.removeAttribute(this._videoElement, 'src');
@@ -686,7 +707,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {Promise<void>} - detach promise
    */
   public detachMediaSource(): Promise<void> {
-    if (this._shaka) {
+    if (this.shaka) {
       // 1 second different between duration and current time will signal as end - will enable replay button
       // @ts-expect-error - ????
       if (Math.floor(this.duration - this.currentTime) === 0) {
@@ -696,7 +717,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._lastTimeDetach = this.currentTime;
       }
       return this._reset().then(() => {
-        this._shaka = null as unknown as shaka.Player;
         this._loadPromise = undefined;
       });
     } else {
@@ -753,44 +773,44 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {void}
    */
   private _addBindings(): void {
-    this._eventManager.listen(this._shaka, ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
-    this._eventManager.listen(this._shaka, ShakaEvent.ERROR, this._adapterEventsBindings.error);
-    this._eventManager.listen(this._shaka, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
+    this._eventManager.listen(this.shaka!, ShakaEvent.ADAPTATION, this._adapterEventsBindings.adaptation);
+    this._eventManager.listen(this.shaka!, ShakaEvent.ERROR, this._adapterEventsBindings.error);
+    this._eventManager.listen(this.shaka!, ShakaEvent.DRM_SESSION_UPDATE, this._adapterEventsBindings.drmsessionupdate);
     this._eventManager.listen(this._videoElement, EventType.WAITING, this._adapterEventsBindings.waiting);
     this._eventManager.listen(this._videoElement, EventType.PLAYING, this._adapterEventsBindings.playing);
     this._eventManager.listen(this._videoElement, EventType.LOADED_DATA, () => this._onLoadedData());
     this._eventManager.listenOnce(this._videoElement, EventType.PLAYING, () => {
-      this._eventManager.listen(this._shaka, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
+      this._eventManager.listen(this.shaka!, ShakaEvent.BUFFERING, this._adapterEventsBindings.buffering);
     });
     if (this._config.trackEmsgEvents) {
-      this._eventManager.listen(this._shaka, ShakaEvent.EMSG, this._adapterEventsBindings.emsg);
+      this._eventManager.listen(this.shaka!, ShakaEvent.EMSG, this._adapterEventsBindings.emsg);
     }
 
     // called when a resource is downloaded
-    this._shaka.getNetworkingEngine()?.registerResponseFilter((type, response) => {
+    this.shaka!.getNetworkingEngine()?.registerResponseFilter((type, response) => {
       switch (type) {
-      case shaka.net.NetworkingEngine.RequestType.SEGMENT:
-        this._trigger(EventType.FRAG_LOADED, {
-          miliSeconds: response.timeMs,
-          bytes: response.data.byteLength,
-          url: response.uri
-        });
-        if (this.isLive()) {
-          this._dispatchNativeEvent(EventType.DURATION_CHANGE);
-        }
-        break;
-      case shaka.net.NetworkingEngine.RequestType.MANIFEST:
-        this._parseManifest(response.data);
-        this._playbackActualUri = response.uri;
-        this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
-        setTimeout(() => {
-          this._isLive = this._isLive || this._shaka?.isLive() as boolean;
-          if (this._isLive && !this._shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
+        case shaka.net.NetworkingEngine.RequestType.SEGMENT:
+          this._trigger(EventType.FRAG_LOADED, {
+            miliSeconds: response.timeMs,
+            bytes: response.data.byteLength,
+            url: response.uri
+          });
+          if (this.isLive()) {
+            this._dispatchNativeEvent(EventType.DURATION_CHANGE);
+          }
+          break;
+        case shaka.net.NetworkingEngine.RequestType.MANIFEST:
+          this._parseManifest(response.data);
+          this._playbackActualUri = response.uri;
+          this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
+          setTimeout(() => {
+            this._isLive = this._isLive || (this.shaka?.isLive() as boolean);
+            if (this._isLive && !this.shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
               this._sourceObj!.url = response.uri;
               this._switchFromDynamicToStatic();
-          }
-        });
-        break;
+            }
+          });
+          break;
       }
     });
   }
@@ -798,13 +818,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   private _onLoadedData(): void {
     this._setLowLatencyMode();
     const segmentDuration = this.getSegmentDuration();
-    this._seekRangeStart = this._shaka.seekRange().start;
-    this._startOverTimeout = window.setTimeout(() => {
-      if (this._shaka.seekRange().start - this._seekRangeStart >= segmentDuration) {
-        // in start over the seekRange().start should be permanent
-        this._isStartOver = false;
-      }
-    }, (segmentDuration + 1) * 1000);
+    this._seekRangeStart = this.shaka!.seekRange().start;
+    this._startOverTimeout = window.setTimeout(
+      () => {
+        if (this.shaka!.seekRange().start - this._seekRangeStart >= segmentDuration) {
+          // in start over the seekRange().start should be permanent
+          this._isStartOver = false;
+        }
+      },
+      (segmentDuration + 1) * 1000
+    );
   }
 
   public async _switchFromDynamicToStatic(): Promise<void> {
@@ -836,7 +859,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   private _setLowLatencyMode(): void {
-    this._shaka.configure({
+    this.shaka?.configure({
       streaming: {
         lowLatencyMode: typeof this._config.lowLatencyMode === 'boolean' ? this._config.lowLatencyMode : this.isLive()
       }
@@ -865,9 +888,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @override
    */
   public async load(startTime?: number): Promise<any> {
+    if (!this.shaka) return Promise.reject('Shaka instance not set');
+
     if (!this._loadPromise) {
       await this._removeMediaKeys();
-      this._shaka.attach(this._videoElement);
+
+      if (!this.shaka.getMediaElement()) {
+        await this.shaka.attach(this._videoElement);
+      }
+
       this._loadPromise = new Promise((resolve, reject) => {
         if (this._sourceObj && this._sourceObj.url) {
           this._trigger(EventType.ABR_MODE_CHANGED, {mode: this.isAdaptiveBitrateEnabled() ? 'auto' : 'manual'});
@@ -875,8 +904,20 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           shakaStartTime = isNaN(this._lastTimeDetach) ? shakaStartTime : this._lastTimeDetach;
           this._lastTimeDetach = NaN;
           this._maybeGetRedirectedUrl(this._sourceObj.url)
-            .then(url => {
-              return this._shaka.load(url, shakaStartTime);
+            .then(async url => {
+              const assetPromise = this.assetCache!.get(url);
+              this.assetCache!.remove2(url);
+              if (assetPromise) {
+                const preloadMgr = await assetPromise;
+                if (preloadMgr) {
+                  return this.shaka!.load(preloadMgr, shakaStartTime).then(() => {
+                    this.assetCache!.remove(url);
+                    return Promise.resolve();
+                  });
+                }
+              }
+
+              return this.shaka!.load(url, shakaStartTime);
             })
             .then(() => {
               const data = {tracks: this._getParsedTracks()};
@@ -901,12 +942,30 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public destroy(): Promise<void> {
     this._isDestroyInProgress = true;
+
     return new Promise((resolve, reject) => {
+      let shakaInstance;
+      let cleanUpFunction;
+
+      if (this.shaka) {
+        // explicitly pass undefined to restore the default drm configuration
+        this.shaka.configure('drm', undefined);
+        shakaInstance = this.shaka;
+
+        if (this.assetCache?.list().length) {
+          cleanUpFunction = 'detach';
+        } else {
+          cleanUpFunction = 'destroy';
+          DashAdapter._shakaInstanceMap.delete(this._videoElement.id);
+          DashAdapter._assetCacheMap.delete(this._videoElement.id);
+        }
+      }
+
       super.destroy().then(() => {
         DashAdapter._logger.debug('destroy');
         this._loadPromise = undefined;
         this._adapterEventsBindings = {};
-        this._reset()
+        this._reset(shakaInstance, cleanUpFunction)
           .then(resetResult => {
             this._isDestroyInProgress = false;
             resolve(resetResult);
@@ -938,7 +997,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    * @returns {Promise<*>} - The destroy promise.
    */
-  private _reset(): Promise<void> {
+  private _reset(shakaInstance?: shaka.Player, cleanUpFunctionName: string = 'destroy'): Promise<void> {
     this._buffering = false;
     this._waitingSent = false;
     this._playingSent = false;
@@ -955,8 +1014,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (this._eventManager) {
       this._eventManager.removeAll();
     }
-    if (this._shaka) {
-      return this._shaka.destroy();
+
+    if (shakaInstance) {
+      return shakaInstance[cleanUpFunctionName]();
     }
     return Promise.resolve();
   }
@@ -992,7 +1052,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   private _getVideoTracks(): Array<any> {
-    const variantTracks = this._shaka.getVariantTracks();
+    const variantTracks = this.shaka!.getVariantTracks();
     const activeVariantTrack = this._getActiveTrack();
     const videoTracks = variantTracks.filter(variantTrack => {
       return variantTrack.audioId === activeVariantTrack.audioId;
@@ -1001,7 +1061,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   private _getActiveTrack(): shaka.extern.Track {
-    return this._shaka.getVariantTracks().find(variantTrack => variantTrack.active)!;
+    return this.shaka!.getVariantTracks().find(variantTrack => variantTrack.active)!;
   }
 
   /**
@@ -1010,9 +1070,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {Array<Object>} - Array of objects with unique language and label.
    * @private
    */
-  private _getAudioTracks(): (shaka.extern.LanguageRole & { active: boolean, id: number })[] {
-    const variantTracks = this._shaka.getVariantTracks();
-    const audioTracks = this._shaka.getAudioLanguagesAndRoles();
+  private _getAudioTracks(): (shaka.extern.LanguageRole & {active: boolean; id: number})[] {
+    const variantTracks = this.shaka!.getVariantTracks();
+    const audioTracks = this.shaka!.getAudioLanguagesAndRoles();
     audioTracks.forEach(track => {
       const sameLangAudioVariants = variantTracks.filter(vt => vt.language === track.language);
       const id = sameLangAudioVariants.map(variant => variant.id).join('_');
@@ -1021,7 +1081,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       track.label = sameLangAudioVariants[0].label;
       track['active'] = active;
     });
-    return audioTracks as (shaka.extern.LanguageRole & { active: boolean, id: number })[];
+    return audioTracks as (shaka.extern.LanguageRole & {active: boolean; id: number})[];
   }
 
   /**
@@ -1031,7 +1091,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   private _getParsedTracks(): Array<Track> {
-    if (this._shaka) {
+    if (this.shaka) {
       const videoTracks = this._getParsedVideoTracks();
       const audioTracks = this._getParsedAudioTracks();
       const textTracks = this._getParsedTextTracks();
@@ -1098,7 +1158,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   private _getParsedTextTracks(): Array<PKTextTrack> {
     const parsedTracks: PKTextTrack[] = [];
-    for (const textTrack of this._shaka.getTextTracks()) {
+    for (const textTrack of this.shaka!.getTextTracks()) {
       let kind = textTrack.kind ? textTrack.kind + 's' : '';
       kind = kind === '' && this._config.useShakaTextTrackDisplay ? 'captions' : kind;
       const settings = {
@@ -1138,18 +1198,18 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public selectVideoTrack(videoTrack: VideoTrack): void {
-    if (this._shaka) {
+    if (this.shaka) {
       const videoTracks = this._getVideoTracks();
       if (videoTrack instanceof VideoTrack && videoTracks) {
         const selectedVideoTrack = videoTracks[videoTrack.index];
         if (selectedVideoTrack) {
           if (this.isAdaptiveBitrateEnabled()) {
-            this._shaka.configure({abr: {enabled: false}});
+            this.shaka.configure({abr: {enabled: false}});
             this._trigger(EventType.ABR_MODE_CHANGED, {mode: 'manual'});
           }
           if (!selectedVideoTrack.active) {
             this._selectedVideoTrack = videoTrack;
-            this._shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
+            this.shaka.selectVariantTrack(videoTracks[videoTrack.index], true);
             this._onTrackChanged(videoTrack);
           }
         }
@@ -1165,8 +1225,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public selectAudioTrack(audioTrack: AudioTrack): void {
-    if (this._shaka && audioTrack instanceof AudioTrack && !audioTrack.active) {
-      this._shaka.selectAudioLanguage(audioTrack.language);
+    if (this.shaka && audioTrack instanceof AudioTrack && !audioTrack.active) {
+      this.shaka.selectAudioLanguage(audioTrack.language);
       this._onTrackChanged(audioTrack);
     }
   }
@@ -1179,15 +1239,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public selectTextTrack(textTrack: PKTextTrack): void {
-    if (this._shaka && textTrack instanceof PKTextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
-      this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
-      this._shaka.selectTextLanguage(textTrack.language);
+    if (this.shaka && textTrack instanceof PKTextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
+      this.shaka.setTextTrackVisibility(this._config.textTrackVisibile);
+      this.shaka.selectTextLanguage(textTrack.language);
       this._onTrackChanged(textTrack);
     }
   }
 
   public selectImageTrack(imageTrack: ImageTrack): void {
-    if (this._shaka && this._thumbnailController && imageTrack instanceof ImageTrack && !imageTrack.active) {
+    if (this.shaka && this._thumbnailController && imageTrack instanceof ImageTrack && !imageTrack.active) {
       this._thumbnailController.selectTrack(imageTrack);
       this._onTrackChanged(imageTrack);
     }
@@ -1200,8 +1260,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public hideTextTrack(): void {
-    if (this._shaka) {
-      this._shaka.setTextTrackVisibility(false);
+    if (this.shaka) {
+      this.shaka.setTextTrackVisibility(false);
     }
   }
 
@@ -1212,9 +1272,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public enableAdaptiveBitrate(): void {
-    if (this._shaka && !this.isAdaptiveBitrateEnabled()) {
+    if (this.shaka && !this.isAdaptiveBitrateEnabled()) {
       this._trigger(EventType.ABR_MODE_CHANGED, {mode: 'auto'});
-      this._shaka.configure({abr: {enabled: true}});
+      this.shaka.configure({abr: {enabled: true}});
     }
   }
 
@@ -1225,8 +1285,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public isAdaptiveBitrateEnabled(): boolean {
-    if (this._shaka) {
-      const shakaConfig = this._shaka.getConfiguration();
+    if (this.shaka) {
+      const shakaConfig = this.shaka.getConfiguration();
       return shakaConfig.abr.enabled;
     }
     return false;
@@ -1260,7 +1320,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   protected _getLiveEdge(): number {
-    return this._shaka ? this._shaka.seekRange().end : NaN;
+    return this.shaka ? this.shaka.seekRange().end : NaN;
   }
 
   /**
@@ -1270,7 +1330,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public seekToLiveEdge(): void {
-    if (this._shaka && this._videoElement.readyState > 0) {
+    if (this.shaka && this._videoElement.readyState > 0) {
       this._videoElement.currentTime = this._getLiveEdge();
     }
   }
@@ -1282,7 +1342,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public isLive(): boolean {
-    return this._shaka?.isLive() || this._isLive;
+    return this.shaka?.isLive() || this._isLive;
   }
 
   /**
@@ -1298,8 +1358,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @return {number} - live duration
    */
   public getSegmentDuration(): number {
-    if (this._shaka) {
-      return this._shaka.getStats().maxSegmentDuration;
+    if (this.shaka) {
+      return this.shaka.getStats().maxSegmentDuration;
     }
     return 0;
   }
@@ -1348,16 +1408,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   private _shouldErrorChangeSeverity(errorCode): boolean {
-    const secondsErrorRepeat = 30
+    const secondsErrorRepeat = 30;
     const errorsCounterToChangeSeverity = 3;
     const getCurrentTimeInSeconds = (): number => {
       return Date.now() / 1000;
     };
-    if(!(errorCode in this._errorCounter)){
+    if (!(errorCode in this._errorCounter)) {
       this._errorCounter[errorCode] = {
         count: 1,
         timeStamp: getCurrentTimeInSeconds()
-      }
+      };
       return false;
     }
 
@@ -1418,8 +1478,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   private _onDrmSessionUpdate(): void {
     this._trigger(EventType.DRM_LICENSE_LOADED, {
-      licenseTime: this._shaka.getStats().licenseTime,
-      scheme: this._shaka.drmInfo()?.keySystem
+      licenseTime: this.shaka?.getStats().licenseTime,
+      scheme: this.shaka?.drmInfo()?.keySystem
     });
   }
 
@@ -1476,8 +1536,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @public
    */
   public getStartTimeOfDvrWindow(): number {
-    if (this.isLive() && this._shaka) {
-      return (this._isStartOver ? this._seekRangeStart : this._shaka.seekRange().start) + this._shaka.getConfiguration().streaming.safeSeekOffset;
+    if (this.isLive() && this.shaka) {
+      return (this._isStartOver ? this._seekRangeStart : this.shaka.seekRange().start) + this.shaka.getConfiguration().streaming.safeSeekOffset;
     }
     return 0;
   }
@@ -1488,7 +1548,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public get targetBuffer(): number {
     let targetBufferVal = NaN;
-    if (!this._shaka) return NaN;
+    if (!this.shaka) return NaN;
     if (this.isLive()) {
       targetBufferVal = this._getLiveEdge() - this._videoElement.currentTime;
     } else {
@@ -1496,12 +1556,12 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       targetBufferVal = this._videoElement.duration - this._videoElement.currentTime;
     }
 
-    targetBufferVal = Math.min(targetBufferVal, this._shaka.getConfiguration().streaming.bufferingGoal + this._shaka.getStats().maxSegmentDuration);
+    targetBufferVal = Math.min(targetBufferVal, this.shaka.getConfiguration().streaming.bufferingGoal + this.shaka.getStats().maxSegmentDuration);
     return targetBufferVal;
   }
 
   public getDrmInfo(): PKDrmDataObject | null {
-    const drmInfo = this._shaka.drmInfo();
+    const drmInfo = this.shaka?.drmInfo();
     if (!drmInfo) {
       return null;
     } else {
@@ -1513,5 +1573,41 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       if (serverCertificateUri) drmDataObject.certificate = serverCertificateUri;
       return drmDataObject;
     }
+  }
+
+  public setCachedUrls(cachedUrls: string[]): void {
+    if (!Array.isArray(cachedUrls) || !this.assetCache) return;
+
+    const existingUrls = this.assetCache.list();
+
+    for (const url of cachedUrls) {
+      if (!existingUrls.includes(url)) {
+        this.assetCache.add(url);
+      }
+    }
+    for (const url of existingUrls) {
+      if (!cachedUrls.includes(url)) {
+        this.assetCache.remove(url);
+      }
+    }
+  }
+
+  private get assetCache(): AssetCache | null {
+    const assetCache = DashAdapter._assetCacheMap.get(this._videoElement.id);
+    if (!assetCache) {
+      DashAdapter._logger.warn('Failed to fetch asset cache for video element ', this._videoElement.id);
+      return null;
+    }
+    return assetCache;
+  }
+
+  private get shaka(): shaka.Player | null {
+    const shakaInstance = DashAdapter._shakaInstanceMap.get(this._videoElement.id);
+    if (!shakaInstance) {
+      DashAdapter._logger.warn('Failed to fetch shaka instance for video element ', this._videoElement.id);
+      return null;
+    }
+
+    return shakaInstance;
   }
 }
