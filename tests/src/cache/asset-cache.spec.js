@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { AssetCache } from '../../../src/cache/asset-cache';
 
-describe.only('AssetCache', () => {
+describe('AssetCache', () => {
   let assetCache, shakaInstance;
 
   beforeEach(() => {
