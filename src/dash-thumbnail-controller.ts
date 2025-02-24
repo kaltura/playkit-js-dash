@@ -89,7 +89,7 @@ class DashThumbnailController {
   private _buildTemplateUrl = (mediaTemplate: string, id: string, url: string, mediaTemplatePrefix: string): string => {
     const last = url.split('/').pop()!;
     const baseUrl = url.replace(last, '');
-    const regex = /^\.\/|^\./;
+    const regex = /^\.\//;
     mediaTemplatePrefix = mediaTemplatePrefix.replace(regex, '');
     if (mediaTemplatePrefix.length > 0 && !mediaTemplatePrefix.endsWith('/')) {
       mediaTemplatePrefix += '/';
