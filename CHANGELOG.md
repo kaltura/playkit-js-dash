@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.37.2 (2025-03-06)
+
+
+### Bug Fixes
+
+* **SUP-46763:** [PPF]-RS(3200)-SK(3206) : [Web]: TwS are not displayed on end device on channel with catchup and blackout enabled ([#264](https://github.com/kaltura/playkit-js-dash/issues/264)) ([e95bdb4](https://github.com/kaltura/playkit-js-dash/commit/e95bdb4))
+
+
+
 ### 1.37.1 (2024-08-22)
 
 
