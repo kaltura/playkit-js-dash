@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.38.0 (2025-03-10)
+
+
+### Features
+
+* **FEC-14380:** add nonce to style tags ([#265](https://github.com/kaltura/playkit-js-dash/issues/265)) ([6256ce2](https://github.com/kaltura/playkit-js-dash/commit/6256ce2))
+
+
+
 ### 1.37.2 (2025-03-06)
 
 
