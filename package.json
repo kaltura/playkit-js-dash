@@ -100,5 +100,8 @@
   },
   "kcc": {
     "name": "playkit-dash"
+  },
+  "dependencies": {
+    "@playkit-js/webpack-common": "^1.0.3"
   }
 }
