@@ -14,6 +14,7 @@ import {
   ImageTrack,
   ThumbnailInfo,
   PKABRRestrictionObject,
+  AudioTrackKind,
   filterTracksByRestriction, PKDrmDataObject, PKMediaSourceObject, IMediaSourceAdapter, FakeEvent, IDrmProtocol, PKResponseObject, PKRequestObject, PKDrmConfigObject
 } from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
@@ -39,6 +40,8 @@ const ShakaEvent: ShakaEventType = {
 };
 
 type ErrorEventsType = {[errorCode: string]: {'timeStamp': number, 'count': number}};
+
+type ShakaAudioTrack = shaka.extern.LanguageRole & { active: boolean, id: number, kind: string };
 
 
 /**
@@ -1010,18 +1013,20 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @returns {Array<Object>} - Array of objects with unique language and label.
    * @private
    */
-  private _getAudioTracks(): (shaka.extern.LanguageRole & { active: boolean, id: number })[] {
+  private _getAudioTracks(): ShakaAudioTrack[] {
     const variantTracks = this._shaka.getVariantTracks();
     const audioTracks = this._shaka.getAudioLanguagesAndRoles();
     audioTracks.forEach(track => {
-      const sameLangAudioVariants = variantTracks.filter(vt => vt.language === track.language);
+      const sameLangAudioVariants = variantTracks.filter(vt => vt.language === track.language && (!track.role || !vt.audioRoles || vt.audioRoles.includes(track.role)));
       const id = sameLangAudioVariants.map(variant => variant.id).join('_');
       const active = sameLangAudioVariants.some(variant => variant.active);
+      const isAccessible = sameLangAudioVariants.some(variant => variant.accessibilityPurpose);
       track['id'] = id;
       track.label = sameLangAudioVariants[0].label;
       track['active'] = active;
+      track['kind'] =  isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
     });
-    return audioTracks as (shaka.extern.LanguageRole & { active: boolean, id: number })[];
+    return audioTracks as ShakaAudioTrack[];
   }
 
   /**
@@ -1082,7 +1087,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
           active: audioTracks[i].active,
           label: audioTracks[i].label,
           language: audioTracks[i].language,
-          index: i
+          index: i,
+          kind: audioTracks[i].kind
         };
         parsedTracks.push(new AudioTrack(settings));
       }
