@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.39.0 (2025-05-11)
+
+
+### Features
+
+* **FEC-14419:** Expose Accessibility Audio \ Text Track Indications ([#266](https://github.com/kaltura/playkit-js-dash/issues/266)) ([6f31c93](https://github.com/kaltura/playkit-js-dash/commit/6f31c93))
+
+
+
 ## 1.38.0 (2025-03-10)
 
 
