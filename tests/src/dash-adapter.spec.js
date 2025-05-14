@@ -594,7 +594,7 @@ describe('DashAdapter: check config overriding', () => {
     config = {playback: {options: {html5: {dash: {drm: {advanced: {'com.widevine.alpha': {videoRobustness: 'HW_SECURE_ALL'}}}}}}}};
     DashAdapter._availableDrmProtocol.push(Widevine);
     dashInstance = DashAdapter.createAdapter(video, source, config);
-    dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].videoRobustness.should.equal('HW_SECURE_ALL');
+    dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].videoRobustness.should.equal(['HW_SECURE_ALL']);
     done();
   });
 });
