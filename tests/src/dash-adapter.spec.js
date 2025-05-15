@@ -11,8 +11,7 @@ const targetId = 'player-placeholder_dash-adapter.spec';
 
 const vodSource = {
   mimetype: 'application/dash+xml',
-  url:
-    'https://cfvod.kaltura.com/dasha/p/1740481/sp/174048100/serveFlavor/entryId/1_ez6mf1n8/v/,1/ev/3/flavorId/1_fwvuvqym,1/ev/3/flavorId/1_5zyuykzo,1/ev/3/flavorId/1_4xul4cg0,1/ev/3/flavorId/1_5jovgwnt,1/ev/3/flavorId/1_dt7bjb0q,2/ev/3/flavorId/0_og64h1z3,2/ev/3/flavorId/0_mgociiko,2/ev/3/flavorId/0_dxxbalt0,/forceproxy/true/name/a.mp4.urlset/manifest.mpd'
+  url: 'https://cfvod.kaltura.com/dasha/p/1740481/sp/174048100/serveFlavor/entryId/1_ez6mf1n8/v/,1/ev/3/flavorId/1_fwvuvqym,1/ev/3/flavorId/1_5zyuykzo,1/ev/3/flavorId/1_4xul4cg0,1/ev/3/flavorId/1_5jovgwnt,1/ev/3/flavorId/1_dt7bjb0q,2/ev/3/flavorId/0_og64h1z3,2/ev/3/flavorId/0_mgociiko,2/ev/3/flavorId/0_dxxbalt0,/forceproxy/true/name/a.mp4.urlset/manifest.mpd'
 };
 
 const liveSource = {
@@ -352,6 +351,7 @@ describe('DashAdapter: targetBuffer', () => {
 
   beforeEach(() => {
     video = document.createElement('video');
+    video.muted = true;
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -594,7 +594,7 @@ describe('DashAdapter: check config overriding', () => {
     config = {playback: {options: {html5: {dash: {drm: {advanced: {'com.widevine.alpha': {videoRobustness: 'HW_SECURE_ALL'}}}}}}}};
     DashAdapter._availableDrmProtocol.push(Widevine);
     dashInstance = DashAdapter.createAdapter(video, source, config);
-    dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].videoRobustness.should.equal('HW_SECURE_ALL');
+    dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].videoRobustness.should.deep.equal(['HW_SECURE_ALL']);
     done();
   });
 });
@@ -1192,6 +1192,7 @@ describe('DashAdapter: seekToLiveEdge', () => {
 
   beforeEach(() => {
     video = document.createElement('video');
+    video.muted = true;
     config = {playback: {options: {html5: {dash: {}}}}};
   });
 
@@ -1256,6 +1257,7 @@ describe('DashAdapter: _onBuffering', () => {
 
   beforeEach(() => {
     video = document.createElement('video');
+    video.muted = true;
     config = {playback: {options: {html5: {dash: {}}}}};
     sandbox = sinon.createSandbox();
   });
@@ -1294,7 +1296,7 @@ describe('DashAdapter: _onBuffering', () => {
   it('should dispatch playing event when buffering is false and video is playing after waiting event', done => {
     dashInstance = DashAdapter.createAdapter(video, vodSource, config);
     let hasPlaying = false;
-    let onPlaying = () => {
+    const onPlaying = () => {
       if (hasPlaying) {
         dashInstance._videoElement.removeEventListener(EventType.PLAYING, onPlaying);
         done();
@@ -1418,16 +1420,19 @@ describe('DashAdapter: getStartTimeOfDvrWindow', () => {
   it('should return the start time of Dvr window for live', done => {
     dashInstance = DashAdapter.createAdapter(video, liveSource, config);
     video.addEventListener(EventType.LOADED_DATA, () => {
-      setTimeout(() => {
-        try {
-          Math.floor(dashInstance.getStartTimeOfDvrWindow()).should.equal(
-            Math.floor(dashInstance._shaka.seekRange().start + dashInstance._shaka.getConfiguration().streaming.safeSeekOffset)
-          );
-          done();
-        } catch (e) {
-          done(e);
-        }
-      }, (dashInstance.getSegmentDuration() + 2) * 1000);
+      setTimeout(
+        () => {
+          try {
+            Math.floor(dashInstance.getStartTimeOfDvrWindow()).should.equal(
+              Math.floor(dashInstance._shaka.seekRange().start + dashInstance._shaka.getConfiguration().streaming.safeSeekOffset)
+            );
+            done();
+          } catch (e) {
+            done(e);
+          }
+        },
+        (dashInstance.getSegmentDuration() + 2) * 1000
+      );
     });
     dashInstance.load();
   });
