@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.39.1 (2025-05-22)
+
+
+### Bug Fixes
+
+* **FEC-14459:** upgrade shaka version to 4.14.9 ([86ce61b](https://github.com/kaltura/playkit-js-dash/commit/86ce61b))
+
+
+
 ## 1.39.0 (2025-05-11)
 
 
