@@ -36,7 +36,10 @@ const ShakaEvent: ShakaEventType = {
   ADAPTATION: 'adaptation',
   BUFFERING: 'buffering',
   DRM_SESSION_UPDATE: 'drmsessionupdate',
-  EMSG: 'emsg'
+  EMSG: 'emsg',
+  TIMELINE_REGION_ADDED: 'timelineregionadded',
+  TIMELINE_REGION_ENTER: 'timelineregionenter',
+  TIMELINE_REGION_EXIT: 'timelineregionexit'
 };
 
 type ErrorEventsType = {[errorCode: string]: {'timeStamp': number, 'count': number}};
@@ -139,6 +142,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     [ShakaEvent.BUFFERING]: event => this._onBuffering(event),
     [ShakaEvent.DRM_SESSION_UPDATE]: () => this._onDrmSessionUpdate(),
     [ShakaEvent.EMSG]: event => this._onEmsg(event),
+    [ShakaEvent.TIMELINE_REGION_ADDED]: event => this._onTimelineRegionAdded(event),
+    [ShakaEvent.TIMELINE_REGION_ENTER]: event => this._onTimelineRegionEnter(event),
+    [ShakaEvent.TIMELINE_REGION_EXIT]: event => this._onTimelineRegionExit(event),
     [EventType.WAITING]: () => this._onWaiting(),
     [EventType.PLAYING]: () => this._onPlaying()
   };
@@ -768,6 +774,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (this._config.trackEmsgEvents) {
       this._eventManager.listen(this._shaka, ShakaEvent.EMSG, this._adapterEventsBindings.emsg);
     }
+
+    // Shaka timeline regions
+    this._eventManager.listen(this._shaka, ShakaEvent.TIMELINE_REGION_ADDED, this._adapterEventsBindings.timelineregionadded);
+    this._eventManager.listen(this._shaka, ShakaEvent.TIMELINE_REGION_ENTER, this._adapterEventsBindings.timelineregionenter);
+    this._eventManager.listen(this._shaka, ShakaEvent.TIMELINE_REGION_EXIT, this._adapterEventsBindings.timelineregionexit);
 
     // called when a resource is downloaded
     this._shaka.getNetworkingEngine()?.registerResponseFilter((type, response) => {
@@ -1448,6 +1459,45 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const textTrackCue = createTextTrackCue(timedMetadata);
     metadataTrack.addCue(textTrackCue!);
     this._trigger(EventType.TIMED_METADATA_ADDED, {cues: [timedMetadata]});
+  }
+
+  /**
+   * Handler for Shaka timelineregionadded event
+   * @param {any} event - Shaka timeline region added event
+   * @private
+   */
+  private _onTimelineRegionAdded(event: any): void {
+    const { detail } = event || {};
+
+    if (!detail) return;
+
+    this._trigger(EventType.TIMELINE_REGION_ADDED, detail);
+  }
+
+  /**
+   * Handler for Shaka timelineregionenter event
+   * @param {any} event - Shaka timeline region removed event
+   * @private
+   */
+  private _onTimelineRegionEnter(event: any): void {
+    const { detail } = event || {};
+
+    if (!detail) return;
+
+    this._trigger(EventType.TIMELINE_REGION_ENTER, detail);
+  }
+
+  /**
+   * Handler for Shaka timelineregionexit event
+   * @param {any} event - Shaka timeline region removed event
+   * @private
+   */
+  private _onTimelineRegionExit(event: any): void {
+    const { detail } = event || {};
+
+    if (!detail) return;
+
+    this._trigger(EventType.TIMELINE_REGION_EXIT, detail);
   }
 
   /**
