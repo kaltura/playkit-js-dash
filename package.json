@@ -1,6 +1,6 @@
 {
   "name": "@playkit-js/playkit-js-dash",
-  "version": "1.39.1",
+  "version": "1.39.2",
   "description": "",
   "keywords": [
     "kaltura",
@@ -28,7 +28,7 @@
     "src/**/*"
   ],
   "scripts": {
-    "preinstall": "npx --yes --prefer-online --registry=https://npm.pkg.github.com --package @kaltura/kaltura-tools@latest kaltura-tools check --root=.",
+    "disabled-preinstall": "npx --yes --prefer-online --registry=https://npm.pkg.github.com --package @kaltura/kaltura-tools@latest kaltura-tools check --root=.",
     "serve": "webpack serve --open --mode development",
     "watch": "webpack --watch --mode development",
     "build:dev": "webpack --mode development",
