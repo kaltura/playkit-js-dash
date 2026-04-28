@@ -1,0 +1,176 @@
+{
+  "repositoryName": "@playkit-js/playkit-js-dash",
+  "version": "1.39.2",
+  "coreResponsibility": {
+    "summary": "A media source adapter plugin that integrates Google's Shaka Player library with the PlayKit JS Player to enable DASH (Dynamic Adaptive Streaming over HTTP) playback with DRM support.",
+    "type": "plugin/media-source-adapter"
+  },
+  "domainAndLogicOwnership": {
+    "featureOwnership": [
+      "DASH manifest parsing and playback",
+      "Adaptive Bitrate (ABR) streaming for DASH content",
+      "Widevine DRM licensing and playback",
+      "PlayReady DRM licensing and playback",
+      "DASH thumbnail/image track extraction (I-Frame based thumbnails)",
+      "Live and VOD DASH stream handling",
+      "Low-latency DASH streaming support",
+      "EMSG (Event Message) metadata handling",
+      "Timeline region events (timelineregionadded, timelineregionenter, timelineregionexit)",
+      "Stall detection and recovery for Smart TVs",
+      "Dynamic to static manifest switching",
+      "Text track (subtitles/captions) handling via Shaka",
+      "ABR restrictions (bitrate, resolution capping)",
+      "Network request/response filter hooks"
+    ],
+    "dataHandling": [
+      "DASH MPD manifest parsing",
+      "Adaptation set extraction (video, audio, text, image)",
+      "Segment template resolution",
+      "Video/Audio/Text/Image track state management",
+      "DRM license acquisition and session management",
+      "ABR state (enabled/disabled, restrictions)",
+      "Buffering state management",
+      "Live edge calculation and seek range tracking",
+      "Thumbnail sprite sheet URL resolution"
+    ]
+  },
+  "integrationPoints": {
+    "upstream": {
+      "repositories": [
+        {
+          "name": "@playkit-js/playkit-js",
+          "description": "Core PlayKit JS Player - provides BaseMediaSourceAdapter, event types, track models, and player infrastructure"
+        }
+      ],
+      "services": [
+        "Kaltura CDN (DASH manifest and segment delivery)",
+        "DRM license servers (Widevine, PlayReady)"
+      ]
+    },
+    "downstream": {
+      "repositories": [
+        {
+          "name": "kaltura-player-js",
+          "description": "Full-featured Kaltura Player that consumes this adapter for DASH playback"
+        },
+        {
+          "name": "playkit-js-providers",
+          "description": "Provider layer that supplies media source configuration including DASH sources"
+        }
+      ],
+      "consumers": [
+        "Kaltura Player V7 web applications",
+        "OTT/OVP web players using PlayKit ecosystem"
+      ]
+    },
+    "externalAPIs": [
+      {
+        "name": "Shaka Player",
+        "version": "4.14.9",
+        "description": "Google's JavaScript library for adaptive media playback - core DASH engine"
+      },
+      {
+        "name": "Widevine DRM",
+        "description": "Google's DRM system for content protection"
+      },
+      {
+        "name": "PlayReady DRM",
+        "description": "Microsoft's DRM system for content protection"
+      },
+      {
+        "name": "MSE (Media Source Extensions)",
+        "description": "Browser API for adaptive streaming"
+      },
+      {
+        "name": "EME (Encrypted Media Extensions)",
+        "description": "Browser API for DRM content decryption"
+      }
+    ]
+  },
+  "technicalStack": {
+    "primaryLanguages": ["TypeScript", "JavaScript"],
+    "frameworks": ["Shaka Player"],
+    "buildTools": ["Webpack", "Babel", "TypeScript Compiler"],
+    "testingFrameworks": ["Karma", "Mocha", "Chai", "Sinon"],
+    "entryPoints": [
+      {
+        "file": "src/index.ts",
+        "description": "Main entry point - registers DashAdapter with PlayKit media source adapter manager"
+      },
+      {
+        "file": "src/dash-adapter.ts",
+        "description": "Core adapter implementation - DashAdapter class extending BaseMediaSourceAdapter"
+      },
+      {
+        "file": "src/drm/widevine.ts",
+        "description": "Widevine DRM protocol implementation"
+      },
+      {
+        "file": "src/drm/playready.ts",
+        "description": "PlayReady DRM protocol implementation"
+      },
+      {
+        "file": "src/parser/dash-manifest-parser.ts",
+        "description": "Custom manifest parser for image adaptation sets and thumbnails"
+      },
+      {
+        "file": "src/dash-thumbnail-controller.ts",
+        "description": "Thumbnail track management and sprite sheet URL resolution"
+      },
+      {
+        "file": "src/default-config.json",
+        "description": "Default Shaka Player and adapter configuration"
+      }
+    ],
+    "outputArtifact": "dist/playkit-dash.js"
+  },
+  "triageKeywords": [
+    "DASH",
+    "dash",
+    "MPD",
+    "mpd",
+    "Shaka",
+    "shaka",
+    "shaka-player",
+    "Widevine",
+    "widevine",
+    "PlayReady",
+    "playready",
+    "DRM",
+    "drm",
+    "DashAdapter",
+    "application/dash+xml",
+    "EMSG",
+    "emsg",
+    "ABR",
+    "abr",
+    "adaptive bitrate",
+    "buffering DASH",
+    "DASH live",
+    "DASH VOD",
+    "low latency",
+    "stall detection",
+    "drmsessionupdate",
+    "license request failed",
+    "shaka error",
+    "manifest parsing",
+    "segment loading",
+    "thumbnail sprite",
+    "image track DASH",
+    "timeline region"
+  ],
+  "errorPatterns": [
+    "Shaka error code",
+    "DRM license error",
+    "Widevine license failed",
+    "PlayReady license failed",
+    "DASH manifest error",
+    "MPD parsing failed",
+    "Segment not found",
+    "ABR restriction error",
+    "shaka.util.Error",
+    "drm session",
+    "mediaKeys",
+    "EME error"
+  ]
+}
