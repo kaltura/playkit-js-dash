@@ -14,7 +14,7 @@ import {
   ImageTrack,
   ThumbnailInfo,
   PKABRRestrictionObject,
-  AudioTrackKind,
+  //AudioTrackKind,
   filterTracksByRestriction, PKDrmDataObject, PKMediaSourceObject, IMediaSourceAdapter, FakeEvent, IDrmProtocol, PKResponseObject, PKRequestObject, PKDrmConfigObject
 } from '@playkit-js/playkit-js';
 import {Widevine} from './drm/widevine';
