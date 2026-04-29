@@ -1027,16 +1027,16 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   private _getAudioTracks(): ShakaAudioTrack[] {
     //const variantTracks = this._shaka.getVariantTracks();
     const audioTracks = this._shaka.getAudioTracks();//getAudioLanguagesAndRoles();
-    // audioTracks.forEach(track => {
+    audioTracks.forEach((track, index) => {
     //   const sameLangAudioVariants = variantTracks.filter(vt => vt.language === track.language && (!track.role || !vt.audioRoles || vt.audioRoles.includes(track.role)));
     //   const id = sameLangAudioVariants.map(variant => variant.id).join('_');
     //   const active = sameLangAudioVariants.some(variant => variant.active);
     //   const isAccessible = sameLangAudioVariants.some(variant => variant.accessibilityPurpose);
-    //   track['id'] = id;
+      track['id'] = index;
     //   track.label = sameLangAudioVariants[0].label;
     //   track['active'] = active;
     //   track['kind'] =  isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
-    // });
+    });
     return audioTracks as unknown as ShakaAudioTrack[];
   }
 
