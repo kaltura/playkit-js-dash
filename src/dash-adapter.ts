@@ -1037,7 +1037,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     //   track['active'] = active;
     //   track['kind'] =  isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
     // });
-    return audioTracks as ShakaAudioTrack[];
+    return audioTracks as unknown as ShakaAudioTrack[];
   }
 
   /**
