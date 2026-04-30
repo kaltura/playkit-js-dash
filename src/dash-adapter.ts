@@ -1032,7 +1032,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       track['id'] = index;
 
       const sameLangAudioVariants = variantTracks.filter(
-        vt => vt.language === track.language && (!track.role || !vt.audioRoles || vt.audioRoles.includes(track.role))
+        vt => vt.language === track.language && (!(track as any).role || !vt.audioRoles || vt.audioRoles.includes((track as any).role))
       );
 
       // TODO when upgrading to shaka v5, where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
