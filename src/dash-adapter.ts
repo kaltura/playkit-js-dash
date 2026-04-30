@@ -1021,7 +1021,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * Get the original audio tracks
    * @function _getAudioTracks
-   * @returns {Array<Object>} - Array of objects with unique language and label.
+   * @returns {Array<Object>} - Array of audio track objects.
    * @private
    */
   private _getAudioTracks(): ShakaAudioTrack[] {
