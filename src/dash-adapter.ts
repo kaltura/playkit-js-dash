@@ -95,7 +95,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   protected static _logger = BaseMediaSourceAdapter.getLogger(DashAdapter.id);
 
-  public static textContainerClass = "shaka-text-container";
+  public static textContainerClass = 'shaka-text-container';
 
   /**
    * The supported mime type by the dash adapter
