@@ -95,7 +95,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   protected static _logger = BaseMediaSourceAdapter.getLogger(DashAdapter.id);
 
-  public static textContainerClass = "shaka-text-container";
+  public static textContainerClass = 'shaka-text-container';
 
   /**
    * The supported mime type by the dash adapter
@@ -1021,23 +1021,26 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   /**
    * Get the original audio tracks
    * @function _getAudioTracks
-   * @returns {Array<Object>} - Array of objects with unique language and label.
+   * @returns {Array<Object>} - Array of audio track objects.
    * @private
    */
   private _getAudioTracks(): ShakaAudioTrack[] {
     const variantTracks = this._shaka.getVariantTracks();
-    const audioTracks = this._shaka.getAudioLanguagesAndRoles();
-    audioTracks.forEach(track => {
-      const sameLangAudioVariants = variantTracks.filter(vt => vt.language === track.language && (!track.role || !vt.audioRoles || vt.audioRoles.includes(track.role)));
-      const id = sameLangAudioVariants.map(variant => variant.id).join('_');
-      const active = sameLangAudioVariants.some(variant => variant.active);
+    const audioTracks = this._shaka.getAudioTracks();
+
+    audioTracks.forEach((track, index) => {
+      track['id'] = index;
+
+      const sameLangAudioVariants = variantTracks.filter(
+        vt => vt.language === track.language && (!(track as any).role || !vt.audioRoles || vt.audioRoles.includes((track as any).role))
+      );
+
+      // TODO when upgrading to shaka v5, where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
       const isAccessible = sameLangAudioVariants.some(variant => variant.accessibilityPurpose);
-      track['id'] = id;
-      track.label = sameLangAudioVariants[0].label;
-      track['active'] = active;
-      track['kind'] =  isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
+      track['kind'] = isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
     });
-    return audioTracks as ShakaAudioTrack[];
+
+    return audioTracks as unknown as ShakaAudioTrack[];
   }
 
   /**
