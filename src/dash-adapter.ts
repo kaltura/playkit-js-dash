@@ -1183,7 +1183,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public selectAudioTrack(audioTrack: AudioTrack): void {
     if (this._shaka && audioTrack instanceof AudioTrack && !audioTrack.active) {
-      this._shaka.selectAudioLanguage(audioTrack.language);
+      this._shaka.selectAudioTrack(audioTrack as unknown as any);
       this._onTrackChanged(audioTrack);
     }
   }
