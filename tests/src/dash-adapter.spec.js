@@ -569,6 +569,88 @@ describe('DashAdapter: _getParsedTracks', () => {
   });
 });
 
+describe('DashAdapter: _getAudioTracks deduplication', () => {
+  let video, dashInstance, config, sandbox;
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    sandbox = sinon.createSandbox();
+  });
+
+  afterEach(done => {
+    sandbox.restore();
+    dashInstance
+      .destroy()
+      .then(() => {
+        dashInstance = null;
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should deduplicate audio tracks with the same language and label (HD flavor bug)', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        // Simulate the HD flavor bug: shaka returns two "und" tracks with the same empty label
+        // but different technical params (e.g. different channel counts).
+        const duplicateAudioTracks = [
+          {language: 'und', label: '', role: '', active: true, channelsCount: 2},
+          {language: 'und', label: '', role: '', active: false, channelsCount: 6}
+        ];
+        sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(duplicateAudioTracks);
+        sandbox.stub(dashInstance._shaka, 'getVariantTracks').returns([]);
+
+        const audioTracks = dashInstance._getAudioTracks();
+        try {
+          audioTracks.length.should.equal(1);
+          audioTracks[0].language.should.equal('und');
+          audioTracks[0].label.should.equal('');
+          // The active track should be kept when deduplicating
+          audioTracks[0].active.should.be.true;
+          done();
+        } catch (e) {
+          done(e);
+        }
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
+  it('should keep audio tracks with the same language but different labels (audio description case)', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        const audioTracksWithDifferentLabels = [
+          {language: 'en', label: 'English', role: '', active: true},
+          {language: 'en', label: 'English Audio Description', role: 'description', active: false}
+        ];
+        sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(audioTracksWithDifferentLabels);
+        sandbox.stub(dashInstance._shaka, 'getVariantTracks').returns([]);
+
+        const audioTracks = dashInstance._getAudioTracks();
+        try {
+          audioTracks.length.should.equal(2);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+});
+
 describe('DashAdapter: check config overriding', () => {
   let video, dashInstance, config;
   const source = {
