@@ -1028,9 +1028,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     const variantTracks = this._shaka.getVariantTracks();
     const audioTracks = this._shaka.getAudioTracks();
 
-    audioTracks.forEach((track, index) => {
-      track['id'] = index;
-
+    audioTracks.forEach(track => {
       const sameLangAudioVariants = variantTracks.filter(
         vt => vt.language === track.language && (!(track as any).role || !vt.audioRoles || vt.audioRoles.includes((track as any).role))
       );
@@ -1040,7 +1038,25 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       track['kind'] = isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
     });
 
-    return audioTracks as unknown as ShakaAudioTrack[];
+    // Deduplicate tracks that share the same language and label: they are user-indistinguishable
+    // and appear as duplicates when an HD flavor adds audio with different technical params but
+    // the same visible properties (e.g. two "und" tracks with empty label).
+    // Prefer the active track within each group; fall back to the first one.
+    const seen = new Map<string, typeof audioTracks[0]>();
+    for (const track of audioTracks) {
+      const key = `${track.language}::${track.label ?? ''}::${(track as any).role ?? ''}`;
+      const existing = seen.get(key);
+      if (!existing || (track as any).active) {
+        seen.set(key, track);
+      }
+    }
+
+    const dedupedTracks = Array.from(seen.values());
+    dedupedTracks.forEach((track, index) => {
+      track['id'] = index;
+    });
+
+    return dedupedTracks as unknown as ShakaAudioTrack[];
   }
 
   /**
@@ -1186,7 +1202,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public selectAudioTrack(audioTrack: AudioTrack): void {
     if (this._shaka && audioTrack instanceof AudioTrack && !audioTrack.active) {
-      this._shaka.selectAudioLanguage(audioTrack.language, undefined, undefined, undefined, undefined, undefined, audioTrack.label);
+      this._shaka.selectAudioLanguage(audioTrack.language, undefined, undefined, undefined, undefined, undefined, audioTrack.label ?? undefined);
       this._onTrackChanged(audioTrack);
     }
   }
