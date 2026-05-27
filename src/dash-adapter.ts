@@ -1044,7 +1044,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     // Prefer the active track within each group; fall back to the first one.
     const seen = new Map<string, typeof audioTracks[0]>();
     for (const track of audioTracks) {
-      const key = `${track.language}::${track.label ?? ''}`;
+      const key = `${track.language}::${track.label ?? ''}::${(track as any).role ?? ''}`;
       const existing = seen.get(key);
       if (!existing || (track as any).active) {
         seen.set(key, track);
