@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.39.3 (2026-06-04)
+
+
+### Bug Fixes
+
+* **SUP-51711/FEC-14971:** deduplicate audio tracks by language+label to prevent duplicate tracks from HD flavors ([#273](https://github.com/kaltura/playkit-js-dash/issues/273)) ([47c9faa](https://github.com/kaltura/playkit-js-dash/commit/47c9faa)), closes [#271](https://github.com/kaltura/playkit-js-dash/issues/271) [#272](https://github.com/kaltura/playkit-js-dash/issues/272)
+
+
+
 ### 1.39.2 (2025-11-27)
 
 
