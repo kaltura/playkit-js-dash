@@ -241,6 +241,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   private _isStaticLive: boolean = false;
   private _selectedVideoTrack: VideoTrack | undefined | null = null;
   private _playbackActualUri: string | undefined;
+  private _liveEntryStValue: string = '';
 
   public applyTextTrackStyles(sheet: CSSStyleSheet, styles: any, containerId: string): void {
     const flexAlignment = {
@@ -796,6 +797,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       case shaka.net.NetworkingEngine.RequestType.MANIFEST:
         this._parseManifest(response.data);
         this._playbackActualUri = response.uri;
+        this._liveEntryStValue = response.uri?.match(/\/st\/([01])\//)?.[1] ?? '';
         this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
         setTimeout(() => {
           this._isLive = this._isLive || this._shaka?.isLive() as boolean;
@@ -1319,6 +1321,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public isLive(): boolean {
     return this._shaka?.isLive() || this._isLive;
+  }
+
+  /**
+   * Returns extracted st value only for live entries.
+   * @returns {string} - st value for live entry, otherwise empty string.
+   * @public
+   */
+  public getLiveEntryStValue(): string {
+    return this._liveEntryStValue;
   }
 
   /**
