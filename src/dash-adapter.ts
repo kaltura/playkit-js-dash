@@ -797,15 +797,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       case shaka.net.NetworkingEngine.RequestType.MANIFEST:
         this._parseManifest(response.data);
         this._playbackActualUri = response.uri;
-        if (!this._liveEntryStValue) {
-          this._liveEntryStValue = response.uri?.match(/\/st\/([01])\//)?.[1] ?? '';
-        }
         this._trigger(EventType.MANIFEST_LOADED, {miliSeconds: response.timeMs});
         setTimeout(() => {
           this._isLive = this._isLive || this._shaka?.isLive() as boolean;
           if (this._isLive && !this._shaka?.isLive() && !this._isStaticLive && this._config.switchDynamicToStatic) {
               this._sourceObj!.url = response.uri;
               this._switchFromDynamicToStatic();
+          }
+          if (this._isLive && !this._liveEntryStValue) {
+            this._liveEntryStValue = response.uri?.match(/\/st\/([01])\//)?.[1] ?? '';
           }
         });
         break;
