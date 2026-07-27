@@ -241,6 +241,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   private _isStaticLive: boolean = false;
   private _selectedVideoTrack: VideoTrack | undefined | null = null;
   private _playbackActualUri: string | undefined;
+  private _liveEntryStValue: string = '';
 
   public applyTextTrackStyles(sheet: CSSStyleSheet, styles: any, containerId: string): void {
     const flexAlignment = {
@@ -803,6 +804,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
               this._sourceObj!.url = response.uri;
               this._switchFromDynamicToStatic();
           }
+          if (this._isLive && !this._liveEntryStValue) {
+            this._liveEntryStValue = response.uri?.match(/\/st\/([01])\//)?.[1] ?? '';
+          }
         });
         break;
       }
@@ -962,6 +966,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._responseFilterError = false;
     this._manifestParser = null;
     this._thumbnailController = null;
+    this._liveEntryStValue = '';
     this._errorCounter = {};
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
@@ -1319,6 +1324,15 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public isLive(): boolean {
     return this._shaka?.isLive() || this._isLive;
+  }
+
+  /**
+   * Returns extracted st value only for live entries.
+   * @returns {string} - st value for live entry, otherwise empty string.
+   * @public
+   */
+  public getLiveEntryStValue(): string {
+    return this._liveEntryStValue;
   }
 
   /**
