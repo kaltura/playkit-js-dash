@@ -92,7 +92,7 @@
   },
   "peerDependencies": {
     "@playkit-js/playkit-js": "0.84.33-canary.0-b1f11ae",
-    "shaka-player": "4.14.9"
+    "shaka-player": "5.2.12"
   },
   "browserslist": [
     "extends @playkit-js/browserslist-config"
