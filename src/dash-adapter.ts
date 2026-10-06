@@ -587,7 +587,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   private _normalizeDrmRobustness(): void {
     const advanced = this._config?.shakaConfig?.drm?.advanced;
-    if (!advanced) {
+    if (!advanced || typeof advanced !== 'object') {
       return;
     }
     for (const keySystem of Object.keys(advanced)) {
