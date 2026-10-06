@@ -581,8 +581,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         }
         Utils.Object.mergeDeep(this._config.shakaConfig, config);
       }
+      this._normalizeDrmRobustness();
     }
-    this._normalizeDrmRobustness();
   }
 
   private _normalizeDrmRobustness(): void {
