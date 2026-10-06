@@ -45,8 +45,8 @@ const Widevine: IDrmProtocol = class Widevine {
       if (browser === 'Chrome') {
         config.drm.advanced = {
           [DrmScheme.WIDEVINE]: {
-            videoRobustness: 'SW_SECURE_CRYPTO',
-            audioRobustness: 'SW_SECURE_CRYPTO'
+            videoRobustness: ['SW_SECURE_CRYPTO'],
+            audioRobustness: ['SW_SECURE_CRYPTO']
           }
         };
       }
