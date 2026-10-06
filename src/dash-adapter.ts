@@ -44,7 +44,7 @@ const ShakaEvent: ShakaEventType = {
 
 type ErrorEventsType = {[errorCode: string]: {'timeStamp': number, 'count': number}};
 
-type ShakaAudioTrack = shaka.extern.LanguageRole & { active: boolean, id: number, kind: string };
+type ShakaAudioTrack = shaka.extern.AudioTrack & { id: number, kind: string };
 
 
 /**
@@ -1055,7 +1055,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         vt => vt.language === track.language && (!(track as any).role || !vt.audioRoles || vt.audioRoles.includes((track as any).role))
       );
 
-      // TODO when upgrading to shaka v5, where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
+      // TODO when upgrading to shaka version where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
       const isAccessible = sameLangAudioVariants.some(variant => variant.accessibilityPurpose);
       track['kind'] = isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
     });
