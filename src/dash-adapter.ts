@@ -44,7 +44,7 @@ const ShakaEvent: ShakaEventType = {
 
 type ErrorEventsType = {[errorCode: string]: {'timeStamp': number, 'count': number}};
 
-type ShakaAudioTrack = shaka.extern.LanguageRole & { active: boolean, id: number, kind: string };
+type ShakaAudioTrack = shaka.extern.AudioTrack & { id: number, kind: string };
 
 
 /**
@@ -582,7 +582,24 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         Utils.Object.mergeDeep(this._config.shakaConfig, config);
       }
     }
+    this._normalizeDrmRobustness();
   }
+
+  private _normalizeDrmRobustness(): void {
+    const advanced = this._config?.shakaConfig?.drm?.advanced;
+    if (!advanced || typeof advanced !== 'object') {
+      return;
+    }
+    for (const keySystem of Object.keys(advanced)) {
+      for (const key of ['videoRobustness', 'audioRobustness']) {
+        const value = advanced[keySystem]?.[key];
+        if (typeof value === 'string') {
+          advanced[keySystem][key] = [value];
+        }
+      }
+    }
+  }
+
 
   /**
    * apply Capping to player size restrictions
@@ -1038,7 +1055,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         vt => vt.language === track.language && (!(track as any).role || !vt.audioRoles || vt.audioRoles.includes((track as any).role))
       );
 
-      // TODO when upgrading to shaka v5, where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
+      // TODO when upgrading to shaka version where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
       const isAccessible = sameLangAudioVariants.some(variant => variant.accessibilityPurpose);
       track['kind'] = isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
     });
@@ -1207,8 +1224,14 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public selectAudioTrack(audioTrack: AudioTrack): void {
     if (this._shaka && audioTrack instanceof AudioTrack && !audioTrack.active) {
-      this._shaka.selectAudioLanguage(audioTrack.language, undefined, undefined, undefined, undefined, undefined, audioTrack.label ?? undefined);
-      this._onTrackChanged(audioTrack);
+      const audioTracks = this._shaka
+        .getAudioTracks()
+        .filter(track => track.language === audioTrack.language && (track.label ?? null) === (audioTrack.label ?? null));
+      const shakaTrack = audioTracks.find(track => !track.active) ?? audioTracks[0];
+      if (shakaTrack) {
+        this._shaka.selectAudioTrack(shakaTrack);
+        this._onTrackChanged(audioTrack);
+      }
     }
   }
 
@@ -1221,9 +1244,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public selectTextTrack(textTrack: PKTextTrack): void {
     if (this._shaka && textTrack instanceof PKTextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
-      this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
-      this._shaka.selectTextLanguage(textTrack.language);
-      this._onTrackChanged(textTrack);
+      const shakaTrack = this._shaka.getTextTracks().find(track => track.id === textTrack.id);
+      if (shakaTrack) {
+        this._shaka.selectTextTrack(shakaTrack);
+        this._onTrackChanged(textTrack);
+      }
     }
   }
 
@@ -1242,7 +1267,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public hideTextTrack(): void {
     if (this._shaka) {
-      this._shaka.setTextTrackVisibility(false);
+      this._shaka.selectTextTrack(null);
     }
   }
 
