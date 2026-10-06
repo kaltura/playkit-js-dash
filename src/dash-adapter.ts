@@ -581,8 +581,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         }
         Utils.Object.mergeDeep(this._config.shakaConfig, config);
       }
-      this._normalizeDrmRobustness();
     }
+    this._normalizeDrmRobustness();
   }
 
   private _normalizeDrmRobustness(): void {
@@ -1217,7 +1217,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
 
   /**
    * Select an audio track
-   * @function audioTracks
+   * @function selectAudioTrack
    * @param {AudioTrack} audioTrack - the audio track to select
    * @returns {void}
    * @public
