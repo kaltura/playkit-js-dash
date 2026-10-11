@@ -1463,6 +1463,80 @@ describe('DashAdapter: _onPlaying', () => {
   });
 });
 
+describe('DashAdapter: _onError', () => {
+  const BAD_HTTP_STATUS = 1001;
+  let video, dashInstance, config, sandbox, destroyStub, triggerStub;
+
+  const createShakaError = severity => ({
+    detail: {severity, category: 1, code: BAD_HTTP_STATUS, data: ['http://segment.m4s', 404]}
+  });
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+    sandbox = sinon.createSandbox();
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    destroyStub = sandbox.stub(dashInstance, 'destroy').resolves();
+    triggerStub = sandbox.stub(dashInstance, '_trigger');
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+    dashInstance.destroy();
+    dashInstance = null;
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should not destroy and should report RECOVERABLE when shaka downgrades the severity right after dispatching the error', () => {
+    const event = createShakaError(Error.Severity.CRITICAL);
+    dashInstance._onError(event);
+    // shaka runs streaming.failureCallback synchronously after dispatching the error event
+    event.detail.severity = Error.Severity.RECOVERABLE;
+    return Promise.resolve().then(() => {
+      destroyStub.should.not.have.been.called;
+      triggerStub.should.have.been.calledOnce;
+      triggerStub.firstCall.args[0].should.equal(EventType.ERROR);
+      triggerStub.firstCall.args[1].severity.should.equal(Error.Severity.RECOVERABLE);
+    });
+  });
+
+  it('should destroy and report CRITICAL when shaka keeps the severity CRITICAL', () => {
+    dashInstance._onError(createShakaError(Error.Severity.CRITICAL));
+    return Promise.resolve().then(() => {
+      destroyStub.should.have.been.calledOnce;
+      triggerStub.should.have.been.calledOnce;
+      triggerStub.firstCall.args[1].severity.should.equal(Error.Severity.CRITICAL);
+    });
+  });
+
+  it('should escalate a repeated recoverable error to CRITICAL and destroy', () => {
+    for (let i = 0; i < 4; i++) {
+      const event = createShakaError(Error.Severity.CRITICAL);
+      dashInstance._onError(event);
+      event.detail.severity = Error.Severity.RECOVERABLE;
+    }
+    return Promise.resolve().then(() => {
+      triggerStub.callCount.should.equal(4);
+      [0, 1, 2].forEach(i => triggerStub.getCall(i).args[1].severity.should.equal(Error.Severity.RECOVERABLE));
+      triggerStub.getCall(3).args[1].severity.should.equal(Error.Severity.CRITICAL);
+      destroyStub.should.have.been.calledOnce;
+    });
+  });
+
+  it('should ignore video element errors', () => {
+    const event = createShakaError(Error.Severity.CRITICAL);
+    event.detail.code = dashInstance.VIDEO_ERROR_CODE;
+    dashInstance._onError(event);
+    return Promise.resolve().then(() => {
+      triggerStub.should.not.have.been.called;
+      destroyStub.should.not.have.been.called;
+    });
+  });
+});
+
 describe('DashAdapter: getStartTimeOfDvrWindow', () => {
   let video, dashInstance, config;
 
