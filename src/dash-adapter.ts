@@ -585,6 +585,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._normalizeDrmRobustness();
   }
 
+  /**
+   * support backward compatibility as shaka V5 need an array and not string as the advanced value
+   * @private
+   * @returns {void}
+   */
   private _normalizeDrmRobustness(): void {
     const advanced = this._config?.shakaConfig?.drm?.advanced;
     if (!advanced) {
