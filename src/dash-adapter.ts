@@ -183,6 +183,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   private _stallInterval: number | null = null;
+  private _cueChangeTrack: TextTrack | null = null;
+  private _textHidden: boolean = false;
 
   /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
@@ -434,11 +436,51 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (this._config.useShakaTextTrackDisplay) {
       this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
     }
+    this._maybeRenderCuesByPlayer();
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
     this._maybeBreakStalls();
     this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
+  }
+
+  /**
+   * Shaka 5 shows the selected text track natively, a tick after selectTextTrack. When neither native nor shaka text
+   * rendering is configured, the player renders the cues itself, so the native track is kept hidden and its cues are
+   * forwarded as TEXT_CUE_CHANGED events.
+   * @private
+   * @returns {void}
+   */
+  private _maybeRenderCuesByPlayer(): void {
+    if (!this._config.textTrackVisibile) {
+      this._eventManager.listen(this._videoElement.textTracks, 'change', () => this._onNativeTextTracksChange());
+    }
+  }
+
+  /**
+   * Keeps the native tracks hidden (so the browser doesn't paint them) and listens for cue changes on the selected
+   * one only, forwarding them as TEXT_CUE_CHANGED. Re-run on every track change to follow language switches and hide.
+   * @private
+   * @returns {void}
+   */
+  private _onNativeTextTracksChange(): void {
+    const tracks = Array.from(this._videoElement.textTracks).filter(track => PKTextTrack.isNativeTextTrack(track) && !PKTextTrack.isExternalTrack(track));
+    tracks.forEach(track => {
+      if (track.mode === 'showing') {
+        track.mode = 'hidden';
+      }
+    });
+    const activeTrack = this._textHidden ? undefined : tracks.find(track => track.mode === 'hidden');
+    if (activeTrack === this._cueChangeTrack) {
+      return;
+    }
+    if (this._cueChangeTrack) {
+      this._eventManager.unlisten(this._cueChangeTrack, 'cuechange');
+    }
+    this._cueChangeTrack = activeTrack || null;
+    if (activeTrack) {
+      this._eventManager.listen(activeTrack, 'cuechange', () => this._trigger(EventType.TEXT_CUE_CHANGED, {cues: Array.from(activeTrack.activeCues || [])}));
+    }
   }
 
   private _clearStallInterval(): void {
@@ -990,6 +1032,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._thumbnailController = null;
     this._liveEntryStValue = '';
     this._errorCounter = {};
+    this._cueChangeTrack = null;
+    this._textHidden = false;
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
     clearTimeout(this._startOverTimeout);
@@ -1251,6 +1295,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (this._shaka && textTrack instanceof PKTextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
       const shakaTrack = this._shaka.getTextTracks().find(track => track.id === textTrack.id);
       if (shakaTrack) {
+        this._textHidden = false;
         this._shaka.selectTextTrack(shakaTrack);
         this._onTrackChanged(textTrack);
       }
@@ -1272,7 +1317,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public hideTextTrack(): void {
     if (this._shaka) {
+      this._textHidden = true;
       this._shaka.selectTextTrack(null);
+      this._onNativeTextTracksChange();
     }
   }
 

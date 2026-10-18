@@ -1010,6 +1010,91 @@ describe('DashAdapter: selectTextTrack', () => {
     });
   });
 
+  it('should hide the selected text track', done => {
+    dashInstance.load().then(() => {
+      const inactiveTrack = dashInstance._getParsedTextTracks().filter(track => !track.active)[0];
+      dashInstance.selectTextTrack(inactiveTrack);
+      dashInstance._shaka.getTextTracks().some(track => track.active).should.be.true;
+      dashInstance.hideTextTrack();
+      dashInstance._shaka.getTextTracks().some(track => track.active).should.be.false;
+      done();
+    });
+  });
+
+  it('should keep the selected text track hidden and forward its cues when no text display mode is configured', done => {
+    dashInstance.load().then(() => {
+      const inactiveTrack = dashInstance._getParsedTextTracks().filter(track => !track.active)[0];
+      dashInstance.addEventListener(EventType.TEXT_CUE_CHANGED, event => {
+        try {
+          event.payload.cues.length.should.equal(1);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      video.textTracks.addEventListener('change', function onChange() {
+        const modes = Array.from(video.textTracks).map(track => track.mode);
+        if (!modes.includes('hidden')) {
+          return;
+        }
+        video.textTracks.removeEventListener('change', onChange);
+        try {
+          modes.should.not.include('showing');
+          const selected = Array.from(video.textTracks).find(track => track.mode === 'hidden');
+          Object.defineProperty(selected, 'activeCues', {value: [new VTTCue(0, 1, 'cue')], configurable: true});
+          selected.dispatchEvent(new Event('cuechange'));
+        } catch (e) {
+          done(e);
+        }
+      });
+      dashInstance.selectTextTrack(inactiveTrack);
+    });
+  });
+
+  it('should stop forwarding cues after the text track is hidden', done => {
+    dashInstance.load().then(() => {
+      const inactiveTrack = dashInstance._getParsedTextTracks().filter(track => !track.active)[0];
+      video.textTracks.addEventListener('change', function onChange() {
+        const selected = Array.from(video.textTracks).find(track => track.mode === 'hidden');
+        if (!selected) {
+          return;
+        }
+        video.textTracks.removeEventListener('change', onChange);
+        let cueEvents = 0;
+        dashInstance.addEventListener(EventType.TEXT_CUE_CHANGED, () => cueEvents++);
+        dashInstance.hideTextTrack();
+        selected.dispatchEvent(new Event('cuechange'));
+        try {
+          cueEvents.should.equal(0);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      dashInstance.selectTextTrack(inactiveTrack);
+    });
+  });
+
+  it('should show the text track when useNativeTextTrack is configured', done => {
+    dashInstance.destroy().then(() => {
+      dashInstance = DashAdapter.createAdapter(video, vodSource, {
+        text: {useNativeTextTrack: true},
+        playback: {options: {html5: {dash: {}}}}
+      });
+      dashInstance.load().then(() => {
+        const inactiveTrack = dashInstance._getParsedTextTracks().filter(track => !track.active)[0];
+        video.textTracks.addEventListener('change', function onChange() {
+          if (!Array.from(video.textTracks).some(track => track.mode === 'showing')) {
+            return;
+          }
+          video.textTracks.removeEventListener('change', onChange);
+          done();
+        });
+        dashInstance.selectTextTrack(inactiveTrack);
+      });
+    });
+  });
+
   it('should not change the already selected text track', done => {
     let eventCounter = 0;
     dashInstance.load().then(() => {
