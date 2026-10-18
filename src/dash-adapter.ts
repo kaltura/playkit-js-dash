@@ -1467,6 +1467,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       // Shaka dispatches the error event before running streaming.failureCallback, which may downgrade
       // the severity of the same error object (e.g. live HTTP errors are retried). Wait for the final severity.
       Promise.resolve().then(() => {
+        // The adapter was detached or destroyed in the meantime, so this error is stale
+        if (!this._shaka || this._shaka.getLoadMode() === shaka.Player.LoadMode.DESTROYED) {
+          return;
+        }
         error.severity = this._shouldErrorChangeSeverity(error.code) ? Error.Severity.CRITICAL : error.severity;
         this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
         DashAdapter._logger.error(error);

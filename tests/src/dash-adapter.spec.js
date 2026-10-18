@@ -1611,6 +1611,16 @@ describe('DashAdapter: _onError', () => {
     });
   });
 
+  it('should drop a queued error when the adapter is reset before the callback runs', () => {
+    dashInstance._onError(createShakaError(Error.Severity.CRITICAL));
+    // detachMediaSource() resets the adapter between the error and the queued callback
+    dashInstance._reset();
+    return Promise.resolve().then(() => {
+      triggerStub.should.not.have.been.called;
+      destroyStub.should.not.have.been.called;
+    });
+  });
+
   it('should ignore video element errors', () => {
     const event = createShakaError(Error.Severity.CRITICAL);
     event.detail.code = dashInstance.VIDEO_ERROR_CODE;
