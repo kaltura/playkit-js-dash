@@ -44,7 +44,7 @@ const ShakaEvent: ShakaEventType = {
 
 type ErrorEventsType = {[errorCode: string]: {'timeStamp': number, 'count': number}};
 
-type ShakaAudioTrack = shaka.extern.AudioTrack & { id: number, kind: string };
+type ShakaAudioTrack = shaka.extern.LanguageRole & { active: boolean, id: number, kind: string };
 
 
 /**
@@ -183,8 +183,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   private _stallInterval: number | null = null;
-  private _cueChangeTrack: TextTrack | null = null;
-  private _textHidden: boolean = false;
 
   /**
    * 3016 is the number of the video error at shaka, we already listens to it in the html5 class
@@ -436,51 +434,11 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     if (this._config.useShakaTextTrackDisplay) {
       this._shaka.setVideoContainer(Utils.Dom.getElementBySelector('.playkit-subtitles'));
     }
-    this._maybeRenderCuesByPlayer();
     this._maybeSetFilters();
     this._maybeSetDrmConfig();
     this._maybeBreakStalls();
     this._shaka.configure(this._config.shakaConfig);
     this._addBindings();
-  }
-
-  /**
-   * Shaka 5 shows the selected text track natively, a tick after selectTextTrack. When neither native nor shaka text
-   * rendering is configured, the player renders the cues itself, so the native track is kept hidden and its cues are
-   * forwarded as TEXT_CUE_CHANGED events.
-   * @private
-   * @returns {void}
-   */
-  private _maybeRenderCuesByPlayer(): void {
-    if (!this._config.textTrackVisibile) {
-      this._eventManager.listen(this._videoElement.textTracks, 'change', () => this._onNativeTextTracksChange());
-    }
-  }
-
-  /**
-   * Keeps the native tracks hidden (so the browser doesn't paint them) and listens for cue changes on the selected
-   * one only, forwarding them as TEXT_CUE_CHANGED. Re-run on every track change to follow language switches and hide.
-   * @private
-   * @returns {void}
-   */
-  private _onNativeTextTracksChange(): void {
-    const tracks = Array.from(this._videoElement.textTracks).filter(track => PKTextTrack.isNativeTextTrack(track) && !PKTextTrack.isExternalTrack(track));
-    tracks.forEach(track => {
-      if (track.mode === 'showing') {
-        track.mode = 'hidden';
-      }
-    });
-    const activeTrack = this._textHidden ? undefined : tracks.find(track => track.mode === 'hidden');
-    if (activeTrack === this._cueChangeTrack) {
-      return;
-    }
-    if (this._cueChangeTrack) {
-      this._eventManager.unlisten(this._cueChangeTrack, 'cuechange');
-    }
-    this._cueChangeTrack = activeTrack || null;
-    if (activeTrack) {
-      this._eventManager.listen(activeTrack, 'cuechange', () => this._trigger(EventType.TEXT_CUE_CHANGED, {cues: Array.from(activeTrack.activeCues || [])}));
-    }
   }
 
   private _clearStallInterval(): void {
@@ -624,29 +582,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         Utils.Object.mergeDeep(this._config.shakaConfig, config);
       }
     }
-    this._normalizeDrmRobustness();
   }
-
-  /**
-   * support backward compatibility as shaka V5 need an array and not string as the advanced value
-   * @private
-   * @returns {void}
-   */
-  private _normalizeDrmRobustness(): void {
-    const advanced = this._config?.shakaConfig?.drm?.advanced;
-    if (!advanced) {
-      return;
-    }
-    for (const keySystem of Object.keys(advanced)) {
-      for (const key of ['videoRobustness', 'audioRobustness']) {
-        const value = advanced[keySystem]?.[key];
-        if (typeof value === 'string') {
-          advanced[keySystem][key] = [value];
-        }
-      }
-    }
-  }
-
 
   /**
    * apply Capping to player size restrictions
@@ -1032,8 +968,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     this._thumbnailController = null;
     this._liveEntryStValue = '';
     this._errorCounter = {};
-    this._cueChangeTrack = null;
-    this._textHidden = false;
     this._clearStallInterval();
     this._clearVideoUpdateTimer();
     clearTimeout(this._startOverTimeout);
@@ -1104,7 +1038,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         vt => vt.language === track.language && (!(track as any).role || !vt.audioRoles || vt.audioRoles.includes((track as any).role))
       );
 
-      // TODO when upgrading to shaka version where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
+      // TODO when upgrading to shaka v5, where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
       const isAccessible = sameLangAudioVariants.some(variant => variant.accessibilityPurpose);
       track['kind'] = isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
     });
@@ -1273,14 +1207,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public selectAudioTrack(audioTrack: AudioTrack): void {
     if (this._shaka && audioTrack instanceof AudioTrack && !audioTrack.active) {
-      const audioTracks = this._shaka
-        .getAudioTracks()
-        .filter(track => track.language === audioTrack.language && (track.label ?? null) === (audioTrack.label ?? null));
-      const shakaTrack = audioTracks.find(track => !track.active) ?? audioTracks[0];
-      if (shakaTrack) {
-        this._shaka.selectAudioTrack(shakaTrack);
-        this._onTrackChanged(audioTrack);
-      }
+      this._shaka.selectAudioLanguage(audioTrack.language, undefined, undefined, undefined, undefined, undefined, audioTrack.label ?? undefined);
+      this._onTrackChanged(audioTrack);
     }
   }
 
@@ -1293,12 +1221,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public selectTextTrack(textTrack: PKTextTrack): void {
     if (this._shaka && textTrack instanceof PKTextTrack && !textTrack.active && (textTrack.kind === 'subtitles' || textTrack.kind === 'captions')) {
-      const shakaTrack = this._shaka.getTextTracks().find(track => track.id === textTrack.id);
-      if (shakaTrack) {
-        this._textHidden = false;
-        this._shaka.selectTextTrack(shakaTrack);
-        this._onTrackChanged(textTrack);
-      }
+      this._shaka.setTextTrackVisibility(this._config.textTrackVisibile);
+      this._shaka.selectTextLanguage(textTrack.language);
+      this._onTrackChanged(textTrack);
     }
   }
 
@@ -1317,9 +1242,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public hideTextTrack(): void {
     if (this._shaka) {
-      this._textHidden = true;
-      this._shaka.selectTextTrack(null);
-      this._onNativeTextTracksChange();
+      this._shaka.setTextTrackVisibility(false);
     }
   }
 
@@ -1464,21 +1387,13 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
         this._requestFilterError ? (this._requestFilterError = false) : (this._responseFilterError = false);
       }
 
-      // Shaka dispatches the error event before running streaming.failureCallback, which may downgrade
-      // the severity of the same error object (e.g. live HTTP errors are retried). Wait for the final severity.
-      Promise.resolve().then(() => {
-        // The adapter was detached or destroyed in the meantime, so this error is stale
-        if (!this._shaka || this._shaka.getLoadMode() === shaka.Player.LoadMode.DESTROYED) {
-          return;
-        }
-        error.severity = this._shouldErrorChangeSeverity(error.code) ? Error.Severity.CRITICAL : error.severity;
-        this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
-        DashAdapter._logger.error(error);
+      error.severity = this._shouldErrorChangeSeverity(error.code) ? Error.Severity.CRITICAL : error.severity;
+      this._trigger(EventType.ERROR, new Error(error.severity, error.category, error.code, error.data));
+      DashAdapter._logger.error(error);
 
-        if (error.severity === Error.Severity.CRITICAL) {
-          this.destroy();
-        }
-      });
+      if (error.severity === Error.Severity.CRITICAL) {
+        this.destroy();
+      }
     }
   }
 
