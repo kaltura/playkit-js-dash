@@ -648,6 +648,31 @@ describe('DashAdapter: _getAudioTracks deduplication', () => {
       });
   });
 
+  it('should keep tracks that differ only by accessibilityPurpose', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        const tracks = [
+          {language: 'en', label: 'English', roles: [], accessibilityPurpose: null, active: true},
+          {language: 'en', label: 'English', roles: [], accessibilityPurpose: 'visually_impaired', active: false}
+        ];
+        sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(tracks);
+
+        const audioTracks = dashInstance._getAudioTracks();
+        try {
+          audioTracks.length.should.equal(2);
+          audioTracks[0].kind.should.equal('main');
+          audioTracks[1].kind.should.equal('description');
+          done();
+        } catch (e) {
+          done(e);
+        }
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
   it('should keep main and description tracks that share the same language and label', done => {
     dashInstance
       .load()
@@ -701,6 +726,69 @@ describe('DashAdapter: check config overriding', () => {
     dashInstance = DashAdapter.createAdapter(video, source, config);
     dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].videoRobustness.should.deep.equal(['HW_SECURE_ALL']);
     done();
+  });
+});
+
+describe('DashAdapter: _normalizeDrmRobustness', () => {
+  let video, dashInstance;
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    dashInstance = DashAdapter.createAdapter(video, vodSource, {playback: {options: {html5: {dash: {}}}}});
+  });
+
+  afterEach(done => {
+    dashInstance
+      .destroy()
+      .then(() => {
+        dashInstance = null;
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should convert string audio and video robustness to arrays for every key system', () => {
+    dashInstance._config.shakaConfig.drm = {
+      advanced: {
+        'com.widevine.alpha': {videoRobustness: 'HW_SECURE_ALL', audioRobustness: 'HW_SECURE_CRYPTO'},
+        'com.microsoft.playready': {videoRobustness: '3000'}
+      }
+    };
+    dashInstance._normalizeDrmRobustness();
+    const advanced = dashInstance._config.shakaConfig.drm.advanced;
+    advanced['com.widevine.alpha'].videoRobustness.should.deep.equal(['HW_SECURE_ALL']);
+    advanced['com.widevine.alpha'].audioRobustness.should.deep.equal(['HW_SECURE_CRYPTO']);
+    advanced['com.microsoft.playready'].videoRobustness.should.deep.equal(['3000']);
+  });
+
+  it('should leave robustness values that are already arrays untouched', () => {
+    dashInstance._config.shakaConfig.drm = {
+      advanced: {'com.widevine.alpha': {videoRobustness: ['SW_SECURE_CRYPTO', 'HW_SECURE_ALL'], audioRobustness: ['SW_SECURE_CRYPTO']}}
+    };
+    dashInstance._normalizeDrmRobustness();
+    const widevine = dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'];
+    widevine.videoRobustness.should.deep.equal(['SW_SECURE_CRYPTO', 'HW_SECURE_ALL']);
+    widevine.audioRobustness.should.deep.equal(['SW_SECURE_CRYPTO']);
+  });
+
+  it('should not add robustness keys that were not configured', () => {
+    dashInstance._config.shakaConfig.drm = {advanced: {'com.widevine.alpha': {videoRobustness: 'HW_SECURE_ALL'}}};
+    dashInstance._normalizeDrmRobustness();
+    dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].should.not.have.property('audioRobustness');
+  });
+
+  it('should not throw when there is no drm.advanced config', () => {
+    dashInstance._config.shakaConfig.drm = {};
+    (() => dashInstance._normalizeDrmRobustness()).should.not.throw();
+    dashInstance._config.shakaConfig.drm.should.deep.equal({});
+    delete dashInstance._config.shakaConfig.drm;
+    (() => dashInstance._normalizeDrmRobustness()).should.not.throw();
   });
 });
 

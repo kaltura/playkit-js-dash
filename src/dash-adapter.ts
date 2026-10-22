@@ -628,7 +628,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
   }
 
   /**
-   * support backward compatibility as shaka V5 need an array and not string as the advanced value
+   * Support backward compatibility: shaka V5 needs an array and not a string as the advanced robustness value
    * @private
    * @returns {void}
    */
@@ -646,7 +646,6 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       }
     }
   }
-
 
   /**
    * apply Capping to player size restrictions
@@ -1108,7 +1107,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     // Prefer the active track within each group; fall back to the first one.
     const seen = new Map<string, typeof audioTracks[0]>();
     for (const track of audioTracks) {
-      const key = `${track.language}::${track.label ?? ''}::${(track.roles ?? []).join(',')}`;
+      const key = `${track.language}::${track.label ?? ''}::${(track.roles ?? []).join(',')}::${track.accessibilityPurpose ?? ''}`;
       const existing = seen.get(key);
       if (!existing || track.active) {
         seen.set(key, track);
