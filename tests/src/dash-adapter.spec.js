@@ -603,11 +603,10 @@ describe('DashAdapter: _getAudioTracks deduplication', () => {
         // Simulate the HD flavor bug: shaka returns two "und" tracks with the same empty label
         // but different technical params (e.g. different channel counts).
         const duplicateAudioTracks = [
-          {language: 'und', label: '', role: '', active: true, channelsCount: 2},
-          {language: 'und', label: '', role: '', active: false, channelsCount: 6}
+          {language: 'und', label: '', roles: [], accessibilityPurpose: null, active: true, channelsCount: 2},
+          {language: 'und', label: '', roles: [], accessibilityPurpose: null, active: false, channelsCount: 6}
         ];
         sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(duplicateAudioTracks);
-        sandbox.stub(dashInstance._shaka, 'getVariantTracks').returns([]);
 
         const audioTracks = dashInstance._getAudioTracks();
         try {
@@ -631,15 +630,39 @@ describe('DashAdapter: _getAudioTracks deduplication', () => {
       .load()
       .then(() => {
         const audioTracksWithDifferentLabels = [
-          {language: 'en', label: 'English', role: '', active: true},
-          {language: 'en', label: 'English Audio Description', role: 'description', active: false}
+          {language: 'en', label: 'English', roles: ['main'], accessibilityPurpose: null, active: true},
+          {language: 'en', label: 'English Audio Description', roles: ['description'], accessibilityPurpose: 'visually_impaired', active: false}
         ];
         sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(audioTracksWithDifferentLabels);
-        sandbox.stub(dashInstance._shaka, 'getVariantTracks').returns([]);
 
         const audioTracks = dashInstance._getAudioTracks();
         try {
           audioTracks.length.should.equal(2);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
+  it('should keep main and description tracks that share the same language and label', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        const sameLabelTracks = [
+          {language: 'en', label: 'English', roles: ['main'], accessibilityPurpose: null, active: true},
+          {language: 'en', label: 'English', roles: ['description'], accessibilityPurpose: 'visually_impaired', active: false}
+        ];
+        sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(sameLabelTracks);
+
+        const audioTracks = dashInstance._getAudioTracks();
+        try {
+          audioTracks.length.should.equal(2);
+          audioTracks[0].kind.should.equal('main');
+          audioTracks[1].kind.should.equal('description');
           done();
         } catch (e) {
           done(e);
@@ -864,6 +887,32 @@ describe('DashAdapter: selectAudioTrack', () => {
           return !track.active;
         })[0];
         dashInstance.selectAudioTrack(inactiveTrack);
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
+  it('should select the track with the requested role when main and description share language and label', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        const mainTrack = {language: 'en', label: 'English', roles: ['main'], accessibilityPurpose: null, active: true};
+        const descriptionTrack = {language: 'en', label: 'English', roles: ['description'], accessibilityPurpose: 'visually_impaired', active: false};
+        const stub = sinon.stub(dashInstance._shaka, 'getAudioTracks').returns([mainTrack, descriptionTrack]);
+        const selectStub = sinon.stub(dashInstance._shaka, 'selectAudioTrack');
+        try {
+          const requested = dashInstance._getParsedAudioTracks().find(track => track.kind === 'description');
+          dashInstance.selectAudioTrack(requested);
+          selectStub.calledOnce.should.be.true;
+          selectStub.firstCall.args[0].roles.should.deep.equal(['description']);
+          done();
+        } catch (e) {
+          done(e);
+        } finally {
+          stub.restore();
+          selectStub.restore();
+        }
       })
       .catch(e => {
         done(e);

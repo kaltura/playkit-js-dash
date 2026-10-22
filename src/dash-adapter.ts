@@ -1096,17 +1096,10 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    * @private
    */
   private _getAudioTracks(): ShakaAudioTrack[] {
-    const variantTracks = this._shaka.getVariantTracks();
     const audioTracks = this._shaka.getAudioTracks();
 
     audioTracks.forEach(track => {
-      const sameLangAudioVariants = variantTracks.filter(
-        vt => vt.language === track.language && (!(track as any).role || !vt.audioRoles || vt.audioRoles.includes((track as any).role))
-      );
-
-      // TODO when upgrading to shaka version where the getVariantTracks API is removed, we will need to find another way to compute isAccessible
-      const isAccessible = sameLangAudioVariants.some(variant => variant.accessibilityPurpose);
-      track['kind'] = isAccessible ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
+      track['kind'] = track.accessibilityPurpose ? AudioTrackKind.DESCRIPTION : AudioTrackKind.MAIN;
     });
 
     // Deduplicate tracks that share the same language and label: they are user-indistinguishable
@@ -1115,9 +1108,9 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     // Prefer the active track within each group; fall back to the first one.
     const seen = new Map<string, typeof audioTracks[0]>();
     for (const track of audioTracks) {
-      const key = `${track.language}::${track.label ?? ''}::${(track as any).role ?? ''}`;
+      const key = `${track.language}::${track.label ?? ''}::${(track.roles ?? []).join(',')}`;
       const existing = seen.get(key);
-      if (!existing || (track as any).active) {
+      if (!existing || track.active) {
         seen.set(key, track);
       }
     }
@@ -1273,10 +1266,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
    */
   public selectAudioTrack(audioTrack: AudioTrack): void {
     if (this._shaka && audioTrack instanceof AudioTrack && !audioTrack.active) {
-      const audioTracks = this._shaka
-        .getAudioTracks()
-        .filter(track => track.language === audioTrack.language && (track.label ?? null) === (audioTrack.label ?? null));
-      const shakaTrack = audioTracks.find(track => !track.active) ?? audioTracks[0];
+      const shakaTrack = this._getAudioTracks().find(track => track.id === audioTrack.id);
       if (shakaTrack) {
         this._shaka.selectAudioTrack(shakaTrack);
         this._onTrackChanged(audioTrack);
