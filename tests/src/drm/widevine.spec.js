@@ -59,8 +59,8 @@ describe('Widevine', function () {
       if (BROWSER === 'Chrome' || BROWSER === 'Chrome Headless') {
         expectedConfig.drm.advanced = {
           [DrmScheme.WIDEVINE]: {
-            videoRobustness: 'SW_SECURE_CRYPTO',
-            audioRobustness: 'SW_SECURE_CRYPTO'
+            videoRobustness: ['SW_SECURE_CRYPTO'],
+            audioRobustness: ['SW_SECURE_CRYPTO']
           }
         };
       }

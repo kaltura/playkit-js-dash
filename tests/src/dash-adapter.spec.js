@@ -603,11 +603,10 @@ describe('DashAdapter: _getAudioTracks deduplication', () => {
         // Simulate the HD flavor bug: shaka returns two "und" tracks with the same empty label
         // but different technical params (e.g. different channel counts).
         const duplicateAudioTracks = [
-          {language: 'und', label: '', role: '', active: true, channelsCount: 2},
-          {language: 'und', label: '', role: '', active: false, channelsCount: 6}
+          {language: 'und', label: '', roles: [], accessibilityPurpose: null, active: true, channelsCount: 2},
+          {language: 'und', label: '', roles: [], accessibilityPurpose: null, active: false, channelsCount: 6}
         ];
         sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(duplicateAudioTracks);
-        sandbox.stub(dashInstance._shaka, 'getVariantTracks').returns([]);
 
         const audioTracks = dashInstance._getAudioTracks();
         try {
@@ -631,15 +630,39 @@ describe('DashAdapter: _getAudioTracks deduplication', () => {
       .load()
       .then(() => {
         const audioTracksWithDifferentLabels = [
-          {language: 'en', label: 'English', role: '', active: true},
-          {language: 'en', label: 'English Audio Description', role: 'description', active: false}
+          {language: 'en', label: 'English', roles: ['main'], accessibilityPurpose: null, active: true},
+          {language: 'en', label: 'English Audio Description', roles: ['description'], accessibilityPurpose: 'visually_impaired', active: false}
         ];
         sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(audioTracksWithDifferentLabels);
-        sandbox.stub(dashInstance._shaka, 'getVariantTracks').returns([]);
 
         const audioTracks = dashInstance._getAudioTracks();
         try {
           audioTracks.length.should.equal(2);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
+  it('should keep main and description tracks that share the same language and label', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        const sameLabelTracks = [
+          {language: 'en', label: 'English', roles: ['main'], accessibilityPurpose: null, active: true},
+          {language: 'en', label: 'English', roles: ['description'], accessibilityPurpose: 'visually_impaired', active: false}
+        ];
+        sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(sameLabelTracks);
+
+        const audioTracks = dashInstance._getAudioTracks();
+        try {
+          audioTracks.length.should.equal(2);
+          audioTracks[0].kind.should.equal('main');
+          audioTracks[1].kind.should.equal('description');
           done();
         } catch (e) {
           done(e);
@@ -678,6 +701,69 @@ describe('DashAdapter: check config overriding', () => {
     dashInstance = DashAdapter.createAdapter(video, source, config);
     dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].videoRobustness.should.deep.equal(['HW_SECURE_ALL']);
     done();
+  });
+});
+
+describe('DashAdapter: _normalizeDrmRobustness', () => {
+  let video, dashInstance;
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    dashInstance = DashAdapter.createAdapter(video, vodSource, {playback: {options: {html5: {dash: {}}}}});
+  });
+
+  afterEach(done => {
+    dashInstance
+      .destroy()
+      .then(() => {
+        dashInstance = null;
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should convert string audio and video robustness to arrays for every key system', () => {
+    dashInstance._config.shakaConfig.drm = {
+      advanced: {
+        'com.widevine.alpha': {videoRobustness: 'HW_SECURE_ALL', audioRobustness: 'HW_SECURE_CRYPTO'},
+        'com.microsoft.playready': {videoRobustness: '3000'}
+      }
+    };
+    dashInstance._normalizeDrmRobustness();
+    const advanced = dashInstance._config.shakaConfig.drm.advanced;
+    advanced['com.widevine.alpha'].videoRobustness.should.deep.equal(['HW_SECURE_ALL']);
+    advanced['com.widevine.alpha'].audioRobustness.should.deep.equal(['HW_SECURE_CRYPTO']);
+    advanced['com.microsoft.playready'].videoRobustness.should.deep.equal(['3000']);
+  });
+
+  it('should leave robustness values that are already arrays untouched', () => {
+    dashInstance._config.shakaConfig.drm = {
+      advanced: {'com.widevine.alpha': {videoRobustness: ['SW_SECURE_CRYPTO', 'HW_SECURE_ALL'], audioRobustness: ['SW_SECURE_CRYPTO']}}
+    };
+    dashInstance._normalizeDrmRobustness();
+    const widevine = dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'];
+    widevine.videoRobustness.should.deep.equal(['SW_SECURE_CRYPTO', 'HW_SECURE_ALL']);
+    widevine.audioRobustness.should.deep.equal(['SW_SECURE_CRYPTO']);
+  });
+
+  it('should not add robustness keys that were not configured', () => {
+    dashInstance._config.shakaConfig.drm = {advanced: {'com.widevine.alpha': {videoRobustness: 'HW_SECURE_ALL'}}};
+    dashInstance._normalizeDrmRobustness();
+    dashInstance._config.shakaConfig.drm.advanced['com.widevine.alpha'].should.not.have.property('audioRobustness');
+  });
+
+  it('should not throw when there is no drm.advanced config', () => {
+    dashInstance._config.shakaConfig.drm = {};
+    (() => dashInstance._normalizeDrmRobustness()).should.not.throw();
+    dashInstance._config.shakaConfig.drm.should.deep.equal({});
+    delete dashInstance._config.shakaConfig.drm;
+    (() => dashInstance._normalizeDrmRobustness()).should.not.throw();
   });
 });
 
@@ -870,6 +956,32 @@ describe('DashAdapter: selectAudioTrack', () => {
       });
   });
 
+  it('should select the track with the requested role when main and description share language and label', done => {
+    dashInstance
+      .load()
+      .then(() => {
+        const mainTrack = {language: 'en', label: 'English', roles: ['main'], accessibilityPurpose: null, active: true};
+        const descriptionTrack = {language: 'en', label: 'English', roles: ['description'], accessibilityPurpose: 'visually_impaired', active: false};
+        const stub = sinon.stub(dashInstance._shaka, 'getAudioTracks').returns([mainTrack, descriptionTrack]);
+        const selectStub = sinon.stub(dashInstance._shaka, 'selectAudioTrack');
+        try {
+          const requested = dashInstance._getParsedAudioTracks().find(track => track.kind === 'description');
+          dashInstance.selectAudioTrack(requested);
+          selectStub.calledOnce.should.be.true;
+          selectStub.firstCall.args[0].roles.should.deep.equal(['description']);
+          done();
+        } catch (e) {
+          done(e);
+        } finally {
+          stub.restore();
+          selectStub.restore();
+        }
+      })
+      .catch(e => {
+        done(e);
+      });
+  });
+
   it('should not change the already selected audio track', done => {
     dashInstance
       .load()
@@ -1007,6 +1119,91 @@ describe('DashAdapter: selectTextTrack', () => {
         return track.active;
       })[0];
       activeTrack.language.should.be.equal(inactiveTrack.language);
+    });
+  });
+
+  it('should hide the selected text track', done => {
+    dashInstance.load().then(() => {
+      const inactiveTrack = dashInstance._getParsedTextTracks().filter(track => !track.active)[0];
+      dashInstance.selectTextTrack(inactiveTrack);
+      dashInstance._shaka.getTextTracks().some(track => track.active).should.be.true;
+      dashInstance.hideTextTrack();
+      dashInstance._shaka.getTextTracks().some(track => track.active).should.be.false;
+      done();
+    });
+  });
+
+  it('should keep the selected text track hidden and forward its cues when no text display mode is configured', done => {
+    dashInstance.load().then(() => {
+      const inactiveTrack = dashInstance._getParsedTextTracks().filter(track => !track.active)[0];
+      dashInstance.addEventListener(EventType.TEXT_CUE_CHANGED, event => {
+        try {
+          event.payload.cues.length.should.equal(1);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      video.textTracks.addEventListener('change', function onChange() {
+        const modes = Array.from(video.textTracks).map(track => track.mode);
+        if (!modes.includes('hidden')) {
+          return;
+        }
+        video.textTracks.removeEventListener('change', onChange);
+        try {
+          modes.should.not.include('showing');
+          const selected = Array.from(video.textTracks).find(track => track.mode === 'hidden');
+          Object.defineProperty(selected, 'activeCues', {value: [new VTTCue(0, 1, 'cue')], configurable: true});
+          selected.dispatchEvent(new Event('cuechange'));
+        } catch (e) {
+          done(e);
+        }
+      });
+      dashInstance.selectTextTrack(inactiveTrack);
+    });
+  });
+
+  it('should stop forwarding cues after the text track is hidden', done => {
+    dashInstance.load().then(() => {
+      const inactiveTrack = dashInstance._getParsedTextTracks().filter(track => !track.active)[0];
+      video.textTracks.addEventListener('change', function onChange() {
+        const selected = Array.from(video.textTracks).find(track => track.mode === 'hidden');
+        if (!selected) {
+          return;
+        }
+        video.textTracks.removeEventListener('change', onChange);
+        let cueEvents = 0;
+        dashInstance.addEventListener(EventType.TEXT_CUE_CHANGED, () => cueEvents++);
+        dashInstance.hideTextTrack();
+        selected.dispatchEvent(new Event('cuechange'));
+        try {
+          cueEvents.should.equal(0);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      dashInstance.selectTextTrack(inactiveTrack);
+    });
+  });
+
+  it('should show the text track when useNativeTextTrack is configured', done => {
+    dashInstance.destroy().then(() => {
+      dashInstance = DashAdapter.createAdapter(video, vodSource, {
+        text: {useNativeTextTrack: true},
+        playback: {options: {html5: {dash: {}}}}
+      });
+      dashInstance.load().then(() => {
+        const inactiveTrack = dashInstance._getParsedTextTracks().filter(track => !track.active)[0];
+        video.textTracks.addEventListener('change', function onChange() {
+          if (!Array.from(video.textTracks).some(track => track.mode === 'showing')) {
+            return;
+          }
+          video.textTracks.removeEventListener('change', onChange);
+          done();
+        });
+        dashInstance.selectTextTrack(inactiveTrack);
+      });
     });
   });
 
@@ -1460,6 +1657,100 @@ describe('DashAdapter: _onPlaying', () => {
       clearTimeout(t);
     });
     dashInstance._onPlaying();
+  });
+});
+
+describe('DashAdapter: _onError', () => {
+  const BAD_HTTP_STATUS = 1001;
+  let video, dashInstance, config, sandbox, destroyStub, triggerStub;
+
+  const createShakaError = severity => ({
+    detail: {severity, category: 1, code: BAD_HTTP_STATUS, data: ['http://segment.m4s', 404]}
+  });
+
+  beforeEach(() => {
+    video = document.createElement('video');
+    config = {playback: {options: {html5: {dash: {}}}}};
+    sandbox = sinon.createSandbox();
+    dashInstance = DashAdapter.createAdapter(video, vodSource, config);
+    destroyStub = sandbox.stub(dashInstance, 'destroy').resolves();
+    triggerStub = sandbox.stub(dashInstance, '_trigger');
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+    dashInstance.destroy();
+    dashInstance = null;
+  });
+
+  after(() => {
+    TestUtils.removeVideoElementsFromTestPage();
+  });
+
+  it('should not destroy and should report RECOVERABLE when shaka downgrades the severity right after dispatching the error', () => {
+    const event = createShakaError(Error.Severity.CRITICAL);
+    dashInstance._onError(event);
+    // shaka runs streaming.failureCallback synchronously after dispatching the error event
+    event.detail.severity = Error.Severity.RECOVERABLE;
+    return Promise.resolve().then(() => {
+      destroyStub.should.not.have.been.called;
+      triggerStub.should.have.been.calledOnce;
+      triggerStub.firstCall.args[0].should.equal(EventType.ERROR);
+      triggerStub.firstCall.args[1].severity.should.equal(Error.Severity.RECOVERABLE);
+    });
+  });
+
+  it('should destroy and report CRITICAL when shaka keeps the severity CRITICAL', () => {
+    dashInstance._onError(createShakaError(Error.Severity.CRITICAL));
+    return Promise.resolve().then(() => {
+      destroyStub.should.have.been.calledOnce;
+      triggerStub.should.have.been.calledOnce;
+      triggerStub.firstCall.args[1].severity.should.equal(Error.Severity.CRITICAL);
+    });
+  });
+
+  it('should escalate a repeated recoverable error to CRITICAL and destroy', () => {
+    for (let i = 0; i < 4; i++) {
+      const event = createShakaError(Error.Severity.CRITICAL);
+      dashInstance._onError(event);
+      event.detail.severity = Error.Severity.RECOVERABLE;
+    }
+    return Promise.resolve().then(() => {
+      triggerStub.callCount.should.equal(4);
+      [0, 1, 2].forEach(i => triggerStub.getCall(i).args[1].severity.should.equal(Error.Severity.RECOVERABLE));
+      triggerStub.getCall(3).args[1].severity.should.equal(Error.Severity.CRITICAL);
+      destroyStub.should.have.been.calledOnce;
+    });
+  });
+
+  it('should drop a queued error when the adapter is reset before the callback runs', () => {
+    dashInstance._onError(createShakaError(Error.Severity.CRITICAL));
+    // detachMediaSource() resets the adapter between the error and the queued callback
+    dashInstance._reset();
+    return Promise.resolve().then(() => {
+      triggerStub.should.not.have.been.called;
+      destroyStub.should.not.have.been.called;
+    });
+  });
+
+  it('should drop a queued error when destroy starts before the callback runs', () => {
+    dashInstance._onError(createShakaError(Error.Severity.CRITICAL));
+    // destroy() sets the flag synchronously, before _reset() runs
+    dashInstance._isDestroyInProgress = true;
+    return Promise.resolve().then(() => {
+      triggerStub.should.not.have.been.called;
+      destroyStub.should.not.have.been.called;
+    });
+  });
+
+  it('should ignore video element errors', () => {
+    const event = createShakaError(Error.Severity.CRITICAL);
+    event.detail.code = dashInstance.VIDEO_ERROR_CODE;
+    dashInstance._onError(event);
+    return Promise.resolve().then(() => {
+      triggerStub.should.not.have.been.called;
+      destroyStub.should.not.have.been.called;
+    });
   });
 });
 
