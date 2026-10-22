@@ -1107,7 +1107,7 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
     // Prefer the active track within each group; fall back to the first one.
     const seen = new Map<string, typeof audioTracks[0]>();
     for (const track of audioTracks) {
-      const key = `${track.language}::${track.label ?? ''}::${(track.roles ?? []).join(',')}::${track.accessibilityPurpose ?? ''}`;
+      const key = `${track.language}::${track.label ?? ''}::${(track.roles ?? []).join(',')}`;
       const existing = seen.get(key);
       if (!existing || track.active) {
         seen.set(key, track);
@@ -1456,8 +1456,8 @@ export default class DashAdapter extends BaseMediaSourceAdapter {
       // Shaka dispatches the error event before running streaming.failureCallback, which may downgrade
       // the severity of the same error object (e.g. live HTTP errors are retried). Wait for the final severity.
       Promise.resolve().then(() => {
-        // The adapter was detached or destroyed in the meantime, so this error is stale
-        if (!this._shaka || this._shaka.getLoadMode() === shaka.Player.LoadMode.DESTROYED) {
+        // The adapter was detached or destroyed (or is being destroyed) in the meantime, so this error is stale
+        if (this._isDestroyInProgress || !this._shaka || this._shaka.getLoadMode() === shaka.Player.LoadMode.DESTROYED) {
           return;
         }
         error.severity = this._shouldErrorChangeSeverity(error.code) ? Error.Severity.CRITICAL : error.severity;

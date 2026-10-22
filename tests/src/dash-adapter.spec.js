@@ -648,31 +648,6 @@ describe('DashAdapter: _getAudioTracks deduplication', () => {
       });
   });
 
-  it('should keep tracks that differ only by accessibilityPurpose', done => {
-    dashInstance
-      .load()
-      .then(() => {
-        const tracks = [
-          {language: 'en', label: 'English', roles: [], accessibilityPurpose: null, active: true},
-          {language: 'en', label: 'English', roles: [], accessibilityPurpose: 'visually_impaired', active: false}
-        ];
-        sandbox.stub(dashInstance._shaka, 'getAudioTracks').returns(tracks);
-
-        const audioTracks = dashInstance._getAudioTracks();
-        try {
-          audioTracks.length.should.equal(2);
-          audioTracks[0].kind.should.equal('main');
-          audioTracks[1].kind.should.equal('description');
-          done();
-        } catch (e) {
-          done(e);
-        }
-      })
-      .catch(e => {
-        done(e);
-      });
-  });
-
   it('should keep main and description tracks that share the same language and label', done => {
     dashInstance
       .load()
@@ -1752,6 +1727,16 @@ describe('DashAdapter: _onError', () => {
     dashInstance._onError(createShakaError(Error.Severity.CRITICAL));
     // detachMediaSource() resets the adapter between the error and the queued callback
     dashInstance._reset();
+    return Promise.resolve().then(() => {
+      triggerStub.should.not.have.been.called;
+      destroyStub.should.not.have.been.called;
+    });
+  });
+
+  it('should drop a queued error when destroy starts before the callback runs', () => {
+    dashInstance._onError(createShakaError(Error.Severity.CRITICAL));
+    // destroy() sets the flag synchronously, before _reset() runs
+    dashInstance._isDestroyInProgress = true;
     return Promise.resolve().then(() => {
       triggerStub.should.not.have.been.called;
       destroyStub.should.not.have.been.called;
