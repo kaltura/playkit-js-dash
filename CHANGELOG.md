@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.40.1 (2026-10-29)
+
+
+### Bug Fixes
+
+* **SUP-52470:** HDCP error not returned on Low Latency channel ([#277](https://github.com/kaltura/playkit-js-dash/issues/277)) ([dd8df18](https://github.com/kaltura/playkit-js-dash/commit/dd8df18))
+
+
+
 ## 1.40.0 (2026-07-30)
 
 
